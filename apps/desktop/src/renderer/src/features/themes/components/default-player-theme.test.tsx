@@ -7,7 +7,7 @@ describe('DefaultPlayerTheme', () => {
     render(<DefaultPlayerTheme playback={null} />)
 
     expect(screen.getByRole('heading', { name: 'Nada tocando agora' })).toBeInTheDocument()
-    expect(screen.getByText('Conecte sua conta Spotify para começar')).toBeInTheDocument()
+    expect(screen.getByText('Dê o play no Spotify para ver a música aqui.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reproduzir' })).toBeDisabled()
   })
 })

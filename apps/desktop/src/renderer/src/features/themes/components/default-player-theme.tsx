@@ -39,12 +39,12 @@ export function DefaultPlayerTheme({ playback }: PlayerThemeProps): React.JSX.El
             Music Display
           </p>
 
-          <h1 className="line-clamp-2 text-[clamp(2.75rem,5vw,6.25rem)] leading-[0.96] font-semibold tracking-[-0.055em] text-balance">
+          <h1 className="line-clamp-2 pb-[0.08em] text-[clamp(2.75rem,5vw,6.25rem)] leading-[1.04] font-semibold tracking-[-0.055em] text-balance">
             {playback?.trackName ?? 'Nada tocando agora'}
           </h1>
 
           <p className="mt-6 truncate text-[clamp(1.3rem,2.5vw,2.3rem)] font-medium text-white/55">
-            {playback?.artistNames.join(', ') ?? 'Conecte sua conta Spotify para começar'}
+            {playback?.artistNames.join(', ') ?? 'Dê o play no Spotify para ver a música aqui.'}
           </p>
 
           <div className="mt-14">
