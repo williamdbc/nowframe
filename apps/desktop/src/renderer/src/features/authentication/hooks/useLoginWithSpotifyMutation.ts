@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { UseMutationResult } from '@tanstack/react-query'
 
+import { spotifyProfileQueryKeys } from '../queries/spotify-profile-query-keys'
 import { spotifySessionQueryKeys } from '../queries/spotify-session-query-keys'
 import { SpotifyAuthenticationService } from '../services/spotify-authentication-service'
 
@@ -11,6 +12,9 @@ export function useLoginWithSpotifyMutation(): UseMutationResult<SpotifySessionS
 
   return useMutation({
     mutationFn: () => SpotifyAuthenticationService.login(),
-    onSuccess: (session) => queryClient.setQueryData(spotifySessionQueryKeys.state(), session)
+    onSuccess: (session) => {
+      queryClient.removeQueries({ queryKey: spotifyProfileQueryKeys.all })
+      queryClient.setQueryData(spotifySessionQueryKeys.state(), session)
+    }
   })
 }

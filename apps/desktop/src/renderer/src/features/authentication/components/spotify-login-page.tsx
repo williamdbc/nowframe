@@ -81,7 +81,7 @@ export function SpotifyLoginPage(): React.JSX.Element {
         )}
 
         <p className="mt-7 border-t border-white/8 pt-6 text-center text-sm text-white/38">
-          Permissões solicitadas: ler e controlar sua reprodução.
+          Permissões solicitadas: identificar seu perfil, ler e controlar sua reprodução.
         </p>
       </section>
     </main>

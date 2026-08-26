@@ -18,6 +18,7 @@ apps/desktop
 - `preload` expõe apenas operações explícitas via `contextBridge`.
 - `renderer` não acessa Node.js, Electron, tokens ou a Spotify Web API diretamente.
 - O Client Secret não faz parte da aplicação desktop. OAuth utiliza Authorization Code com PKCE.
+- O perfil público é carregado pelo processo principal e reduzido aos campos usados pela interface.
 - A sessão é criptografada com `safeStorage` e persistida no diretório de dados do aplicativo.
 
 ## Renderer
@@ -48,9 +49,9 @@ O renderer usa hash history (`#/` e `#/login`) porque a aplicação empacotada �
 
 ## Autenticação Spotify
 
-O processo `main` cria o verifier, challenge e state do PKCE, inicia temporariamente o callback em `127.0.0.1:8888`, abre o navegador padrão e troca o authorization code por tokens. Os scopes ficam definidos em `spotify-scopes.ts` e atualmente permitem somente ler e controlar a reprodução.
+O processo `main` cria o verifier, challenge e state do PKCE, inicia temporariamente o callback em `127.0.0.1:8888`, abre o navegador padrão e troca o authorization code por tokens. Os scopes ficam definidos em `spotify-scopes.ts` e atualmente permitem identificar o perfil, ler e controlar a reprodução.
 
-O access token é renovado antes de expirar. Um refresh token expirado ou revogado remove a sessão local e exige nova autorização. O renderer recebe apenas `authenticated` ou `unauthenticated` por IPC.
+O access token é renovado antes de expirar. Um refresh token expirado, revogado ou sem os scopes atuais remove a sessão local e exige nova autorização. O renderer recebe por IPC apenas o estado da sessão e os campos públicos de perfil usados pelo menu; tokens permanecem no processo principal.
 
 ## Modo apresentação
 

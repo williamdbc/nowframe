@@ -5,6 +5,7 @@ import { getSpotifyEnvironment } from '../../config/spotify-environment'
 import { SpotifyAccountsClient, SpotifyAccountsError } from './spotify-accounts-client'
 import { waitForSpotifyAuthorizationCode } from './spotify-authorization-callback'
 import { createSpotifyAuthorizationUrl, createSpotifyPkceAuthorization } from './spotify-pkce'
+import { hasRequiredSpotifyAuthorizationScopes } from './spotify-scopes'
 import { SpotifySessionStore } from './spotify-session-store'
 import type { SpotifyTokenSession } from './spotify-token-session'
 
@@ -22,24 +23,13 @@ export class SpotifyAuthService {
   private static loginPromise: Promise<SpotifySessionState> | null = null
 
   static async getSession(): Promise<SpotifySessionState> {
-    const tokenSession = await SpotifySessionStore.read()
+    const tokenSession = await this.getValidTokenSession()
+    return tokenSession ? authenticatedSession() : unauthenticatedSession()
+  }
 
-    if (!tokenSession) return unauthenticatedSession()
-    if (tokenSession.accessTokenExpiresAt > Date.now() + accessTokenRefreshBufferMs) {
-      return authenticatedSession()
-    }
-
-    try {
-      await this.refreshSession(tokenSession)
-      return authenticatedSession()
-    } catch (error) {
-      if (error instanceof SpotifyAccountsError && error.code === 'invalid_grant') {
-        await SpotifySessionStore.clear()
-        return unauthenticatedSession()
-      }
-
-      throw error
-    }
+  static async getAccessToken(): Promise<string | null> {
+    const tokenSession = await this.getValidTokenSession()
+    return tokenSession?.accessToken ?? null
   }
 
   static login(): Promise<SpotifySessionState> {
@@ -87,19 +77,48 @@ export class SpotifyAuthService {
     return authenticatedSession()
   }
 
-  private static async refreshSession(session: SpotifyTokenSession): Promise<void> {
+  private static async getValidTokenSession(): Promise<SpotifyTokenSession | null> {
+    const tokenSession = await SpotifySessionStore.read()
+
+    if (!tokenSession) return null
+
+    if (!hasRequiredSpotifyAuthorizationScopes(tokenSession.scope)) {
+      await SpotifySessionStore.clear()
+      return null
+    }
+
+    if (tokenSession.accessTokenExpiresAt > Date.now() + accessTokenRefreshBufferMs) {
+      return tokenSession
+    }
+
+    try {
+      return await this.refreshSession(tokenSession)
+    } catch (error) {
+      if (error instanceof SpotifyAccountsError && error.code === 'invalid_grant') {
+        await SpotifySessionStore.clear()
+        return null
+      }
+
+      throw error
+    }
+  }
+
+  private static async refreshSession(session: SpotifyTokenSession): Promise<SpotifyTokenSession> {
     const environment = getSpotifyEnvironment()
     const token = await SpotifyAccountsClient.refreshAccessToken({
       clientId: environment.clientId,
       refreshToken: session.refreshToken
     })
 
-    await SpotifySessionStore.write({
+    const refreshedSession: SpotifyTokenSession = {
       accessToken: token.accessToken,
       refreshToken: token.refreshToken ?? session.refreshToken,
       accessTokenExpiresAt: Date.now() + token.expiresInSeconds * 1000,
       authorizedAt: session.authorizedAt,
       scope: token.scope || session.scope
-    })
+    }
+
+    await SpotifySessionStore.write(refreshedSession)
+    return refreshedSession
   }
 }

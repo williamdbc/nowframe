@@ -9,6 +9,7 @@ const musicDisplayApi: MusicDisplayApi = {
   },
   spotify: {
     getSession: () => ipcRenderer.invoke(ipcChannels.getSpotifySession),
+    getProfile: () => ipcRenderer.invoke(ipcChannels.getSpotifyProfile),
     login: () => ipcRenderer.invoke(ipcChannels.loginWithSpotify),
     logout: () => ipcRenderer.invoke(ipcChannels.logoutFromSpotify)
   },

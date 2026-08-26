@@ -4,6 +4,8 @@ import { AppBootstrapErrorState } from '@/features/app-bootstrap/components/app-
 import { AppBootstrapLoadingState } from '@/features/app-bootstrap/components/app-bootstrap-loading-state'
 import { useGetAppBootstrapQuery } from '@/features/app-bootstrap/hooks/useGetAppBootstrapQuery'
 import { SpotifyConnectionStatus } from '@/features/authentication/components/spotify-connection-status'
+import { SpotifyProfileMenu } from '@/features/authentication/components/spotify-profile-menu'
+import { useGetSpotifyProfileQuery } from '@/features/authentication/hooks/useGetSpotifyProfileQuery'
 import { useLogoutFromSpotifyMutation } from '@/features/authentication/hooks/useLogoutFromSpotifyMutation'
 import { themeRegistry } from '@/features/themes/theme-registry'
 import { FullscreenHint } from '@/features/window-controls/components/fullscreen-hint'
@@ -13,6 +15,7 @@ import { DisplayToolbar } from './display-toolbar'
 
 export function MusicDisplayPage(): React.JSX.Element {
   const bootstrapQuery = useGetAppBootstrapQuery()
+  const profileQuery = useGetSpotifyProfileQuery()
   const logoutMutation = useLogoutFromSpotifyMutation()
   const navigate = useNavigate()
   const ActiveTheme = themeRegistry.default.component
@@ -40,11 +43,19 @@ export function MusicDisplayPage(): React.JSX.Element {
             <SpotifyConnectionStatus />
           </div>
           <DisplayToolbar
+            accountMenu={
+              <SpotifyProfileMenu
+                profile={profileQuery.data ?? null}
+                isLoading={profileQuery.isPending}
+                isError={profileQuery.isError}
+                isLoggingOut={logoutMutation.isPending}
+                onRetry={() => void profileQuery.refetch()}
+                onLogout={logoutFromSpotify}
+              />
+            }
             activeThemeName={themeRegistry.default.name}
             isEnteringFullScreen={presentationMode.isTransitioning}
-            isLoggingOut={logoutMutation.isPending}
             onEnterFullScreen={presentationMode.enterFullScreen}
-            onLogout={logoutFromSpotify}
           />
         </>
       )}

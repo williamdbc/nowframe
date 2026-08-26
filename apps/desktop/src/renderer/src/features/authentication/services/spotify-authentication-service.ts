@@ -10,6 +10,14 @@ export class SpotifyAuthenticationService {
     return window.musicDisplay.spotify.getSession()
   }
 
+  static async getProfile(): ReturnType<typeof window.musicDisplay.spotify.getProfile> {
+    try {
+      return await window.musicDisplay.spotify.getProfile()
+    } catch (error) {
+      throw normalizeIpcError(error)
+    }
+  }
+
   static async login(): ReturnType<typeof window.musicDisplay.spotify.login> {
     try {
       return await window.musicDisplay.spotify.login()

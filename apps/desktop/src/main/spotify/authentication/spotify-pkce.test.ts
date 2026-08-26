@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { SpotifyEnvironment } from '../../config/spotify-environment'
 import { createSpotifyAuthorizationUrl, createSpotifyPkceAuthorization } from './spotify-pkce'
+import { hasRequiredSpotifyAuthorizationScopes } from './spotify-scopes'
 
 describe('Spotify PKCE authorization', () => {
   it('generates a verifier, S256 challenge and CSRF state', () => {
@@ -15,7 +16,7 @@ describe('Spotify PKCE authorization', () => {
     expect(authorization.state).toMatch(/^[A-Za-z0-9_-]+$/)
   })
 
-  it('requests only the playback scopes currently used by the application', () => {
+  it('requests only the profile and playback scopes currently used by the application', () => {
     const environment: SpotifyEnvironment = {
       clientId: 'client-id',
       redirectUri: 'http://127.0.0.1:8888/callback'
@@ -26,10 +27,21 @@ describe('Spotify PKCE authorization', () => {
     expect(authorizationUrl.origin).toBe('https://accounts.spotify.com')
     expect(authorizationUrl.pathname).toBe('/authorize')
     expect(authorizationUrl.searchParams.get('scope')).toBe(
-      'user-read-playback-state user-modify-playback-state'
+      'user-read-private user-read-playback-state user-modify-playback-state'
     )
     expect(authorizationUrl.searchParams.get('code_challenge_method')).toBe('S256')
     expect(authorizationUrl.searchParams.get('redirect_uri')).toBe(environment.redirectUri)
     expect(authorizationUrl.searchParams.get('state')).toBe(authorization.state)
+  })
+
+  it('requires a new authorization when a stored session lacks a current scope', () => {
+    expect(
+      hasRequiredSpotifyAuthorizationScopes(
+        'user-read-private user-read-playback-state user-modify-playback-state'
+      )
+    ).toBe(true)
+    expect(
+      hasRequiredSpotifyAuthorizationScopes('user-read-playback-state user-modify-playback-state')
+    ).toBe(false)
   })
 })

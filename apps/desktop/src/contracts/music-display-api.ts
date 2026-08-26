@@ -1,6 +1,7 @@
 export const ipcChannels = {
   getAppBootstrapState: 'app:get-bootstrap-state',
   getSpotifySession: 'spotify:get-session',
+  getSpotifyProfile: 'spotify:get-profile',
   loginWithSpotify: 'spotify:login',
   logoutFromSpotify: 'spotify:logout',
   getWindowState: 'window:get-state',
@@ -29,12 +30,20 @@ export type SpotifySessionState =
       status: 'unauthenticated'
     }
 
+export interface SpotifyProfile {
+  accountId: string
+  displayName: string | null
+  imageUrl: string | null
+  profileUrl: string
+}
+
 export interface MusicDisplayApi {
   app: {
     getBootstrapState: () => Promise<AppBootstrapState>
   }
   spotify: {
     getSession: () => Promise<SpotifySessionState>
+    getProfile: () => Promise<SpotifyProfile>
     login: () => Promise<SpotifySessionState>
     logout: () => Promise<SpotifySessionState>
   }
