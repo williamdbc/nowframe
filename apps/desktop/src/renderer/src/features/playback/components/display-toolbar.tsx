@@ -1,10 +1,11 @@
-import { Link } from '@tanstack/react-router'
-import { Check, ChevronDown, Ellipsis, Maximize2, Palette, UserRound } from 'lucide-react'
+import { Check, ChevronDown, Ellipsis, LogOut, Maximize2, Palette, UserRound } from 'lucide-react'
 
 interface DisplayToolbarProps {
   activeThemeName: string
   isEnteringFullScreen: boolean
+  isLoggingOut: boolean
   onEnterFullScreen: () => void
+  onLogout: () => void
 }
 
 const actionClassName =
@@ -13,7 +14,9 @@ const actionClassName =
 export function DisplayToolbar({
   activeThemeName,
   isEnteringFullScreen,
-  onEnterFullScreen
+  isLoggingOut,
+  onEnterFullScreen,
+  onLogout
 }: DisplayToolbarProps): React.JSX.Element {
   return (
     <nav className="fixed top-6 right-6 z-20 flex items-start gap-2" aria-label="Ações do display">
@@ -57,20 +60,18 @@ export function DisplayToolbar({
           <Ellipsis aria-hidden="true" className="h-5 w-5" />
         </summary>
         <div className="absolute top-[calc(100%+0.65rem)] right-0 min-w-60 rounded-2xl border border-white/10 bg-[#101211]/95 p-2 shadow-2xl backdrop-blur-2xl">
-          <Link
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/78 transition hover:bg-white/7 hover:text-white"
-            to="/login"
-          >
+          <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/78">
             <UserRound aria-hidden="true" className="h-4 w-4" />
-            Conta Spotify
-          </Link>
+            Spotify conectado
+          </div>
           <button
-            className="mt-1 flex w-full cursor-not-allowed items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm text-white/28"
+            className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-red-200/75 transition hover:bg-red-400/10 hover:text-red-100 disabled:cursor-wait disabled:opacity-45"
             type="button"
-            disabled
+            disabled={isLoggingOut}
+            onClick={onLogout}
           >
-            Desconectar Spotify
-            <span className="text-[0.65rem] tracking-wider uppercase">Após login</span>
+            <LogOut aria-hidden="true" className="h-4 w-4" />
+            {isLoggingOut ? 'Desconectando...' : 'Desconectar Spotify'}
           </button>
         </div>
       </details>

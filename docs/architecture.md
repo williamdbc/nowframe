@@ -14,10 +14,11 @@ apps/desktop
 
 ## Limites dos processos
 
-- `main` possui capacidades do sistema operacional e, futuramente, os tokens Spotify.
+- `main` possui capacidades do sistema operacional, executa o OAuth e mantém os tokens Spotify.
 - `preload` expõe apenas operações explícitas via `contextBridge`.
 - `renderer` não acessa Node.js, Electron, tokens ou a Spotify Web API diretamente.
-- O Client Secret não faz parte da aplicação desktop. OAuth utilizará Authorization Code com PKCE.
+- O Client Secret não faz parte da aplicação desktop. OAuth utiliza Authorization Code com PKCE.
+- A sessão é criptografada com `safeStorage` e persistida no diretório de dados do aplicativo.
 
 ## Renderer
 
@@ -28,6 +29,7 @@ src/renderer/src
     authentication/
     playback/
     themes/
+    window-controls/
   routes/
   shared/
 ```
@@ -38,10 +40,17 @@ O renderer usa hash history (`#/` e `#/login`) porque a aplicação empacotada �
 
 ## Navegação atual
 
-- `/` exibe o player e sua barra de ações.
-- `/login` apresenta a futura conexão Spotify via PKCE.
-- A proteção automática do display será adicionada somente quando existir uma sessão Spotify real e confiável.
+- `/` exibe o player e sua barra de ações apenas com uma sessão Spotify válida.
+- `/login` inicia a conexão Spotify via PKCE.
+- O layout pathless `_authenticated` consulta a sessão no processo principal e protege o display.
+- Login e logout atualizam o cache da sessão e redirecionam entre as duas rotas.
 - O seletor de temas permanece sobre o display; uma página de configurações só será criada quando houver preferências suficientes.
+
+## Autenticação Spotify
+
+O processo `main` cria o verifier, challenge e state do PKCE, inicia temporariamente o callback em `127.0.0.1:8888`, abre o navegador padrão e troca o authorization code por tokens. Os scopes ficam definidos em `spotify-scopes.ts` e atualmente permitem somente ler e controlar a reprodução.
+
+O access token é renovado antes de expirar. Um refresh token expirado ou revogado remove a sessão local e exige nova autorização. O renderer recebe apenas `authenticated` ou `unauthenticated` por IPC.
 
 ## Modo apresentação
 

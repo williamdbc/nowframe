@@ -2,9 +2,22 @@ import { z } from 'zod'
 
 const defaultRedirectUri = 'http://127.0.0.1:8888/callback'
 
+const spotifyRedirectUriSchema = z
+  .string()
+  .url()
+  .refine((value) => {
+    const url = new URL(value)
+    return (
+      url.protocol === 'http:' &&
+      ['127.0.0.1', '[::1]'].includes(url.hostname) &&
+      Boolean(url.port) &&
+      url.pathname.length > 1
+    )
+  }, 'Use an HTTP loopback redirect URI with an explicit port and callback path.')
+
 const spotifyEnvironmentSchema = z.object({
   clientId: z.string().trim().min(1),
-  redirectUri: z.string().url()
+  redirectUri: spotifyRedirectUriSchema
 })
 
 export interface SpotifyEnvironment {

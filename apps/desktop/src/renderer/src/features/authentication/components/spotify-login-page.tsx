@@ -1,13 +1,17 @@
-import { Link } from '@tanstack/react-router'
-import { AudioLines, LockKeyhole, Music2 } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
+import { AudioLines, LoaderCircle, LockKeyhole, Music2 } from 'lucide-react'
 
 import { AppBootstrapErrorState } from '@/features/app-bootstrap/components/app-bootstrap-error-state'
 import { AppBootstrapLoadingState } from '@/features/app-bootstrap/components/app-bootstrap-loading-state'
 import { SpotifyConfigurationStatus } from '@/features/app-bootstrap/components/spotify-configuration-status'
 import { useGetAppBootstrapQuery } from '@/features/app-bootstrap/hooks/useGetAppBootstrapQuery'
 
+import { useLoginWithSpotifyMutation } from '../hooks/useLoginWithSpotifyMutation'
+
 export function SpotifyLoginPage(): React.JSX.Element {
   const bootstrapQuery = useGetAppBootstrapQuery()
+  const loginMutation = useLoginWithSpotifyMutation()
+  const navigate = useNavigate()
 
   if (bootstrapQuery.isPending) {
     return <AppBootstrapLoadingState />
@@ -15,6 +19,16 @@ export function SpotifyLoginPage(): React.JSX.Element {
 
   if (bootstrapQuery.isError) {
     return <AppBootstrapErrorState onRetry={() => void bootstrapQuery.refetch()} />
+  }
+
+  const isSpotifyConfigured = bootstrapQuery.data.spotify.isConfigured
+
+  const loginWithSpotify = (): void => {
+    loginMutation.mutate(undefined, {
+      onSuccess: (session) => {
+        if (session.status === 'authenticated') void navigate({ to: '/' })
+      }
+    })
   }
 
   return (
@@ -27,7 +41,7 @@ export function SpotifyLoginPage(): React.JSX.Element {
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1ed760] text-[#071109] shadow-[0_16px_40px_rgba(30,215,96,0.2)]">
             <AudioLines aria-hidden="true" className="h-7 w-7" />
           </div>
-          <SpotifyConfigurationStatus isConfigured={bootstrapQuery.data.spotify.isConfigured} />
+          <SpotifyConfigurationStatus isConfigured={isSpotifyConfigured} />
         </div>
 
         <p className="mt-8 text-sm font-semibold tracking-[0.25em] text-[#1ed760] uppercase">
@@ -42,27 +56,33 @@ export function SpotifyLoginPage(): React.JSX.Element {
         </p>
 
         <button
-          className="mt-8 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-full bg-[#1ed760] px-6 py-4 font-semibold text-[#071109] opacity-55"
+          className="mt-8 flex w-full items-center justify-center gap-3 rounded-full bg-[#1ed760] px-6 py-4 font-semibold text-[#071109] transition hover:bg-[#28e86b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1ed760] disabled:cursor-not-allowed disabled:opacity-55"
           type="button"
-          disabled
+          disabled={!isSpotifyConfigured || loginMutation.isPending}
+          onClick={loginWithSpotify}
         >
-          <Music2 aria-hidden="true" className="h-5 w-5" />
-          Conectar com Spotify
+          {loginMutation.isPending ? (
+            <LoaderCircle aria-hidden="true" className="h-5 w-5 animate-spin" />
+          ) : (
+            <Music2 aria-hidden="true" className="h-5 w-5" />
+          )}
+          {loginMutation.isPending ? 'Aguardando autorização...' : 'Conectar com Spotify'}
         </button>
 
         <div className="mt-4 flex items-center justify-center gap-2 text-sm text-white/38">
           <LockKeyhole aria-hidden="true" className="h-4 w-4" />
-          <span>Login seguro via PKCE será conectado na próxima etapa.</span>
+          <span>Login seguro via PKCE. Seus tokens não são enviados para esta tela.</span>
         </div>
 
-        <div className="mt-7 border-t border-white/8 pt-6 text-center">
-          <Link
-            className="text-sm font-medium text-white/58 transition hover:text-white focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-            to="/"
-          >
-            Visualizar o display por enquanto
-          </Link>
-        </div>
+        {loginMutation.isError && (
+          <p className="mt-5 text-center text-sm text-red-300" role="alert">
+            {loginMutation.error.message}
+          </p>
+        )}
+
+        <p className="mt-7 border-t border-white/8 pt-6 text-center text-sm text-white/38">
+          Permissões solicitadas: ler e controlar sua reprodução.
+        </p>
       </section>
     </main>
   )

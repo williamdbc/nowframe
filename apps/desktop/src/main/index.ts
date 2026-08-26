@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 
 import { registerAppIpcHandlers } from './ipc/register-app-ipc-handlers'
+import { registerSpotifyIpcHandlers } from './ipc/register-spotify-ipc-handlers'
 import { registerWindowIpcHandlers } from './ipc/register-window-ipc-handlers'
 import { createMainWindow } from './windows/create-main-window'
 
@@ -13,6 +14,7 @@ void app.whenReady().then(() => {
   })
 
   registerAppIpcHandlers()
+  registerSpotifyIpcHandlers()
   registerWindowIpcHandlers()
   createMainWindow()
 

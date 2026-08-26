@@ -1,7 +1,10 @@
+import { useNavigate } from '@tanstack/react-router'
+
 import { AppBootstrapErrorState } from '@/features/app-bootstrap/components/app-bootstrap-error-state'
 import { AppBootstrapLoadingState } from '@/features/app-bootstrap/components/app-bootstrap-loading-state'
-import { SpotifyConfigurationStatus } from '@/features/app-bootstrap/components/spotify-configuration-status'
 import { useGetAppBootstrapQuery } from '@/features/app-bootstrap/hooks/useGetAppBootstrapQuery'
+import { SpotifyConnectionStatus } from '@/features/authentication/components/spotify-connection-status'
+import { useLogoutFromSpotifyMutation } from '@/features/authentication/hooks/useLogoutFromSpotifyMutation'
 import { themeRegistry } from '@/features/themes/theme-registry'
 import { FullscreenHint } from '@/features/window-controls/components/fullscreen-hint'
 import { useWindowPresentationMode } from '@/features/window-controls/hooks/useWindowPresentationMode'
@@ -10,6 +13,8 @@ import { DisplayToolbar } from './display-toolbar'
 
 export function MusicDisplayPage(): React.JSX.Element {
   const bootstrapQuery = useGetAppBootstrapQuery()
+  const logoutMutation = useLogoutFromSpotifyMutation()
+  const navigate = useNavigate()
   const ActiveTheme = themeRegistry.default.component
   const presentationMode = useWindowPresentationMode()
 
@@ -21,17 +26,25 @@ export function MusicDisplayPage(): React.JSX.Element {
     return <AppBootstrapErrorState onRetry={() => void bootstrapQuery.refetch()} />
   }
 
+  const logoutFromSpotify = (): void => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => void navigate({ to: '/login' })
+    })
+  }
+
   return (
     <>
       {!presentationMode.isFullScreen && (
         <>
           <div className="fixed top-6 left-6 z-20">
-            <SpotifyConfigurationStatus isConfigured={bootstrapQuery.data.spotify.isConfigured} />
+            <SpotifyConnectionStatus />
           </div>
           <DisplayToolbar
             activeThemeName={themeRegistry.default.name}
             isEnteringFullScreen={presentationMode.isTransitioning}
+            isLoggingOut={logoutMutation.isPending}
             onEnterFullScreen={presentationMode.enterFullScreen}
+            onLogout={logoutFromSpotify}
           />
         </>
       )}

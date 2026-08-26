@@ -7,6 +7,11 @@ const musicDisplayApi: MusicDisplayApi = {
   app: {
     getBootstrapState: () => ipcRenderer.invoke(ipcChannels.getAppBootstrapState)
   },
+  spotify: {
+    getSession: () => ipcRenderer.invoke(ipcChannels.getSpotifySession),
+    login: () => ipcRenderer.invoke(ipcChannels.loginWithSpotify),
+    logout: () => ipcRenderer.invoke(ipcChannels.logoutFromSpotify)
+  },
   window: {
     getState: () => ipcRenderer.invoke(ipcChannels.getWindowState),
     setFullScreen: (isFullScreen) =>
