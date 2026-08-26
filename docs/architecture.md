@@ -34,6 +34,19 @@ src/renderer/src
 
 Rotas apenas conectam URL e páginas. Estado assíncrono usa TanStack Query; chamadas IPC ficam encapsuladas em services. Componentes e tipos permanecem em suas features até existir reutilização real.
 
+O renderer usa hash history (`#/` e `#/login`) porque a aplicação empacotada é carregada pelo protocolo `file://`.
+
+## Navegação atual
+
+- `/` exibe o player e sua barra de ações.
+- `/login` apresenta a futura conexão Spotify via PKCE.
+- A proteção automática do display será adicionada somente quando existir uma sessão Spotify real e confiável.
+- O seletor de temas permanece sobre o display; uma página de configurações só será criada quando houver preferências suficientes.
+
+## Modo apresentação
+
+O renderer solicita fullscreen por uma API tipada do preload. O processo `main` controla a `BrowserWindow` e publica as transições de entrada e saída para manter a interface sincronizada. Em fullscreen, a barra de ações desaparece e `ESC` encerra o modo apresentação.
+
 ## Evolução
 
 Quando necessário, novas aplicações entram em `apps/web` e `apps/api`. Uma pasta compartilhada na raiz só será criada depois que desktop e web tiverem código comprovadamente reutilizável.

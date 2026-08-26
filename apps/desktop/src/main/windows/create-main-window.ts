@@ -3,6 +3,7 @@ import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 
 import icon from '../../../resources/icon.png?asset'
+import { ipcChannels, type WindowState } from '../../contracts/music-display-api'
 
 export function createMainWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -24,6 +25,17 @@ export function createMainWindow(): BrowserWindow {
   })
 
   mainWindow.on('ready-to-show', () => mainWindow.show())
+
+  const notifyWindowStateChanged = (): void => {
+    const state: WindowState = {
+      isFullScreen: mainWindow.isFullScreen()
+    }
+
+    mainWindow.webContents.send(ipcChannels.windowStateChanged, state)
+  }
+
+  mainWindow.on('enter-full-screen', notifyWindowStateChanged)
+  mainWindow.on('leave-full-screen', notifyWindowStateChanged)
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     const target = new URL(url)

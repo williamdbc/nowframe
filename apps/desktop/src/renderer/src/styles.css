@@ -78,6 +78,23 @@ select {
   font-size: 1rem;
 }
 
+@keyframes fullscreen-hint {
+  0%,
+  75% {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  100% {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+.fullscreen-hint {
+  animation: fullscreen-hint 2.5s ease forwards;
+}
+
 @media (max-width: 900px) {
   body {
     overflow: auto;
