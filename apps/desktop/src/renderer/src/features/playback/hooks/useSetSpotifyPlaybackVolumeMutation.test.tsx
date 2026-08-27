@@ -49,6 +49,7 @@ describe('useSetSpotifyPlaybackVolumeMutation', () => {
       .mockResolvedValueOnce(undefined)
       .mockRejectedValueOnce(new Error('Spotify indisponível'))
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries')
     queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
     const { result } = renderHook(() => useSetSpotifyPlaybackVolumeMutation(), {
       wrapper: createWrapper(queryClient)
@@ -59,6 +60,7 @@ describe('useSetSpotifyPlaybackVolumeMutation', () => {
       queryClient.getQueryData<PlaybackState>(spotifyPlaybackQueryKeys.current())?.device
         .volumePercent
     ).toBe(42)
+    expect(invalidateQueriesSpy).not.toHaveBeenCalled()
 
     await expect(act(() => result.current.mutateAsync(80))).rejects.toThrow('Spotify indisponível')
     expect(setVolumeSpy).toHaveBeenNthCalledWith(1, 42)
@@ -67,5 +69,6 @@ describe('useSetSpotifyPlaybackVolumeMutation', () => {
       queryClient.getQueryData<PlaybackState>(spotifyPlaybackQueryKeys.current())?.device
         .volumePercent
     ).toBe(42)
+    expect(invalidateQueriesSpy).not.toHaveBeenCalled()
   })
 })

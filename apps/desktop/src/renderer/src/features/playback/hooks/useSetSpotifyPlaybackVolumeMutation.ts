@@ -41,9 +41,6 @@ export function useSetSpotifyPlaybackVolumeMutation(): UseMutationResult<
     },
     onError: (_error, _volumePercent, context) => {
       queryClient.setQueryData(queryKey, context?.previousPlayback)
-    },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey })
     }
   })
 }

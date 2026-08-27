@@ -64,6 +64,7 @@ describe('useControlSpotifyPlaybackMutation', () => {
     vi.spyOn(Date, 'now').mockReturnValue(3_500)
     vi.spyOn(SpotifyPlaybackService, 'pause').mockResolvedValue(undefined)
     const queryClient = createQueryClient()
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries')
     queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
     const { result } = renderHook(() => useControlSpotifyPlaybackMutation(), {
       wrapper: createWrapper(queryClient)
@@ -79,12 +80,14 @@ describe('useControlSpotifyPlaybackMutation', () => {
       progressMs: 32_500,
       synchronizedAt: 3_500
     })
+    expect(invalidateQueriesSpy).not.toHaveBeenCalled()
   })
 
   it('restores the previous playback when a command fails', async () => {
     vi.spyOn(SpotifyPlaybackService, 'resume').mockRejectedValue(new Error('Spotify indisponível'))
     const pausedPlayback = { ...playback, isPlaying: false }
     const queryClient = createQueryClient()
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries')
     queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), pausedPlayback)
     const { result } = renderHook(() => useControlSpotifyPlaybackMutation(), {
       wrapper: createWrapper(queryClient)
@@ -94,5 +97,6 @@ describe('useControlSpotifyPlaybackMutation', () => {
       'Spotify indisponível'
     )
     expect(queryClient.getQueryData(spotifyPlaybackQueryKeys.current())).toEqual(pausedPlayback)
+    expect(invalidateQueriesSpy).not.toHaveBeenCalled()
   })
 })

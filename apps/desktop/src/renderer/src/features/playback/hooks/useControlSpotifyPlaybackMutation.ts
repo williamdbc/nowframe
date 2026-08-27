@@ -64,9 +64,6 @@ export function useControlSpotifyPlaybackMutation(): UseMutationResult<
     },
     onError: (_error, _command, context) => {
       queryClient.setQueryData(queryKey, context?.previousPlayback)
-    },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey })
     }
   })
 }

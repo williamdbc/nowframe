@@ -55,6 +55,7 @@ describe('useSeekSpotifyPlaybackMutation', () => {
     vi.spyOn(Date, 'now').mockReturnValue(5_000)
     vi.spyOn(SpotifyPlaybackService, 'seek').mockResolvedValue(undefined)
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries')
     queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
     const { result } = renderHook(() => useSeekSpotifyPlaybackMutation(), {
       wrapper: createWrapper(queryClient)
@@ -66,5 +67,6 @@ describe('useSeekSpotifyPlaybackMutation', () => {
     expect(
       queryClient.getQueryData<PlaybackState>(spotifyPlaybackQueryKeys.current())
     ).toMatchObject({ progressMs: 75_000, synchronizedAt: 5_000 })
+    expect(invalidateQueriesSpy).not.toHaveBeenCalled()
   })
 })
