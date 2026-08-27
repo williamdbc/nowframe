@@ -1,6 +1,7 @@
 import { Disc3, Heart, MonitorSpeaker } from 'lucide-react'
 
 import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
+import { PlaybackErrorMessage } from '@/features/playback/components/playback-error-message'
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
 import type { PlayerThemeProps } from '@/features/themes/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/utils/get-player-theme-content'
@@ -106,9 +107,11 @@ export function DefaultPlayerTheme({
           </div>
 
           {controls.errorMessage && (
-            <p className="mt-4 text-sm font-medium text-red-300" role="alert">
-              {controls.errorMessage}
-            </p>
+            <PlaybackErrorMessage
+              key={controls.errorMessage}
+              className="mt-4 text-sm font-medium text-red-300"
+              message={controls.errorMessage}
+            />
           )}
         </section>
       </div>

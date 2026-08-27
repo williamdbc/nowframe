@@ -1,6 +1,7 @@
 import { Disc3, Heart } from 'lucide-react'
 
 import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
+import { PlaybackErrorMessage } from '@/features/playback/components/playback-error-message'
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
 import type { PlayerThemeProps } from '@/features/themes/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/utils/get-player-theme-content'
@@ -114,9 +115,11 @@ export function MinimalistPlayerTheme({
         )}
 
         {controls.errorMessage && (
-          <p className="mt-5 text-sm font-medium text-red-200" role="alert">
-            {controls.errorMessage}
-          </p>
+          <PlaybackErrorMessage
+            key={controls.errorMessage}
+            className="mt-5 text-sm font-medium text-red-200"
+            message={controls.errorMessage}
+          />
         )}
       </section>
     </main>

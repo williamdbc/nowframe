@@ -1,6 +1,7 @@
 import { Disc3, Heart, MonitorSpeaker } from 'lucide-react'
 
 import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
+import { PlaybackErrorMessage } from '@/features/playback/components/playback-error-message'
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
 import type { PlayerThemeProps } from '@/features/themes/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/utils/get-player-theme-content'
@@ -116,9 +117,11 @@ export function DrivePlayerTheme({
           <DriveTransportControls controls={controls} playback={playback} />
 
           {controls.errorMessage && (
-            <p className="mt-5 max-w-xl text-sm font-semibold text-red-200" role="alert">
-              {controls.errorMessage}
-            </p>
+            <PlaybackErrorMessage
+              key={controls.errorMessage}
+              className="mt-5 max-w-xl text-sm font-semibold text-red-200"
+              message={controls.errorMessage}
+            />
           )}
         </section>
       </div>
