@@ -25,6 +25,26 @@ export class SpotifyPlaybackService {
     }
   }
 
+  static async seek(
+    positionMs: number
+  ): ReturnType<typeof window.musicDisplay.spotify.seekPlayback> {
+    try {
+      return await window.musicDisplay.spotify.seekPlayback(positionMs)
+    } catch (error) {
+      throw normalizeIpcError(error, 'Não foi possível alterar a posição da reprodução.')
+    }
+  }
+
+  static async setVolume(
+    volumePercent: number
+  ): ReturnType<typeof window.musicDisplay.spotify.setPlaybackVolume> {
+    try {
+      return await window.musicDisplay.spotify.setPlaybackVolume(volumePercent)
+    } catch (error) {
+      throw normalizeIpcError(error, 'Não foi possível alterar o volume da reprodução.')
+    }
+  }
+
   static async skipToNext(): ReturnType<typeof window.musicDisplay.spotify.skipPlaybackToNext> {
     try {
       return await window.musicDisplay.spotify.skipPlaybackToNext()

@@ -11,6 +11,12 @@ export function registerSpotifyIpcHandlers(): void {
   ipcMain.handle(ipcChannels.getSpotifyPlayback, () => SpotifyPlaybackService.getCurrentPlayback())
   ipcMain.handle(ipcChannels.pauseSpotifyPlayback, () => SpotifyPlaybackService.pause())
   ipcMain.handle(ipcChannels.resumeSpotifyPlayback, () => SpotifyPlaybackService.resume())
+  ipcMain.handle(ipcChannels.seekSpotifyPlayback, (_event, positionMs: unknown) =>
+    SpotifyPlaybackService.seek(positionMs)
+  )
+  ipcMain.handle(ipcChannels.setSpotifyPlaybackVolume, (_event, volumePercent: unknown) =>
+    SpotifyPlaybackService.setVolume(volumePercent)
+  )
   ipcMain.handle(ipcChannels.skipSpotifyPlaybackToNext, () => SpotifyPlaybackService.skipToNext())
   ipcMain.handle(ipcChannels.skipSpotifyPlaybackToPrevious, () =>
     SpotifyPlaybackService.skipToPrevious()

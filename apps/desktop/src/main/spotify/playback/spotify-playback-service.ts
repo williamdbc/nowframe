@@ -15,6 +15,27 @@ export class SpotifyPlaybackService {
     return SpotifyPlaybackClient.resume(await this.getAccessToken())
   }
 
+  static async seek(positionMs: unknown): Promise<void> {
+    if (typeof positionMs !== 'number' || !Number.isSafeInteger(positionMs) || positionMs < 0) {
+      throw new Error('A posição da reprodução é inválida.')
+    }
+
+    return SpotifyPlaybackClient.seek(await this.getAccessToken(), positionMs)
+  }
+
+  static async setVolume(volumePercent: unknown): Promise<void> {
+    if (
+      typeof volumePercent !== 'number' ||
+      !Number.isSafeInteger(volumePercent) ||
+      volumePercent < 0 ||
+      volumePercent > 100
+    ) {
+      throw new Error('O volume deve ser um número inteiro entre 0 e 100.')
+    }
+
+    return SpotifyPlaybackClient.setVolume(await this.getAccessToken(), volumePercent)
+  }
+
   static async skipToNext(): Promise<void> {
     return SpotifyPlaybackClient.skipToNext(await this.getAccessToken())
   }

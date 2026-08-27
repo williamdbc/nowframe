@@ -12,6 +12,8 @@ const playback: PlaybackState = {
   capabilities: {
     canPause: true,
     canResume: true,
+    canSeek: true,
+    canSetVolume: true,
     canSkipNext: true,
     canSkipPrevious: true
   },

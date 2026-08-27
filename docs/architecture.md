@@ -61,7 +61,7 @@ Enquanto há reprodução ativa, a query sincroniza a cada 3 segundos; pausada o
 
 Play, pause, faixa anterior e próxima são enviados pelo processo `main` ao dispositivo ativo. O renderer aplica uma atualização otimista apenas ao estado play/pause, restaura o cache se o comando falhar e reconcilia com a Web API ao concluir. Restrições de dispositivo e contexto retornadas pelo Spotify determinam quais botões ficam disponíveis.
 
-Seek e volume serão adicionados sobre o mesmo limite IPC antes da avaliação do Web Playback SDK.
+Seek e volume usam o mesmo limite IPC e atualizam o cache de forma otimista, com rollback em falhas. Os sliders apenas enviam o comando ao término da interação para evitar uma chamada externa por movimento. Como a Web API não possui mute próprio, a interface envia volume zero e guarda em memória o último volume audível para restauração. O Web Playback SDK será avaliado depois desta camada de controle remoto.
 
 ## Modo apresentação
 

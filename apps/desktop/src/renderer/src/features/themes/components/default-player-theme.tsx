@@ -1,13 +1,9 @@
-import { Disc3, MonitorSpeaker, Pause, Play, SkipBack, SkipForward, Volume2 } from 'lucide-react'
+import { Disc3, MonitorSpeaker, Pause, Play, SkipBack, SkipForward } from 'lucide-react'
+
+import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
+import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
 
 import type { PlayerThemeProps } from '../types/player-theme'
-
-function formatDuration(milliseconds: number): string {
-  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000))
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`
-}
 
 export function DefaultPlayerTheme({
   controls,
@@ -15,9 +11,6 @@ export function DefaultPlayerTheme({
   playbackStatus
 }: PlayerThemeProps): React.JSX.Element {
   const item = playback?.item ?? null
-  const progressPercentage = item?.durationMs
-    ? Math.min(100, ((playback?.progressMs ?? 0) / item.durationMs) * 100)
-    : 0
   const emptyTitle =
     playbackStatus === 'loading'
       ? 'Sincronizando com Spotify'
@@ -78,39 +71,37 @@ export function DefaultPlayerTheme({
           )}
 
           {playback && (
-            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium text-white/38">
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-medium text-white/38">
               <span className="inline-flex items-center gap-2">
                 <MonitorSpeaker aria-hidden="true" className="h-4 w-4" />
                 {playback.device.name}
               </span>
-              <span className="inline-flex items-center gap-2">
-                <Volume2 aria-hidden="true" className="h-4 w-4" />
-                {playback.device.volumePercent === null
-                  ? 'Volume indisponível'
-                  : `${playback.device.volumePercent}%`}
-              </span>
+              <PlaybackVolumeControl
+                canSetVolume={playback.capabilities.canSetVolume}
+                isPending={controls.isVolumePending}
+                onSetVolume={controls.onSetVolume}
+                onToggleMute={controls.onToggleMute}
+                volumePercent={playback.device.volumePercent}
+              />
             </div>
           )}
 
           <div className={item || playback ? 'mt-10' : 'mt-14'}>
-            <div className="h-2 overflow-hidden rounded-full bg-white/12">
-              <div
-                className="h-full rounded-full bg-white transition-[width] duration-300"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
-            <div className="mt-3 flex justify-between text-sm font-medium text-white/38 tabular-nums">
-              <span>{formatDuration(playback?.progressMs ?? 0)}</span>
-              <span>{formatDuration(item?.durationMs ?? 0)}</span>
-            </div>
+            <PlaybackProgressControl
+              canSeek={Boolean(item && playback?.capabilities.canSeek)}
+              durationMs={item?.durationMs ?? 0}
+              isPending={controls.isSeekPending}
+              onSeek={controls.onSeek}
+              positionMs={playback?.progressMs ?? 0}
+            />
           </div>
 
-          <div className="mt-10 flex items-center gap-7" aria-busy={controls.isPending}>
+          <div className="mt-10 flex items-center gap-7" aria-busy={controls.isCommandPending}>
             <button
               className="player-control"
               type="button"
               aria-label="Faixa anterior"
-              disabled={controls.isPending || !playback?.capabilities.canSkipPrevious}
+              disabled={controls.isCommandPending || !playback?.capabilities.canSkipPrevious}
               onClick={controls.onPrevious}
             >
               <SkipBack aria-hidden="true" className="h-8 w-8" fill="currentColor" />
@@ -119,7 +110,7 @@ export function DefaultPlayerTheme({
               className="player-control player-control-primary"
               type="button"
               aria-label={playback?.isPlaying ? 'Pausar' : 'Reproduzir'}
-              disabled={controls.isPending || !canPauseOrResume}
+              disabled={controls.isCommandPending || !canPauseOrResume}
               onClick={controls.onPauseOrResume}
             >
               {playback?.isPlaying ? (
@@ -132,7 +123,7 @@ export function DefaultPlayerTheme({
               className="player-control"
               type="button"
               aria-label="Próxima faixa"
-              disabled={controls.isPending || !playback?.capabilities.canSkipNext}
+              disabled={controls.isCommandPending || !playback?.capabilities.canSkipNext}
               onClick={controls.onNext}
             >
               <SkipForward aria-hidden="true" className="h-8 w-8" fill="currentColor" />

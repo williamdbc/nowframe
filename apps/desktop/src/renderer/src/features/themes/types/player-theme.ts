@@ -4,10 +4,15 @@ import type { PlaybackLoadStatus, PlaybackState } from '@/features/playback/type
 
 export interface PlaybackControls {
   errorMessage: string | null
-  isPending: boolean
+  isCommandPending: boolean
+  isSeekPending: boolean
+  isVolumePending: boolean
   onNext: () => void
   onPauseOrResume: () => void
   onPrevious: () => void
+  onSeek: (positionMs: number) => void
+  onSetVolume: (volumePercent: number) => void
+  onToggleMute: () => void
 }
 
 export interface PlayerThemeProps {

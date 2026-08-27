@@ -5,6 +5,8 @@ export const ipcChannels = {
   getSpotifyPlayback: 'spotify:get-playback',
   pauseSpotifyPlayback: 'spotify:pause-playback',
   resumeSpotifyPlayback: 'spotify:resume-playback',
+  seekSpotifyPlayback: 'spotify:seek-playback',
+  setSpotifyPlaybackVolume: 'spotify:set-playback-volume',
   skipSpotifyPlaybackToNext: 'spotify:skip-playback-to-next',
   skipSpotifyPlaybackToPrevious: 'spotify:skip-playback-to-previous',
   loginWithSpotify: 'spotify:login',
@@ -65,6 +67,8 @@ export interface SpotifyPlaybackState {
   capabilities: {
     canPause: boolean
     canResume: boolean
+    canSeek: boolean
+    canSetVolume: boolean
     canSkipNext: boolean
     canSkipPrevious: boolean
   }
@@ -85,6 +89,8 @@ export interface MusicDisplayApi {
     getPlayback: () => Promise<SpotifyPlaybackState | null>
     pausePlayback: () => Promise<void>
     resumePlayback: () => Promise<void>
+    seekPlayback: (positionMs: number) => Promise<void>
+    setPlaybackVolume: (volumePercent: number) => Promise<void>
     skipPlaybackToNext: () => Promise<void>
     skipPlaybackToPrevious: () => Promise<void>
     login: () => Promise<SpotifySessionState>

@@ -57,6 +57,8 @@ describe('SpotifyPlaybackClient', () => {
       capabilities: {
         canPause: true,
         canResume: true,
+        canSeek: true,
+        canSetVolume: true,
         canSkipNext: true,
         canSkipPrevious: true
       },
@@ -92,7 +94,7 @@ describe('SpotifyPlaybackClient', () => {
             device: { ...device, volume_percent: null, supports_volume: false },
             is_playing: false,
             progress_ms: null,
-            actions: { pausing: true, skipping_next: true },
+            actions: { pausing: true, seeking: true, skipping_next: true },
             item: {
               id: 'episode-id',
               type: 'episode',
@@ -126,6 +128,8 @@ describe('SpotifyPlaybackClient', () => {
     expect(playback?.capabilities).toEqual({
       canPause: false,
       canResume: true,
+      canSeek: false,
+      canSetVolume: false,
       canSkipNext: false,
       canSkipPrevious: true
     })
@@ -137,6 +141,8 @@ describe('SpotifyPlaybackClient', () => {
 
     await SpotifyPlaybackClient.pause('access-token')
     await SpotifyPlaybackClient.resume('access-token')
+    await SpotifyPlaybackClient.seek('access-token', 75_000)
+    await SpotifyPlaybackClient.setVolume('access-token', 42)
     await SpotifyPlaybackClient.skipToNext('access-token')
     await SpotifyPlaybackClient.skipToPrevious('access-token')
 
@@ -157,11 +163,21 @@ describe('SpotifyPlaybackClient', () => {
     )
     expect(fetchMock).toHaveBeenNthCalledWith(
       3,
+      'https://api.spotify.com/v1/me/player/seek?position_ms=75000',
+      request('PUT')
+    )
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      4,
+      'https://api.spotify.com/v1/me/player/volume?volume_percent=42',
+      request('PUT')
+    )
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      5,
       'https://api.spotify.com/v1/me/player/next',
       request('POST')
     )
     expect(fetchMock).toHaveBeenNthCalledWith(
-      4,
+      6,
       'https://api.spotify.com/v1/me/player/previous',
       request('POST')
     )

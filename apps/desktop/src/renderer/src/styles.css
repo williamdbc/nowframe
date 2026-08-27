@@ -88,6 +88,95 @@ select {
   outline-offset: 4px;
 }
 
+.player-range {
+  appearance: none;
+  width: 100%;
+  height: 0.5rem;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.player-range::-webkit-slider-runnable-track {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.player-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  margin-top: -0.25rem;
+  border: 0;
+  border-radius: 999px;
+  background: white;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 45%);
+  opacity: 0;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.player-range:hover::-webkit-slider-thumb,
+.player-range:focus-visible::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+.player-range:active::-webkit-slider-thumb {
+  opacity: 1;
+  transform: scale(1.16);
+}
+
+.player-range:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 4px;
+}
+
+.player-range:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.player-volume-range {
+  width: 7rem;
+  height: 0.3rem;
+}
+
+.player-volume-range::-webkit-slider-runnable-track {
+  height: 0.3rem;
+}
+
+.player-volume-range::-webkit-slider-thumb {
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-top: -0.25rem;
+}
+
+.player-volume-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  color: inherit;
+  background: transparent;
+}
+
+.player-volume-button:not(:disabled) {
+  cursor: pointer;
+}
+
+.player-volume-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.player-volume-button:focus-visible {
+  border-radius: 999px;
+  outline: 2px solid #1ed760;
+  outline-offset: 4px;
+}
+
 .app-status {
   display: grid;
   min-height: 100vh;

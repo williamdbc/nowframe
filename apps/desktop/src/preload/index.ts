@@ -13,6 +13,9 @@ const musicDisplayApi: MusicDisplayApi = {
     getPlayback: () => ipcRenderer.invoke(ipcChannels.getSpotifyPlayback),
     pausePlayback: () => ipcRenderer.invoke(ipcChannels.pauseSpotifyPlayback),
     resumePlayback: () => ipcRenderer.invoke(ipcChannels.resumeSpotifyPlayback),
+    seekPlayback: (positionMs) => ipcRenderer.invoke(ipcChannels.seekSpotifyPlayback, positionMs),
+    setPlaybackVolume: (volumePercent) =>
+      ipcRenderer.invoke(ipcChannels.setSpotifyPlaybackVolume, volumePercent),
     skipPlaybackToNext: () => ipcRenderer.invoke(ipcChannels.skipSpotifyPlaybackToNext),
     skipPlaybackToPrevious: () => ipcRenderer.invoke(ipcChannels.skipSpotifyPlaybackToPrevious),
     login: () => ipcRenderer.invoke(ipcChannels.loginWithSpotify),

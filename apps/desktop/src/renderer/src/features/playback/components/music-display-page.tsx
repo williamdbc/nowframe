@@ -15,6 +15,8 @@ import { DisplayToolbar } from './display-toolbar'
 import { useControlSpotifyPlaybackMutation } from '../hooks/useControlSpotifyPlaybackMutation'
 import { useGetSpotifyPlaybackQuery } from '../hooks/useGetSpotifyPlaybackQuery'
 import { useLivePlaybackState } from '../hooks/useLivePlaybackState'
+import { usePlaybackVolumeControl } from '../hooks/usePlaybackVolumeControl'
+import { useSeekSpotifyPlaybackMutation } from '../hooks/useSeekSpotifyPlaybackMutation'
 import type { PlaybackLoadStatus } from '../types/playback-state'
 
 export function MusicDisplayPage(): React.JSX.Element {
@@ -22,11 +24,13 @@ export function MusicDisplayPage(): React.JSX.Element {
   const profileQuery = useGetSpotifyProfileQuery()
   const playbackQuery = useGetSpotifyPlaybackQuery()
   const playbackControlMutation = useControlSpotifyPlaybackMutation()
+  const seekMutation = useSeekSpotifyPlaybackMutation()
   const logoutMutation = useLogoutFromSpotifyMutation()
   const navigate = useNavigate()
   const ActiveTheme = themeRegistry.default.component
   const presentationMode = useWindowPresentationMode()
   const playback = useLivePlaybackState(playbackQuery.data ?? null)
+  const volumeControl = usePlaybackVolumeControl(playback)
 
   if (bootstrapQuery.isPending) {
     return <AppBootstrapLoadingState />
@@ -72,12 +76,21 @@ export function MusicDisplayPage(): React.JSX.Element {
       <FullscreenHint isFullScreen={presentationMode.isFullScreen} />
       <ActiveTheme
         controls={{
-          errorMessage: playbackControlMutation.error?.message ?? null,
-          isPending: playbackControlMutation.isPending,
+          errorMessage:
+            playbackControlMutation.error?.message ??
+            seekMutation.error?.message ??
+            volumeControl.error?.message ??
+            null,
+          isCommandPending: playbackControlMutation.isPending,
+          isSeekPending: seekMutation.isPending,
+          isVolumePending: volumeControl.isPending,
           onNext: () => playbackControlMutation.mutate('next'),
           onPauseOrResume: () =>
             playbackControlMutation.mutate(playback?.isPlaying ? 'pause' : 'resume'),
-          onPrevious: () => playbackControlMutation.mutate('previous')
+          onPrevious: () => playbackControlMutation.mutate('previous'),
+          onSeek: (positionMs) => seekMutation.mutate(Math.round(positionMs)),
+          onSetVolume: volumeControl.setVolume,
+          onToggleMute: volumeControl.toggleMute
         }}
         playback={playback}
         playbackStatus={playbackStatus}

@@ -8,10 +8,15 @@ import { DefaultPlayerTheme } from './default-player-theme'
 function createControls(): PlaybackControls {
   return {
     errorMessage: null,
-    isPending: false,
+    isCommandPending: false,
+    isSeekPending: false,
+    isVolumePending: false,
     onNext: vi.fn(),
     onPauseOrResume: vi.fn(),
-    onPrevious: vi.fn()
+    onPrevious: vi.fn(),
+    onSeek: vi.fn(),
+    onSetVolume: vi.fn(),
+    onToggleMute: vi.fn()
   }
 }
 
@@ -51,6 +56,8 @@ describe('DefaultPlayerTheme', () => {
           capabilities: {
             canPause: true,
             canResume: true,
+            canSeek: true,
+            canSetVolume: true,
             canSkipNext: true,
             canSkipPrevious: true
           },

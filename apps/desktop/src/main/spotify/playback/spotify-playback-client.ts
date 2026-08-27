@@ -8,6 +8,14 @@ import type {
 const spotifyPlaybackUrl = 'https://api.spotify.com/v1/me/player'
 let rateLimitedUntil = 0
 
+type SpotifyPlaybackCommandPath =
+  | '/next'
+  | '/pause'
+  | '/play'
+  | '/previous'
+  | `/seek?position_ms=${number}`
+  | `/volume?volume_percent=${number}`
+
 const spotifyImageSchema = z.object({
   url: z.string().url()
 })
@@ -52,6 +60,7 @@ const spotifyPlaybackResponseSchema = z.object({
     .object({
       pausing: z.boolean().optional(),
       resuming: z.boolean().optional(),
+      seeking: z.boolean().optional(),
       skipping_next: z.boolean().optional(),
       skipping_prev: z.boolean().optional()
     })
@@ -123,7 +132,7 @@ async function createSpotifyApiError(response: Response, fallbackMessage: string
 
 async function sendPlaybackCommand(
   accessToken: string,
-  path: '/next' | '/pause' | '/play' | '/previous',
+  path: SpotifyPlaybackCommandPath,
   method: 'POST' | 'PUT',
   fallbackMessage: string
 ): Promise<void> {
@@ -166,6 +175,8 @@ export class SpotifyPlaybackClient {
       capabilities: {
         canPause: !isRestricted && !playback.actions.pausing,
         canResume: !isRestricted && !playback.actions.resuming,
+        canSeek: !isRestricted && !playback.actions.seeking,
+        canSetVolume: !isRestricted && playback.device.supports_volume,
         canSkipNext: !isRestricted && !playback.actions.skipping_next,
         canSkipPrevious: !isRestricted && !playback.actions.skipping_prev
       },
@@ -199,6 +210,24 @@ export class SpotifyPlaybackClient {
       '/play',
       'PUT',
       'Não foi possível retomar a reprodução do Spotify.'
+    )
+  }
+
+  static seek(accessToken: string, positionMs: number): Promise<void> {
+    return sendPlaybackCommand(
+      accessToken,
+      `/seek?position_ms=${positionMs}`,
+      'PUT',
+      'Não foi possível alterar a posição da reprodução.'
+    )
+  }
+
+  static setVolume(accessToken: string, volumePercent: number): Promise<void> {
+    return sendPlaybackCommand(
+      accessToken,
+      `/volume?volume_percent=${volumePercent}`,
+      'PUT',
+      'Não foi possível alterar o volume da reprodução.'
     )
   }
 
