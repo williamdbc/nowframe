@@ -89,6 +89,7 @@ export function MusicDisplayPage(): React.JSX.Element {
             playbackControlMutation.mutate(playback?.isPlaying ? 'pause' : 'resume'),
           onPrevious: () => playbackControlMutation.mutate('previous'),
           onSeek: (positionMs) => seekMutation.mutate(Math.round(positionMs)),
+          onCommitVolume: volumeControl.commitVolume,
           onSetVolume: volumeControl.setVolume,
           onToggleMute: volumeControl.toggleMute
         }}

@@ -11,6 +11,7 @@ export interface PlaybackControls {
   onPauseOrResume: () => void
   onPrevious: () => void
   onSeek: (positionMs: number) => void
+  onCommitVolume: (volumePercent: number) => Promise<void>
   onSetVolume: (volumePercent: number) => void
   onToggleMute: () => void
 }

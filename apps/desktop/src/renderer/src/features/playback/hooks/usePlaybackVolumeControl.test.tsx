@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SpotifyPlaybackService } from '@/features/playback/services/spotify-playback-service'
 import type { PlaybackState } from '@/features/playback/types/playback-state'
 
-import { usePlaybackVolumeControl } from './usePlaybackVolumeControl'
+import { usePlaybackVolumeControl, volumeUpdateIntervalMs } from './usePlaybackVolumeControl'
 
 const playback: PlaybackState = {
   capabilities: {
@@ -40,6 +40,7 @@ function createWrapper(): React.ComponentType<PropsWithChildren> {
 }
 
 afterEach(() => {
+  vi.useRealTimers()
   vi.restoreAllMocks()
 })
 
@@ -65,5 +66,72 @@ describe('usePlaybackVolumeControl', () => {
     })
     act(() => result.current.toggleMute())
     await waitFor(() => expect(setVolumeSpy).toHaveBeenLastCalledWith(64))
+  })
+
+  it('throttles volume updates and sends only the latest queued value', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1_000)
+    const setVolumeSpy = vi.spyOn(SpotifyPlaybackService, 'setVolume').mockResolvedValue(undefined)
+    const { result } = renderHook(() => usePlaybackVolumeControl(playback), {
+      wrapper: createWrapper()
+    })
+
+    await act(async () => {
+      result.current.setVolume(40)
+      await Promise.resolve()
+    })
+    expect(setVolumeSpy).toHaveBeenCalledTimes(1)
+    expect(setVolumeSpy).toHaveBeenLastCalledWith(40)
+
+    act(() => {
+      result.current.setVolume(41)
+      result.current.setVolume(42)
+    })
+    await act(async () => {
+      vi.advanceTimersByTime(volumeUpdateIntervalMs - 1)
+      await Promise.resolve()
+    })
+    expect(setVolumeSpy).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      vi.advanceTimersByTime(1)
+      await Promise.resolve()
+    })
+    expect(setVolumeSpy).toHaveBeenCalledTimes(2)
+    expect(setVolumeSpy).toHaveBeenLastCalledWith(42)
+  })
+
+  it('serializes requests and prioritizes the final committed volume', async () => {
+    let resolveFirstRequest: (() => void) | undefined
+    const setVolumeSpy = vi
+      .spyOn(SpotifyPlaybackService, 'setVolume')
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>((resolve) => {
+            resolveFirstRequest = resolve
+          })
+      )
+      .mockResolvedValue(undefined)
+    const { result } = renderHook(() => usePlaybackVolumeControl(playback), {
+      wrapper: createWrapper()
+    })
+
+    act(() => result.current.setVolume(40))
+    await waitFor(() => expect(setVolumeSpy).toHaveBeenCalledWith(40))
+
+    let commitPromise: Promise<void> | undefined
+    act(() => {
+      result.current.setVolume(41)
+      result.current.setVolume(42)
+      commitPromise = result.current.commitVolume(43)
+    })
+    expect(setVolumeSpy).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      resolveFirstRequest?.()
+      await commitPromise
+    })
+    await waitFor(() => expect(setVolumeSpy).toHaveBeenCalledTimes(2))
+    expect(setVolumeSpy).toHaveBeenLastCalledWith(43)
   })
 })

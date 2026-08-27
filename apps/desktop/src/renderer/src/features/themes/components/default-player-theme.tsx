@@ -79,6 +79,7 @@ export function DefaultPlayerTheme({
               <PlaybackVolumeControl
                 canSetVolume={playback.capabilities.canSetVolume}
                 isPending={controls.isVolumePending}
+                onCommitVolume={controls.onCommitVolume}
                 onSetVolume={controls.onSetVolume}
                 onToggleMute={controls.onToggleMute}
                 volumePercent={playback.device.volumePercent}

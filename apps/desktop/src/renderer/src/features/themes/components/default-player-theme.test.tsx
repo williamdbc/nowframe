@@ -15,6 +15,7 @@ function createControls(): PlaybackControls {
     onPauseOrResume: vi.fn(),
     onPrevious: vi.fn(),
     onSeek: vi.fn(),
+    onCommitVolume: vi.fn(),
     onSetVolume: vi.fn(),
     onToggleMute: vi.fn()
   }

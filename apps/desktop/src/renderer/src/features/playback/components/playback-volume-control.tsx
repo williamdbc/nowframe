@@ -1,9 +1,10 @@
 import { Volume1, Volume2, VolumeX } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 interface PlaybackVolumeControlProps {
   canSetVolume: boolean
   isPending: boolean
+  onCommitVolume: (volumePercent: number) => Promise<void>
   onSetVolume: (volumePercent: number) => void
   onToggleMute: () => void
   volumePercent: number | null
@@ -23,19 +24,29 @@ const rangeCommitKeys = new Set([
 export function PlaybackVolumeControl({
   canSetVolume,
   isPending,
+  onCommitVolume,
   onSetVolume,
   onToggleMute,
   volumePercent
 }: PlaybackVolumeControlProps): React.JSX.Element {
   const [previewVolumePercent, setPreviewVolumePercent] = useState<number | null>(null)
+  const committedVolumePercent = useRef<number | null>(null)
   const displayedVolumePercent = previewVolumePercent ?? volumePercent ?? 0
   const isMuted = volumePercent === 0
-  const isDisabled = !canSetVolume || volumePercent === null || isPending
+  const isDisabled = !canSetVolume || volumePercent === null
   const VolumeIcon = isMuted ? VolumeX : displayedVolumePercent <= 50 ? Volume1 : Volume2
 
   const commitVolume = (nextVolumePercent: number): void => {
-    setPreviewVolumePercent(null)
-    onSetVolume(Math.round(nextVolumePercent))
+    const roundedVolumePercent = Math.round(nextVolumePercent)
+    if (committedVolumePercent.current === roundedVolumePercent) return
+
+    committedVolumePercent.current = roundedVolumePercent
+    void onCommitVolume(roundedVolumePercent).then(() => {
+      if (committedVolumePercent.current !== roundedVolumePercent) return
+
+      committedVolumePercent.current = null
+      setPreviewVolumePercent(null)
+    })
   }
 
   return (
@@ -65,7 +76,12 @@ export function PlaybackVolumeControl({
         onBlur={(event) => {
           if (previewVolumePercent !== null) commitVolume(Number(event.currentTarget.value))
         }}
-        onChange={(event) => setPreviewVolumePercent(Number(event.currentTarget.value))}
+        onChange={(event) => {
+          const nextVolumePercent = Number(event.currentTarget.value)
+          committedVolumePercent.current = null
+          setPreviewVolumePercent(nextVolumePercent)
+          onSetVolume(nextVolumePercent)
+        }}
         onKeyUp={(event) => {
           if (rangeCommitKeys.has(event.key)) commitVolume(Number(event.currentTarget.value))
         }}
