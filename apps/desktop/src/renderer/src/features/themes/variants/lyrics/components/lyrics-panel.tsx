@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
+import { useLyricsPlaybackPosition } from '@/features/lyrics/hooks/useLyricsPlaybackPosition'
 import type { LyricsDisplayState } from '@/features/lyrics/types/lyrics-display-state'
 import { getActiveLyricsLineIndex } from '@/features/lyrics/utils/get-active-lyrics-line-index'
 
@@ -8,8 +9,6 @@ interface LyricsPanelProps {
   lyrics: LyricsDisplayState
   positionMs: number
 }
-
-const lyricsClockIntervalMs = 100
 
 function LyricsMessage({ children }: React.PropsWithChildren): React.JSX.Element {
   return (
@@ -28,20 +27,7 @@ export function LyricsPanel({
 }: LyricsPanelProps): React.JSX.Element {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const lineRefs = useRef<Array<HTMLParagraphElement | null>>([])
-  const [livePositionMs, setLivePositionMs] = useState(positionMs)
-
-  useEffect(() => {
-    if (!isPlaying) return undefined
-
-    const startedAt = Date.now()
-    const interval = window.setInterval(() => {
-      setLivePositionMs(positionMs + Date.now() - startedAt)
-    }, lyricsClockIntervalMs)
-
-    return () => window.clearInterval(interval)
-  }, [isPlaying, positionMs])
-
-  const lyricsPositionMs = isPlaying ? livePositionMs : positionMs
+  const lyricsPositionMs = useLyricsPlaybackPosition(positionMs, isPlaying)
   const activeLineIndex = useMemo(
     () =>
       lyrics.status === 'synced'

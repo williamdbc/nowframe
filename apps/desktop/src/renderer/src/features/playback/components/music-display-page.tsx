@@ -45,7 +45,8 @@ export function MusicDisplayPage(): React.JSX.Element {
   const presentationMode = useWindowPresentationMode()
   const playback = useLivePlaybackState(playbackQuery.data ?? null)
   const isTracklistTheme = selectedTheme.activeThemeId === 'tracklist'
-  const isLyricsTheme = selectedTheme.activeThemeId === 'lyrics'
+  const shouldLoadLyrics =
+    selectedTheme.activeThemeId === 'lyrics' || selectedTheme.activeThemeId === 'karaoke'
   const lyricsQueryInput =
     playback?.item?.type === 'track' && playback.item.creatorNames[0]
       ? {
@@ -55,8 +56,8 @@ export function MusicDisplayPage(): React.JSX.Element {
           trackName: playback.item.title
         }
       : null
-  const lyricsQuery = useGetLyricsQuery(lyricsQueryInput, isLyricsTheme)
-  const lyrics = useLyricsDisplayState(lyricsQuery, isLyricsTheme && Boolean(lyricsQueryInput))
+  const lyricsQuery = useGetLyricsQuery(lyricsQueryInput, shouldLoadLyrics)
+  const lyrics = useLyricsDisplayState(lyricsQuery, shouldLoadLyrics && Boolean(lyricsQueryInput))
   const playbackContext =
     playback?.context ??
     (playback?.item?.album

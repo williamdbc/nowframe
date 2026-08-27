@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import type { LyricsQuery, LyricsResult } from '../../contracts/music-display-api'
+import { parseLyricsfile } from './lyricsfile-parser'
 
 const lrclibGetUrl = 'https://lrclib.net/api/get'
 const requestTimeoutMs = 8_000
@@ -12,6 +13,7 @@ const lrclibLyricsSchema = z.object({
   duration: z.number().nonnegative(),
   id: z.number().int().positive(),
   instrumental: z.boolean(),
+  lyricsfile: z.string().nullable().optional(),
   plainLyrics: z.string().nullable(),
   syncedLyrics: z.string().nullable(),
   trackName: z.string()
@@ -74,6 +76,7 @@ export class LrclibClient {
       plainLyrics: lyrics.plainLyrics,
       source: 'lrclib',
       syncedLyrics: lyrics.syncedLyrics,
+      timedLines: parseLyricsfile(lyrics.lyricsfile),
       trackName: lyrics.trackName
     }
   }

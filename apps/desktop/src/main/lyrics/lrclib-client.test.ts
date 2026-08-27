@@ -17,6 +17,23 @@ describe('LrclibClient', () => {
           duration: 312,
           id: 394343,
           instrumental: false,
+          lyricsfile: `
+version: '1.0'
+metadata:
+  title: Wind Of Change
+  artist: Scorpions
+lines:
+  - text: 'A first line'
+    start_ms: 22660
+    end_ms: 25000
+    words:
+      - text: 'A first '
+        start_ms: 22660
+        end_ms: 24000
+      - text: 'line'
+        start_ms: 24000
+        end_ms: 25000
+`,
           plainLyrics: 'A first line',
           syncedLyrics: '[00:22.66] A first line',
           trackName: 'Wind Of Change'
@@ -42,6 +59,17 @@ describe('LrclibClient', () => {
       plainLyrics: 'A first line',
       source: 'lrclib',
       syncedLyrics: '[00:22.66] A first line',
+      timedLines: [
+        {
+          endTimeMs: 25_000,
+          startTimeMs: 22_660,
+          text: 'A first line',
+          words: [
+            { endTimeMs: 24_000, startTimeMs: 22_660, text: 'A first ' },
+            { endTimeMs: 25_000, startTimeMs: 24_000, text: 'line' }
+          ]
+        }
+      ],
       trackName: 'Wind Of Change'
     })
 

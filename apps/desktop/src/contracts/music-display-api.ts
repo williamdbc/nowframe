@@ -143,6 +143,19 @@ export interface LyricsQuery {
   trackName: string
 }
 
+export interface LyricsTimedWord {
+  endTimeMs: number | null
+  startTimeMs: number
+  text: string
+}
+
+export interface LyricsTimedLine {
+  endTimeMs: number | null
+  startTimeMs: number
+  text: string
+  words: LyricsTimedWord[]
+}
+
 export interface LyricsResult {
   albumName: string
   artistName: string
@@ -152,6 +165,7 @@ export interface LyricsResult {
   plainLyrics: string | null
   source: 'lrclib'
   syncedLyrics: string | null
+  timedLines: LyricsTimedLine[]
   trackName: string
 }
 

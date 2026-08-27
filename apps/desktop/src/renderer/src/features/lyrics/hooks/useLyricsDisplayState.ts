@@ -28,7 +28,20 @@ export function useLyricsDisplayState(
     const plainLines = parsePlainLyrics(query.data.plainLyrics)
     const syncedLines = parseSyncedLyrics(query.data.syncedLyrics)
 
-    if (syncedLines.length > 0) return { status: 'synced', plainLines, syncedLines }
+    if (syncedLines.length > 0 || query.data.timedLines.length > 0) {
+      return {
+        status: 'synced',
+        plainLines,
+        syncedLines:
+          syncedLines.length > 0
+            ? syncedLines
+            : query.data.timedLines.map((line) => ({
+                startTimeMs: line.startTimeMs,
+                text: line.text
+              })),
+        wordSyncedLines: query.data.timedLines
+      }
+    }
     if (plainLines.length > 0) return { status: 'plain', plainLines, syncedLines: [] }
     return { status: 'not-found', plainLines: [], syncedLines: [] }
   }, [enabled, query.data, query.error, query.isError, query.isPending])

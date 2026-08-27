@@ -9,7 +9,8 @@ const syncedLyrics = {
   syncedLines: [
     { startTimeMs: 1_000, text: 'First line' },
     { startTimeMs: 2_500, text: 'Second line' }
-  ]
+  ],
+  wordSyncedLines: []
 }
 
 beforeEach(() => {

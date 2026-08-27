@@ -50,7 +50,7 @@ export interface PlayerThemeProps {
   tracklist: PlayerThemeTracklist
 }
 
-export type PlayerThemeId = 'default' | 'drive' | 'lyrics' | 'minimalist' | 'tracklist'
+export type PlayerThemeId = 'default' | 'drive' | 'karaoke' | 'lyrics' | 'minimalist' | 'tracklist'
 
 export interface PlayerTheme {
   id: PlayerThemeId
