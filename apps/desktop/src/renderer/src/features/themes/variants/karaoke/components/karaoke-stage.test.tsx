@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { LyricsDisplayState } from '@/features/lyrics/types/lyrics-display-state'
 
+import { karaokeLyricsLeadMs } from '../config/karaoke-timing'
 import { KaraokeStage } from './karaoke-stage'
 
 const wordSyncedLyrics: LyricsDisplayState = {
@@ -57,15 +58,41 @@ describe('KaraokeStage', () => {
     expect(screen.getByText('Sincronização por palavra indisponível nesta música')).toBeVisible()
   })
 
-  it('keeps the active phrase centered when the line changes', () => {
+  it('moves the current and next phrases through the vertical rail', () => {
     const { container, rerender } = render(
       <KaraokeStage isPlaying={false} lyrics={wordSyncedLyrics} positionMs={1_500} />
     )
 
-    rerender(<KaraokeStage isPlaying={false} lyrics={wordSyncedLyrics} positionMs={3_100} />)
+    const helloLine = container.querySelector('.karaoke-rail-line-active')
+
+    expect(helloLine).toHaveTextContent('Hello world')
+    expect(screen.getByText('Next line').closest('p')).toHaveClass('karaoke-rail-line-next')
+
+    rerender(
+      <KaraokeStage
+        isPlaying={false}
+        lyrics={wordSyncedLyrics}
+        positionMs={3_000 - karaokeLyricsLeadMs}
+      />
+    )
 
     expect(screen.getByText('Next line').closest('p')).toHaveAttribute('aria-current', 'true')
-    expect(container.querySelector('.karaoke-phrase-group')).toBeInTheDocument()
-    expect(container.querySelector('.karaoke-active-line')).toHaveTextContent('Next line')
+    expect(screen.getByText('Hello world').closest('p')).toHaveClass('karaoke-rail-line-previous')
+    expect(screen.getByText('Hello world').closest('p')).toBe(helloLine)
+    expect(container.querySelector('.karaoke-line-rail')).toBeInTheDocument()
+  })
+
+  it('shows the next phrase using the configured lead time', () => {
+    const { container } = render(
+      <KaraokeStage
+        isPlaying={false}
+        lyrics={wordSyncedLyrics}
+        positionMs={3_000 - karaokeLyricsLeadMs}
+      />
+    )
+
+    expect(karaokeLyricsLeadMs).toBe(500)
+    expect(screen.getByText('Next line').closest('p')).toHaveAttribute('aria-current', 'true')
+    expect(container.querySelector('.karaoke-word')?.getAttribute('style')).toContain('0%')
   })
 })
