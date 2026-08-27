@@ -1,5 +1,6 @@
 import { DefaultPlayerTheme } from '@/features/themes/variants/default/default-player-theme'
 import { DrivePlayerTheme } from '@/features/themes/variants/drive/drive-player-theme'
+import { LyricsPlayerTheme } from '@/features/themes/variants/lyrics/lyrics-player-theme'
 import { MinimalistPlayerTheme } from '@/features/themes/variants/minimalist/minimalist-player-theme'
 import { TracklistPlayerTheme } from '@/features/themes/variants/tracklist/tracklist-player-theme'
 
@@ -17,6 +18,11 @@ export const themeRegistry = {
     id: 'drive',
     name: 'Drive',
     component: DrivePlayerTheme
+  },
+  lyrics: {
+    id: 'lyrics',
+    name: 'Lyrics',
+    component: LyricsPlayerTheme
   },
   minimalist: {
     id: 'minimalist',

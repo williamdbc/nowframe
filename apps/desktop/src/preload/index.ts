@@ -7,6 +7,9 @@ const musicDisplayApi: MusicDisplayApi = {
   app: {
     getBootstrapState: () => ipcRenderer.invoke(ipcChannels.getAppBootstrapState)
   },
+  lyrics: {
+    get: (query) => ipcRenderer.invoke(ipcChannels.getLyrics, query)
+  },
   spotify: {
     getSession: () => ipcRenderer.invoke(ipcChannels.getSpotifySession),
     getProfile: () => ipcRenderer.invoke(ipcChannels.getSpotifyProfile),

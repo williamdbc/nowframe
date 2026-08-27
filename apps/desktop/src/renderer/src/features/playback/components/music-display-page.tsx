@@ -10,6 +10,8 @@ import { useGetSpotifyProfileQuery } from '@/features/authentication/hooks/useGe
 import { useLogoutFromSpotifyMutation } from '@/features/authentication/hooks/useLogoutFromSpotifyMutation'
 import { useGetSpotifyLibraryItemQuery } from '@/features/library/hooks/useGetSpotifyLibraryItemQuery'
 import { useToggleSpotifyLibraryItemMutation } from '@/features/library/hooks/useToggleSpotifyLibraryItemMutation'
+import { useGetLyricsQuery } from '@/features/lyrics/hooks/useGetLyricsQuery'
+import { useLyricsDisplayState } from '@/features/lyrics/hooks/useLyricsDisplayState'
 import { useGetSpotifyPlaylistTracksQuery } from '@/features/playlists/hooks/useGetSpotifyPlaylistTracksQuery'
 import { ThemeSelector } from '@/features/themes/core/components/theme-selector'
 import { useSelectedTheme } from '@/features/themes/core/hooks/useSelectedTheme'
@@ -43,6 +45,18 @@ export function MusicDisplayPage(): React.JSX.Element {
   const presentationMode = useWindowPresentationMode()
   const playback = useLivePlaybackState(playbackQuery.data ?? null)
   const isTracklistTheme = selectedTheme.activeThemeId === 'tracklist'
+  const isLyricsTheme = selectedTheme.activeThemeId === 'lyrics'
+  const lyricsQueryInput =
+    playback?.item?.type === 'track' && playback.item.creatorNames[0]
+      ? {
+          albumName: playback.item.collectionName,
+          artistName: playback.item.creatorNames[0],
+          durationMs: playback.item.durationMs,
+          trackName: playback.item.title
+        }
+      : null
+  const lyricsQuery = useGetLyricsQuery(lyricsQueryInput, isLyricsTheme)
+  const lyrics = useLyricsDisplayState(lyricsQuery, isLyricsTheme && Boolean(lyricsQueryInput))
   const playbackContext =
     playback?.context ??
     (playback?.item?.album
@@ -175,6 +189,7 @@ export function MusicDisplayPage(): React.JSX.Element {
           },
           onToggleMute: volumeControl.toggleMute
         }}
+        lyrics={lyrics}
         playback={playback}
         playbackStatus={playbackStatus}
         tracklist={{

@@ -5,6 +5,7 @@ export const ipcChannels = {
   getSpotifyPlayback: 'spotify:get-playback',
   getSpotifyAlbumTracks: 'spotify:get-album-tracks',
   getSpotifyPlaylistTracks: 'spotify:get-playlist-tracks',
+  getLyrics: 'lyrics:get',
   getSpotifyLibraryItemState: 'spotify:get-library-item-state',
   pauseSpotifyPlayback: 'spotify:pause-playback',
   playSpotifyContextTrack: 'spotify:play-context-track',
@@ -135,9 +136,31 @@ export interface SpotifyLibraryItemState {
   uri: string
 }
 
+export interface LyricsQuery {
+  albumName: string
+  artistName: string
+  durationMs: number
+  trackName: string
+}
+
+export interface LyricsResult {
+  albumName: string
+  artistName: string
+  durationMs: number
+  id: number
+  instrumental: boolean
+  plainLyrics: string | null
+  source: 'lrclib'
+  syncedLyrics: string | null
+  trackName: string
+}
+
 export interface MusicDisplayApi {
   app: {
     getBootstrapState: () => Promise<AppBootstrapState>
+  }
+  lyrics: {
+    get: (query: LyricsQuery) => Promise<LyricsResult | null>
   }
   spotify: {
     getSession: () => Promise<SpotifySessionState>
