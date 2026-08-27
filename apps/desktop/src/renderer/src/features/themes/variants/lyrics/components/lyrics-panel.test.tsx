@@ -47,4 +47,17 @@ describe('LyricsPanel', () => {
 
     expect(screen.getByText('Não encontramos a letra desta versão da música.')).toBeVisible()
   })
+
+  it('hides unsynchronized lyrics while the theme option is disabled', () => {
+    render(
+      <LyricsPanel
+        isPlaying={false}
+        lyrics={{ status: 'plain', plainLines: ['Unsynchronized line'], syncedLines: [] }}
+        positionMs={0}
+      />
+    )
+
+    expect(screen.getByText('Esta música não possui letra sincronizada.')).toBeVisible()
+    expect(screen.queryByText('Unsynchronized line')).not.toBeInTheDocument()
+  })
 })

@@ -4,6 +4,8 @@ import { useLyricsPlaybackPosition } from '@/features/lyrics/hooks/useLyricsPlay
 import type { LyricsDisplayState } from '@/features/lyrics/types/lyrics-display-state'
 import { getActiveLyricsLineIndex } from '@/features/lyrics/utils/get-active-lyrics-line-index'
 
+import { showUnsynchronizedLyrics } from '../config/lyrics-theme-options'
+
 interface LyricsPanelProps {
   isPlaying: boolean
   lyrics: LyricsDisplayState
@@ -78,6 +80,10 @@ export function LyricsPanel({
   }
 
   if (lyrics.status === 'plain') {
+    if (!showUnsynchronizedLyrics) {
+      return <LyricsMessage>Esta música não possui letra sincronizada.</LyricsMessage>
+    }
+
     return (
       <div
         className="lyrics-scroll h-full overflow-y-auto px-8 py-[42vh]"

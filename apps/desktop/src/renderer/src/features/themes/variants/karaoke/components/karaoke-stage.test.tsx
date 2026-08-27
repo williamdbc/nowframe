@@ -95,4 +95,20 @@ describe('KaraokeStage', () => {
     expect(screen.getByText('Next line').closest('p')).toHaveAttribute('aria-current', 'true')
     expect(container.querySelector('.karaoke-word')?.getAttribute('style')).toContain('0%')
   })
+
+  it('reserves the same flexible stage area while lyrics are loading', () => {
+    const { container, rerender } = render(
+      <KaraokeStage
+        isPlaying={false}
+        lyrics={{ status: 'loading', plainLines: [], syncedLines: [] }}
+        positionMs={0}
+      />
+    )
+
+    expect(container.firstElementChild).toHaveClass('karaoke-stage', 'min-h-0', 'flex-1')
+
+    rerender(<KaraokeStage isPlaying={false} lyrics={wordSyncedLyrics} positionMs={1_500} />)
+
+    expect(container.firstElementChild).toHaveClass('karaoke-stage', 'min-h-0', 'flex-1')
+  })
 })

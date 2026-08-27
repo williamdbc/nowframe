@@ -18,7 +18,7 @@ interface KaraokeStageProps {
 
 function KaraokeMessage({ children }: React.PropsWithChildren): React.JSX.Element {
   return (
-    <div className="flex min-h-72 items-center justify-center px-8 text-center">
+    <div className="karaoke-stage relative flex min-h-0 flex-1 items-center justify-center px-8 text-center">
       <p className="max-w-2xl text-[clamp(1.7rem,3.4vw,3.5rem)] leading-tight font-bold tracking-[-0.04em] text-white/42">
         {children}
       </p>
