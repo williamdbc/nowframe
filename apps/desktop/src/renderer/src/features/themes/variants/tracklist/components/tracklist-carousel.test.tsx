@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TracklistCarousel } from './tracklist-carousel'
 
@@ -32,6 +32,10 @@ const tracks = [
 ]
 
 describe('TracklistCarousel', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('centers the current track and lets the user play another context track', async () => {
     const user = userEvent.setup()
     const onPlayTrack = vi.fn()
@@ -84,7 +88,7 @@ describe('TracklistCarousel', () => {
       pointerType: 'mouse'
     })
 
-    expect(carousel).toHaveClass('tracklist-scroll-dragging')
+    expect(carousel).not.toHaveClass('tracklist-scroll-dragging')
 
     fireEvent.pointerMove(carousel, {
       clientX: 150,
@@ -127,7 +131,7 @@ describe('TracklistCarousel', () => {
       pointerType: 'mouse'
     })
     fireEvent.pointerMove(carousel, {
-      clientX: 196,
+      clientX: 195,
       pointerId: 1,
       pointerType: 'mouse'
     })
@@ -135,5 +139,57 @@ describe('TracklistCarousel', () => {
     fireEvent.click(trackButton)
 
     expect(onPlayTrack).toHaveBeenCalledWith(tracks[0])
+  })
+
+  it('continues scrolling with momentum after a quick drag', () => {
+    let now = 0
+    const animationFrames: FrameRequestCallback[] = []
+    vi.spyOn(performance, 'now').mockImplementation(() => now)
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      animationFrames.push(callback)
+      return animationFrames.length
+    })
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => undefined)
+
+    render(
+      <TracklistCarousel
+        contextName="Hurry Up, We’re Dreaming"
+        currentTrackId="track-2"
+        fallbackImageUrl="https://i.scdn.co/image/album-cover"
+        isPending={false}
+        isPlayPending={false}
+        onPlayTrack={vi.fn()}
+        tracks={tracks}
+      />
+    )
+
+    const carousel = screen.getByLabelText('Faixas de Hurry Up, We’re Dreaming')
+    carousel.scrollLeft = 120
+
+    fireEvent.pointerDown(carousel, {
+      button: 0,
+      clientX: 200,
+      pointerId: 1,
+      pointerType: 'mouse'
+    })
+
+    now = 16
+    fireEvent.pointerMove(carousel, {
+      clientX: 192,
+      pointerId: 1,
+      pointerType: 'mouse'
+    })
+
+    now = 20
+    fireEvent.pointerUp(carousel, { pointerId: 1, pointerType: 'mouse' })
+
+    expect(carousel).toHaveClass('tracklist-scroll-gliding')
+    expect(carousel.scrollLeft).toBe(128)
+
+    act(() => {
+      animationFrames.shift()?.(36)
+    })
+
+    expect(carousel.scrollLeft).toBe(136)
   })
 })

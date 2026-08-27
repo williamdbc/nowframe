@@ -1,13 +1,12 @@
 .tracklist-scroll {
   cursor: grab;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
   scrollbar-width: none;
 }
 
-.tracklist-scroll-dragging {
+.tracklist-scroll-dragging,
+.tracklist-scroll-gliding {
   scroll-behavior: auto;
-  scroll-snap-type: none;
 }
 
 .tracklist-scroll-dragging,
@@ -17,6 +16,10 @@
 
 .tracklist-scroll-dragging .tracklist-card {
   pointer-events: none;
+}
+
+.tracklist-scroll-dragging .tracklist-card,
+.tracklist-scroll-gliding .tracklist-card {
   transform: none;
   transition: none;
 }
