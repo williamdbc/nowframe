@@ -59,9 +59,9 @@ O processo `main` consulta `GET /me/player` e entrega ao renderer um contrato re
 
 Enquanto há reprodução ativa, a query sincroniza a cada 3 segundos; pausada ou sem reprodução, a cada 10 segundos; após falhas, a cada 30 segundos. O polling para quando a janela fica em segundo plano e volta imediatamente ao foco. Entre respostas do Spotify, o progresso visual avança localmente a cada 250 ms e é corrigido na próxima sincronização. Respostas de rate limit respeitam o `Retry-After` antes de uma nova chamada externa.
 
-Play, pause, faixa anterior e próxima são enviados pelo processo `main` ao dispositivo ativo. O renderer aplica uma atualização otimista apenas ao estado play/pause, restaura o cache se o comando falhar e reconcilia com a Web API ao concluir. Restrições de dispositivo e contexto retornadas pelo Spotify determinam quais botões ficam disponíveis.
+Play, pause, faixa anterior e próxima são enviados pelo processo `main` ao dispositivo ativo. O renderer aplica uma atualização otimista apenas ao estado play/pause e restaura o cache se o comando falhar. Após avançar ou voltar uma faixa, uma sequência curta e limitada de consultas reconcilia os metadados assim que o Spotify publica o novo estado; o polling periódico permanece como fallback. Restrições de dispositivo e contexto retornadas pelo Spotify determinam quais botões ficam disponíveis.
 
-Seek e volume usam o mesmo limite IPC e atualizam o cache de forma otimista, com rollback em falhas. Os sliders apenas enviam o comando ao término da interação para evitar uma chamada externa por movimento. Como a Web API não possui mute próprio, a interface envia volume zero e guarda em memória o último volume audível para restauração. O Web Playback SDK será avaliado depois desta camada de controle remoto.
+Seek e volume usam o mesmo limite IPC e atualizam o cache de forma otimista, com rollback em falhas. O seek é enviado ao término da interação. O volume é atualizado durante o arraste com debounce e limite de frequência, e a última posição é confirmada ao soltar. Como a Web API não possui mute próprio, a interface envia volume zero e guarda em memória o último volume audível para restauração.
 
 ## Modo apresentação
 

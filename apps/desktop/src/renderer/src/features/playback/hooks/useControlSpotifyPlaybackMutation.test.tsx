@@ -56,6 +56,7 @@ function createWrapper(queryClient: QueryClient) {
 }
 
 afterEach(() => {
+  vi.useRealTimers()
   vi.restoreAllMocks()
 })
 
@@ -98,5 +99,65 @@ describe('useControlSpotifyPlaybackMutation', () => {
     )
     expect(queryClient.getQueryData(spotifyPlaybackQueryKeys.current())).toEqual(pausedPlayback)
     expect(invalidateQueriesSpy).not.toHaveBeenCalled()
+  })
+
+  it('reconciles the metadata shortly after skipping to the next content', async () => {
+    vi.useFakeTimers()
+    const nextPlayback: PlaybackState = {
+      ...playback,
+      item: {
+        collectionName: 'Next Album',
+        creatorNames: ['Next Artist'],
+        durationMs: 180_000,
+        id: 'next-track-id',
+        imageUrl: null,
+        title: 'Next Track',
+        type: 'track'
+      },
+      progressMs: 800,
+      synchronizedAt: 4_000
+    }
+    vi.spyOn(SpotifyPlaybackService, 'skipToNext').mockResolvedValue(undefined)
+    const getCurrentPlaybackSpy = vi
+      .spyOn(SpotifyPlaybackService, 'getCurrentPlayback')
+      .mockResolvedValueOnce(playback)
+      .mockResolvedValueOnce(playback)
+      .mockResolvedValueOnce(nextPlayback)
+    const queryClient = createQueryClient()
+    queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
+    const { result } = renderHook(() => useControlSpotifyPlaybackMutation(), {
+      wrapper: createWrapper(queryClient)
+    })
+
+    await act(() => result.current.mutateAsync('next'))
+    expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(1)
+
+    await act(() => vi.advanceTimersByTimeAsync(250))
+    expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(2)
+
+    await act(() => vi.advanceTimersByTimeAsync(250))
+    expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(3)
+    expect(queryClient.getQueryData(spotifyPlaybackQueryKeys.current())).toEqual(nextPlayback)
+
+    await act(() => vi.advanceTimersByTimeAsync(1_000))
+    expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(3)
+  })
+
+  it('limits reconciliation when Spotify keeps returning the previous content', async () => {
+    vi.useFakeTimers()
+    vi.spyOn(SpotifyPlaybackService, 'skipToPrevious').mockResolvedValue(undefined)
+    const getCurrentPlaybackSpy = vi
+      .spyOn(SpotifyPlaybackService, 'getCurrentPlayback')
+      .mockResolvedValue(playback)
+    const queryClient = createQueryClient()
+    queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
+    const { result } = renderHook(() => useControlSpotifyPlaybackMutation(), {
+      wrapper: createWrapper(queryClient)
+    })
+
+    await act(() => result.current.mutateAsync('previous'))
+    await act(() => vi.advanceTimersByTimeAsync(1_000))
+
+    expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(4)
   })
 })
