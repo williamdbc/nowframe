@@ -45,6 +45,82 @@ body {
   display: none;
 }
 
+@media (min-width: 1100px) and (min-height: 650px) {
+  .tracklist-theme {
+    justify-content: center;
+    padding-inline: clamp(2.5rem, 5vw, 6rem);
+  }
+
+  .tracklist-theme .tracklist-now-playing {
+    display: grid;
+    grid-template-columns: clamp(13rem, 20vw, 22rem) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(2.5rem, 6vw, 7rem);
+    max-width: 88rem;
+    text-align: left;
+  }
+
+  .tracklist-theme .tracklist-main-cover {
+    width: 100%;
+    margin-inline: 0;
+    border-radius: clamp(1.75rem, 2.3vw, 2.5rem);
+  }
+
+  .tracklist-theme .tracklist-title {
+    margin-top: 0;
+  }
+
+  .tracklist-theme .tracklist-carousel {
+    width: 100%;
+    margin-top: clamp(1.5rem, 3vh, 2.75rem);
+    padding-top: 0;
+  }
+
+  .tracklist-theme .tracklist-card {
+    width: clamp(8.5rem, 9vw, 10.5rem);
+  }
+
+  .tracklist-theme .tracklist-card-current {
+    width: clamp(12rem, 15vw, 18rem);
+  }
+
+  .tracklist-theme .tracklist-scroll {
+    padding-inline: calc(50% - clamp(6rem, 7.5vw, 9rem));
+  }
+}
+
+@media (min-width: 2000px) and (min-height: 1100px) {
+  .tracklist-theme {
+    max-width: 132rem;
+  }
+
+  .tracklist-theme .tracklist-now-playing {
+    grid-template-columns: 26rem minmax(0, 1fr);
+    gap: 8rem;
+    max-width: 104rem;
+  }
+
+  .tracklist-theme .tracklist-title {
+    font-size: 5.5rem;
+  }
+
+  .tracklist-theme .tracklist-carousel {
+    margin-top: 3rem;
+  }
+
+  .tracklist-theme .tracklist-card {
+    width: 12rem;
+  }
+
+  .tracklist-theme .tracklist-card-current {
+    width: 21rem;
+  }
+
+  .tracklist-theme .tracklist-scroll {
+    padding-inline: calc(50% - 10.5rem);
+  }
+}
+
 @media (max-height: 600px) {
   .tracklist-theme {
     padding-top: 3.25rem;
