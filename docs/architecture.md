@@ -67,6 +67,14 @@ Seek e volume usam o mesmo limite IPC e atualizam o cache de forma otimista, com
 
 O renderer solicita fullscreen por uma API tipada do preload. O processo `main` controla a `BrowserWindow` e publica as transições de entrada e saída para manter a interface sincronizada. Em fullscreen, a barra de ações desaparece e `ESC` encerra o modo apresentação.
 
+## Temas do player
+
+Cada tema implementa um layout completo do player e possui seus próprios controles visuais de transporte. A página do display permanece responsável por buscar dados, executar comandos e selecionar o tema ativo; por isso, trocar o tema nunca duplica integração com Spotify ou estado assíncrono.
+
+O contrato `PlayerThemeProps` entrega a todos os temas os mesmos dados e capacidades: conteúdo atual, progresso, volume, faixa anterior, play/pause, próxima faixa e mensagens de erro. Progresso e volume reutilizam o comportamento compartilhado, mas aceitam aparência específica de cada tema. As ações de conta, conexão, tema e fullscreen são entregues como slots, permitindo que cada layout escolha suas posições.
+
+O registro central contém atualmente `default`, `drive` e `minimalist`. A preferência é persistida no `localStorage` do renderer e restaurada na próxima inicialização. Um teste de conformidade renderiza todos os temas registrados e garante que nenhum deles omita as capacidades obrigatórias do player.
+
 ## Evolução
 
 Quando necessário, novas aplicações entram em `apps/web` e `apps/api`. Uma pasta compartilhada na raiz só será criada depois que desktop e web tiverem código comprovadamente reutilizável.

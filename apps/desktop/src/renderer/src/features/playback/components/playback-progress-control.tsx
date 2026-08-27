@@ -1,11 +1,16 @@
 import { useState } from 'react'
 
 interface PlaybackProgressControlProps {
+  accentColor?: string
   canSeek: boolean
+  className?: string
   durationMs: number
   isPending: boolean
   onSeek: (positionMs: number) => void
   positionMs: number
+  rangeClassName?: string
+  timeClassName?: string
+  trackColor?: string
 }
 
 const rangeCommitKeys = new Set([
@@ -27,11 +32,16 @@ function formatDuration(milliseconds: number): string {
 }
 
 export function PlaybackProgressControl({
+  accentColor = 'white',
   canSeek,
+  className = '',
   durationMs,
   isPending,
   onSeek,
-  positionMs
+  positionMs,
+  rangeClassName = '',
+  timeClassName = 'mt-3 flex justify-between text-sm font-medium text-white/38 tabular-nums',
+  trackColor = 'rgba(255, 255, 255, 0.12)'
 }: PlaybackProgressControlProps): React.JSX.Element {
   const [previewPositionMs, setPreviewPositionMs] = useState<number | null>(null)
   const displayedPositionMs = Math.min(durationMs, previewPositionMs ?? positionMs)
@@ -44,9 +54,9 @@ export function PlaybackProgressControl({
   }
 
   return (
-    <div aria-busy={isPending}>
+    <div className={className} aria-busy={isPending}>
       <input
-        className="player-range player-progress-range"
+        className={`player-range player-progress-range ${rangeClassName}`}
         type="range"
         min={0}
         max={durationMs}
@@ -56,7 +66,7 @@ export function PlaybackProgressControl({
         aria-valuetext={`${formatDuration(displayedPositionMs)} de ${formatDuration(durationMs)}`}
         disabled={isDisabled}
         style={{
-          background: `linear-gradient(to right, white 0%, white ${progressPercentage}%, rgba(255, 255, 255, 0.12) ${progressPercentage}%, rgba(255, 255, 255, 0.12) 100%)`
+          background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${progressPercentage}%, ${trackColor} ${progressPercentage}%, ${trackColor} 100%)`
         }}
         onBlur={(event) => {
           if (previewPositionMs !== null) commitPosition(Number(event.currentTarget.value))
@@ -67,7 +77,7 @@ export function PlaybackProgressControl({
         }}
         onPointerUp={(event) => commitPosition(Number(event.currentTarget.value))}
       />
-      <div className="mt-3 flex justify-between text-sm font-medium text-white/38 tabular-nums">
+      <div className={timeClassName}>
         <span>{formatDuration(displayedPositionMs)}</span>
         <span>{formatDuration(durationMs)}</span>
       </div>

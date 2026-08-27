@@ -2,11 +2,17 @@ import { Volume1, Volume2, VolumeX } from 'lucide-react'
 import { useRef, useState } from 'react'
 
 interface PlaybackVolumeControlProps {
+  accentColor?: string
+  buttonClassName?: string
   canSetVolume: boolean
+  className?: string
   isPending: boolean
   onCommitVolume: (volumePercent: number) => Promise<void>
   onSetVolume: (volumePercent: number) => void
   onToggleMute: () => void
+  percentageClassName?: string
+  rangeClassName?: string
+  trackColor?: string
   volumePercent: number | null
 }
 
@@ -22,11 +28,17 @@ const rangeCommitKeys = new Set([
 ])
 
 export function PlaybackVolumeControl({
+  accentColor = 'rgba(255, 255, 255, 0.62)',
+  buttonClassName = '',
   canSetVolume,
+  className = '',
   isPending,
   onCommitVolume,
   onSetVolume,
   onToggleMute,
+  percentageClassName = 'w-9 text-right text-xs tabular-nums',
+  rangeClassName = '',
+  trackColor = 'rgba(255, 255, 255, 0.12)',
   volumePercent
 }: PlaybackVolumeControlProps): React.JSX.Element {
   const [previewVolumePercent, setPreviewVolumePercent] = useState<number | null>(null)
@@ -50,9 +62,9 @@ export function PlaybackVolumeControl({
   }
 
   return (
-    <div className="flex items-center gap-2" aria-busy={isPending}>
+    <div className={`flex items-center gap-2 ${className}`} aria-busy={isPending}>
       <button
-        className="player-volume-button"
+        className={`player-volume-button ${buttonClassName}`}
         type="button"
         aria-label={isMuted ? 'Restaurar volume' : 'Silenciar'}
         disabled={isDisabled}
@@ -61,7 +73,7 @@ export function PlaybackVolumeControl({
         <VolumeIcon aria-hidden="true" className="h-4 w-4" />
       </button>
       <input
-        className="player-range player-volume-range"
+        className={`player-range player-volume-range ${rangeClassName}`}
         type="range"
         min={0}
         max={100}
@@ -71,7 +83,7 @@ export function PlaybackVolumeControl({
         aria-valuetext={`${displayedVolumePercent}%`}
         disabled={isDisabled}
         style={{
-          background: `linear-gradient(to right, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.62) ${displayedVolumePercent}%, rgba(255, 255, 255, 0.12) ${displayedVolumePercent}%, rgba(255, 255, 255, 0.12) 100%)`
+          background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${displayedVolumePercent}%, ${trackColor} ${displayedVolumePercent}%, ${trackColor} 100%)`
         }}
         onBlur={(event) => {
           if (previewVolumePercent !== null) commitVolume(Number(event.currentTarget.value))
@@ -87,7 +99,7 @@ export function PlaybackVolumeControl({
         }}
         onPointerUp={(event) => commitVolume(Number(event.currentTarget.value))}
       />
-      <span className="w-9 text-right text-xs tabular-nums">
+      <span className={percentageClassName}>
         {volumePercent === null ? '—' : `${displayedVolumePercent}%`}
       </span>
     </div>

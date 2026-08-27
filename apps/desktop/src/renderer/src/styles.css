@@ -177,6 +177,31 @@ select {
   outline-offset: 4px;
 }
 
+.drive-player-range::-webkit-slider-runnable-track {
+  height: 0.7rem;
+}
+
+.drive-player-range::-webkit-slider-thumb {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: -0.225rem;
+  background: #66e4ff;
+  opacity: 1;
+}
+
+.minimalist-player-range::-webkit-slider-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-top: -0.125rem;
+  opacity: 0;
+}
+
+.minimalist-player-range:hover::-webkit-slider-thumb,
+.minimalist-player-range:focus-visible::-webkit-slider-thumb,
+.minimalist-player-range:active::-webkit-slider-thumb {
+  opacity: 1;
+}
+
 .app-status {
   display: grid;
   min-height: 100vh;

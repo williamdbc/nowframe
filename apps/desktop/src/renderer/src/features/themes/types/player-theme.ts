@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 
 import type { PlaybackLoadStatus, PlaybackState } from '@/features/playback/types/playback-state'
 
@@ -16,14 +16,24 @@ export interface PlaybackControls {
   onToggleMute: () => void
 }
 
+export interface PlayerThemeChrome {
+  accountMenu: ReactNode
+  connectionStatus: ReactNode
+  fullscreenControl: ReactNode
+  themeSelector: ReactNode
+}
+
 export interface PlayerThemeProps {
+  chrome: PlayerThemeChrome
   controls: PlaybackControls
   playback: PlaybackState | null
   playbackStatus: PlaybackLoadStatus
 }
 
+export type PlayerThemeId = 'default' | 'drive' | 'minimalist'
+
 export interface PlayerTheme {
-  id: string
+  id: PlayerThemeId
   name: string
   component: ComponentType<PlayerThemeProps>
 }

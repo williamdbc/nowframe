@@ -7,11 +7,13 @@ import { SpotifyConnectionStatus } from '@/features/authentication/components/sp
 import { SpotifyProfileMenu } from '@/features/authentication/components/spotify-profile-menu'
 import { useGetSpotifyProfileQuery } from '@/features/authentication/hooks/useGetSpotifyProfileQuery'
 import { useLogoutFromSpotifyMutation } from '@/features/authentication/hooks/useLogoutFromSpotifyMutation'
-import { themeRegistry } from '@/features/themes/theme-registry'
+import { ThemeSelector } from '@/features/themes/components/theme-selector'
+import { useSelectedTheme } from '@/features/themes/hooks/useSelectedTheme'
+import { availableThemes } from '@/features/themes/theme-registry'
+import { FullscreenControl } from '@/features/window-controls/components/fullscreen-control'
 import { FullscreenHint } from '@/features/window-controls/components/fullscreen-hint'
 import { useWindowPresentationMode } from '@/features/window-controls/hooks/useWindowPresentationMode'
 
-import { DisplayToolbar } from './display-toolbar'
 import { useControlSpotifyPlaybackMutation } from '../hooks/useControlSpotifyPlaybackMutation'
 import { useGetSpotifyPlaybackQuery } from '../hooks/useGetSpotifyPlaybackQuery'
 import { useLivePlaybackState } from '../hooks/useLivePlaybackState'
@@ -27,7 +29,8 @@ export function MusicDisplayPage(): React.JSX.Element {
   const seekMutation = useSeekSpotifyPlaybackMutation()
   const logoutMutation = useLogoutFromSpotifyMutation()
   const navigate = useNavigate()
-  const ActiveTheme = themeRegistry.default.component
+  const selectedTheme = useSelectedTheme()
+  const ActiveTheme = selectedTheme.activeTheme.component
   const presentationMode = useWindowPresentationMode()
   const playback = useLivePlaybackState(playbackQuery.data ?? null)
   const volumeControl = usePlaybackVolumeControl(playback)
@@ -48,33 +51,45 @@ export function MusicDisplayPage(): React.JSX.Element {
 
   const playbackStatus: PlaybackLoadStatus =
     playbackQuery.data !== undefined ? 'ready' : playbackQuery.isError ? 'error' : 'loading'
-
-  return (
-    <>
-      {!presentationMode.isFullScreen && (
-        <>
-          <div className="fixed top-6 left-6 z-20">
-            <SpotifyConnectionStatus />
-          </div>
-          <DisplayToolbar
-            accountMenu={
-              <SpotifyProfileMenu
-                profile={profileQuery.data ?? null}
-                isLoading={profileQuery.isPending}
-                isError={profileQuery.isError}
-                isLoggingOut={logoutMutation.isPending}
-                onRetry={() => void profileQuery.refetch()}
-                onLogout={logoutFromSpotify}
-              />
-            }
-            activeThemeName={themeRegistry.default.name}
+  const chrome = presentationMode.isFullScreen
+    ? {
+        accountMenu: null,
+        connectionStatus: null,
+        fullscreenControl: null,
+        themeSelector: null
+      }
+    : {
+        accountMenu: (
+          <SpotifyProfileMenu
+            profile={profileQuery.data ?? null}
+            isLoading={profileQuery.isPending}
+            isError={profileQuery.isError}
+            isLoggingOut={logoutMutation.isPending}
+            onRetry={() => void profileQuery.refetch()}
+            onLogout={logoutFromSpotify}
+          />
+        ),
+        connectionStatus: <SpotifyConnectionStatus />,
+        fullscreenControl: (
+          <FullscreenControl
             isEnteringFullScreen={presentationMode.isTransitioning}
             onEnterFullScreen={presentationMode.enterFullScreen}
           />
-        </>
-      )}
+        ),
+        themeSelector: (
+          <ThemeSelector
+            activeThemeId={selectedTheme.activeThemeId}
+            onSelectTheme={selectedTheme.selectTheme}
+            themes={availableThemes}
+          />
+        )
+      }
+
+  return (
+    <>
       <FullscreenHint isFullScreen={presentationMode.isFullScreen} />
       <ActiveTheme
+        chrome={chrome}
         controls={{
           errorMessage:
             playbackControlMutation.error?.message ??
