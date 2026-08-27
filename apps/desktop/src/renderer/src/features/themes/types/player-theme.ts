@@ -3,16 +3,23 @@ import type { ComponentType, ReactNode } from 'react'
 import type { PlaybackLoadStatus, PlaybackState } from '@/features/playback/types/playback-state'
 
 export interface PlaybackControls {
+  canToggleSaved: boolean
   errorMessage: string | null
   isCommandPending: boolean
+  isLibraryPending: boolean
+  isPlaybackOptionPending: boolean
+  isSaved: boolean
   isSeekPending: boolean
   isVolumePending: boolean
+  onCycleRepeat: () => void
   onNext: () => void
   onPauseOrResume: () => void
   onPrevious: () => void
   onSeek: (positionMs: number) => void
   onCommitVolume: (volumePercent: number) => Promise<void>
   onSetVolume: (volumePercent: number) => void
+  onToggleSaved: () => void
+  onToggleShuffle: () => void
   onToggleMute: () => void
 }
 

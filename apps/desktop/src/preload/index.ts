@@ -11,9 +11,16 @@ const musicDisplayApi: MusicDisplayApi = {
     getSession: () => ipcRenderer.invoke(ipcChannels.getSpotifySession),
     getProfile: () => ipcRenderer.invoke(ipcChannels.getSpotifyProfile),
     getPlayback: () => ipcRenderer.invoke(ipcChannels.getSpotifyPlayback),
+    getLibraryItemState: (uri) => ipcRenderer.invoke(ipcChannels.getSpotifyLibraryItemState, uri),
     pausePlayback: () => ipcRenderer.invoke(ipcChannels.pauseSpotifyPlayback),
+    removeLibraryItem: (uri) => ipcRenderer.invoke(ipcChannels.removeSpotifyLibraryItem, uri),
     resumePlayback: () => ipcRenderer.invoke(ipcChannels.resumeSpotifyPlayback),
+    saveLibraryItem: (uri) => ipcRenderer.invoke(ipcChannels.saveSpotifyLibraryItem, uri),
     seekPlayback: (positionMs) => ipcRenderer.invoke(ipcChannels.seekSpotifyPlayback, positionMs),
+    setPlaybackRepeatMode: (repeatMode) =>
+      ipcRenderer.invoke(ipcChannels.setSpotifyPlaybackRepeatMode, repeatMode),
+    setPlaybackShuffle: (enabled) =>
+      ipcRenderer.invoke(ipcChannels.setSpotifyPlaybackShuffle, enabled),
     setPlaybackVolume: (volumePercent) =>
       ipcRenderer.invoke(ipcChannels.setSpotifyPlaybackVolume, volumePercent),
     skipPlaybackToNext: () => ipcRenderer.invoke(ipcChannels.skipSpotifyPlaybackToNext),

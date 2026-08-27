@@ -49,7 +49,7 @@ O renderer usa hash history (`#/` e `#/login`) porque a aplicação empacotada �
 
 ## Autenticação Spotify
 
-O processo `main` cria o verifier, challenge e state do PKCE, inicia temporariamente o callback em `127.0.0.1:8888`, abre o navegador padrão e troca o authorization code por tokens. Os scopes ficam definidos em `spotify-scopes.ts` e atualmente permitem identificar o perfil, ler e controlar a reprodução.
+O processo `main` cria o verifier, challenge e state do PKCE, inicia temporariamente o callback em `127.0.0.1:8888`, abre o navegador padrão e troca o authorization code por tokens. Os scopes ficam definidos em `spotify-scopes.ts` e atualmente permitem identificar o perfil, ler e controlar a reprodução e gerenciar itens salvos na biblioteca.
 
 O access token é renovado antes de expirar. Um refresh token expirado, revogado ou sem os scopes atuais remove a sessão local e exige nova autorização. O renderer recebe por IPC apenas o estado da sessão e os campos públicos de perfil usados pelo menu; tokens permanecem no processo principal.
 
@@ -63,6 +63,12 @@ Play, pause, faixa anterior e próxima são enviados pelo processo `main` ao dis
 
 Seek e volume usam o mesmo limite IPC e atualizam o cache de forma otimista, com rollback em falhas. O seek é enviado ao término da interação. O volume é atualizado durante o arraste com debounce e limite de frequência, e a última posição é confirmada ao soltar. Como a Web API não possui mute próprio, a interface envia volume zero e guarda em memória o último volume audível para restauração.
 
+Os estados de reprodução aleatória e repetição vêm na mesma resposta de playback, sem novas consultas. Seus comandos também atualizam o cache de forma otimista e respeitam as restrições de ação publicadas pelo Spotify. A repetição percorre `off`, `context` e `track`.
+
+## Biblioteca Spotify
+
+O estado de favorito não faz parte do polling do player. O renderer mantém uma query separada por URI do conteúdo e consulta a biblioteca apenas quando a faixa ou episódio muda; o resultado fica em cache por um minuto. Adicionar e remover usam os endpoints genéricos `/me/library`, com atualização otimista e rollback em falhas. URIs locais ou de tipos não suportados são rejeitadas no processo principal antes de acessar o Spotify.
+
 ## Modo apresentação
 
 O renderer solicita fullscreen por uma API tipada do preload. O processo `main` controla a `BrowserWindow` e publica as transições de entrada e saída para manter a interface sincronizada. Em fullscreen, a barra de ações desaparece e `ESC` encerra o modo apresentação.
@@ -71,7 +77,7 @@ O renderer solicita fullscreen por uma API tipada do preload. O processo `main` 
 
 Cada tema implementa um layout completo do player e possui seus próprios controles visuais de transporte. A página do display permanece responsável por buscar dados, executar comandos e selecionar o tema ativo; por isso, trocar o tema nunca duplica integração com Spotify ou estado assíncrono.
 
-O contrato `PlayerThemeProps` entrega a todos os temas os mesmos dados e capacidades: conteúdo atual, progresso, volume, faixa anterior, play/pause, próxima faixa e mensagens de erro. Progresso e volume reutilizam o comportamento compartilhado, mas aceitam aparência específica de cada tema. As ações de conta, conexão, tema e fullscreen são entregues como slots, permitindo que cada layout escolha suas posições.
+O contrato `PlayerThemeProps` entrega a todos os temas os mesmos dados e capacidades: conteúdo atual, progresso, volume, aleatório, faixa anterior, play/pause, próxima faixa, repetição, favorito e mensagens de erro. Progresso e volume reutilizam o comportamento compartilhado, mas aceitam aparência específica de cada tema. As ações de conta, conexão, tema e fullscreen são entregues como slots, permitindo que cada layout escolha suas posições.
 
 O registro central contém atualmente `default`, `drive` e `minimalist`. A preferência é persistida no `localStorage` do renderer e restaurada na próxima inicialização. Um teste de conformidade renderiza todos os temas registrados e garante que nenhum deles omita as capacidades obrigatórias do player.
 

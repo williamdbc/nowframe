@@ -10,7 +10,9 @@ const playback: PlaybackState = {
     canSeek: true,
     canSetVolume: true,
     canSkipNext: true,
-    canSkipPrevious: true
+    canSkipPrevious: true,
+    canToggleRepeat: true,
+    canToggleShuffle: true
   },
   device: {
     id: 'device-id',
@@ -28,9 +30,12 @@ const playback: PlaybackState = {
     id: 'track-id',
     imageUrl: null,
     title: 'Track',
-    type: 'track'
+    type: 'track',
+    uri: 'spotify:track:trackid'
   },
   progressMs: 30_000,
+  repeatMode: 'off',
+  shuffleEnabled: false,
   synchronizedAt: 1_000
 }
 

@@ -14,7 +14,9 @@ const playback: PlaybackState = {
     canSeek: true,
     canSetVolume: true,
     canSkipNext: true,
-    canSkipPrevious: true
+    canSkipPrevious: true,
+    canToggleRepeat: true,
+    canToggleShuffle: true
   },
   device: {
     id: 'device-id',
@@ -32,9 +34,12 @@ const playback: PlaybackState = {
     id: 'track-id',
     imageUrl: 'https://i.scdn.co/image/album-cover',
     title: 'Midnight City',
-    type: 'track'
+    type: 'track',
+    uri: 'spotify:track:trackid'
   },
   progressMs: 42_000,
+  repeatMode: 'off',
+  shuffleEnabled: false,
   synchronizedAt: 1_000
 }
 
@@ -47,16 +52,23 @@ const chrome: PlayerThemeChrome = {
 
 function createControls(): PlaybackControls {
   return {
+    canToggleSaved: true,
     errorMessage: null,
     isCommandPending: false,
+    isLibraryPending: false,
+    isPlaybackOptionPending: false,
+    isSaved: false,
     isSeekPending: false,
     isVolumePending: false,
+    onCycleRepeat: vi.fn(),
     onNext: vi.fn(),
     onPauseOrResume: vi.fn(),
     onPrevious: vi.fn(),
     onSeek: vi.fn(),
     onCommitVolume: vi.fn().mockResolvedValue(undefined),
     onSetVolume: vi.fn(),
+    onToggleSaved: vi.fn(),
+    onToggleShuffle: vi.fn(),
     onToggleMute: vi.fn()
   }
 }
@@ -82,6 +94,9 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     expect(screen.getByRole('button', { name: 'Faixa anterior' })).toBeEnabled()
     expect(screen.getByRole('button', { name: 'Pausar' })).toBeEnabled()
     expect(screen.getByRole('button', { name: 'Próxima faixa' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Ativar modo aleatório' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Ativar repetição' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Adicionar à biblioteca' })).toBeEnabled()
     expect(screen.getByText('Conta')).toBeInTheDocument()
     expect(screen.getByText('Conectado')).toBeInTheDocument()
     expect(screen.getByText('Tela cheia')).toBeInTheDocument()
@@ -96,10 +111,16 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     await user.click(screen.getByRole('button', { name: 'Faixa anterior' }))
     await user.click(screen.getByRole('button', { name: 'Pausar' }))
     await user.click(screen.getByRole('button', { name: 'Próxima faixa' }))
+    await user.click(screen.getByRole('button', { name: 'Ativar modo aleatório' }))
+    await user.click(screen.getByRole('button', { name: 'Ativar repetição' }))
+    await user.click(screen.getByRole('button', { name: 'Adicionar à biblioteca' }))
 
     expect(controls.onPrevious).toHaveBeenCalledOnce()
     expect(controls.onPauseOrResume).toHaveBeenCalledOnce()
     expect(controls.onNext).toHaveBeenCalledOnce()
+    expect(controls.onToggleShuffle).toHaveBeenCalledOnce()
+    expect(controls.onCycleRepeat).toHaveBeenCalledOnce()
+    expect(controls.onToggleSaved).toHaveBeenCalledOnce()
   })
 
   it('renders a genuine empty state with disabled transport controls', () => {
@@ -110,5 +131,8 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     expect(screen.getByRole('heading', { name: 'Nada tocando agora' })).toBeVisible()
     expect(screen.getByText('Dê o play no Spotify para ver a música aqui.')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Reproduzir' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Ativar modo aleatório' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Ativar repetição' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Adicionar à biblioteca' })).toBeDisabled()
   })
 })

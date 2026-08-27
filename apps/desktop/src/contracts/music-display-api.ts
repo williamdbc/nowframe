@@ -3,9 +3,14 @@ export const ipcChannels = {
   getSpotifySession: 'spotify:get-session',
   getSpotifyProfile: 'spotify:get-profile',
   getSpotifyPlayback: 'spotify:get-playback',
+  getSpotifyLibraryItemState: 'spotify:get-library-item-state',
   pauseSpotifyPlayback: 'spotify:pause-playback',
+  removeSpotifyLibraryItem: 'spotify:remove-library-item',
   resumeSpotifyPlayback: 'spotify:resume-playback',
+  saveSpotifyLibraryItem: 'spotify:save-library-item',
   seekSpotifyPlayback: 'spotify:seek-playback',
+  setSpotifyPlaybackRepeatMode: 'spotify:set-playback-repeat-mode',
+  setSpotifyPlaybackShuffle: 'spotify:set-playback-shuffle',
   setSpotifyPlaybackVolume: 'spotify:set-playback-volume',
   skipSpotifyPlaybackToNext: 'spotify:skip-playback-to-next',
   skipSpotifyPlaybackToPrevious: 'spotify:skip-playback-to-previous',
@@ -61,7 +66,10 @@ export interface SpotifyPlaybackItem {
   imageUrl: string | null
   title: string
   type: 'episode' | 'track'
+  uri: string | null
 }
+
+export type SpotifyRepeatMode = 'context' | 'off' | 'track'
 
 export interface SpotifyPlaybackState {
   capabilities: {
@@ -71,12 +79,21 @@ export interface SpotifyPlaybackState {
     canSetVolume: boolean
     canSkipNext: boolean
     canSkipPrevious: boolean
+    canToggleRepeat: boolean
+    canToggleShuffle: boolean
   }
   device: SpotifyPlaybackDevice
   isPlaying: boolean
   item: SpotifyPlaybackItem | null
   progressMs: number
+  repeatMode: SpotifyRepeatMode
+  shuffleEnabled: boolean
   synchronizedAt: number
+}
+
+export interface SpotifyLibraryItemState {
+  isSaved: boolean
+  uri: string
 }
 
 export interface MusicDisplayApi {
@@ -87,9 +104,14 @@ export interface MusicDisplayApi {
     getSession: () => Promise<SpotifySessionState>
     getProfile: () => Promise<SpotifyProfile>
     getPlayback: () => Promise<SpotifyPlaybackState | null>
+    getLibraryItemState: (uri: string) => Promise<SpotifyLibraryItemState>
     pausePlayback: () => Promise<void>
+    removeLibraryItem: (uri: string) => Promise<void>
     resumePlayback: () => Promise<void>
+    saveLibraryItem: (uri: string) => Promise<void>
     seekPlayback: (positionMs: number) => Promise<void>
+    setPlaybackRepeatMode: (repeatMode: SpotifyRepeatMode) => Promise<void>
+    setPlaybackShuffle: (enabled: boolean) => Promise<void>
     setPlaybackVolume: (volumePercent: number) => Promise<void>
     skipPlaybackToNext: () => Promise<void>
     skipPlaybackToPrevious: () => Promise<void>

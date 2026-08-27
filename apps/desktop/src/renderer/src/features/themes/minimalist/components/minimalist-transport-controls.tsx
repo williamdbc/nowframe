@@ -1,7 +1,8 @@
-import { Pause, Play, SkipBack, SkipForward } from 'lucide-react'
+import { Pause, Play, Repeat1, Repeat2, Shuffle, SkipBack, SkipForward } from 'lucide-react'
 
 import type { PlaybackState } from '@/features/playback/types/playback-state'
 import type { PlaybackControls } from '@/features/themes/types/player-theme'
+import { getRepeatControlLabel } from '@/features/themes/utils/get-repeat-control-label'
 
 interface MinimalistTransportControlsProps {
   controls: PlaybackControls
@@ -21,9 +22,19 @@ export function MinimalistTransportControls({
 
   return (
     <div
-      className="mt-7 flex items-center justify-center gap-5"
+      className="mt-7 flex items-center justify-center gap-3"
       aria-busy={controls.isCommandPending}
     >
+      <button
+        className={`${secondaryButtonClassName} aria-pressed:bg-white/10 aria-pressed:text-white`}
+        type="button"
+        aria-label={playback?.shuffleEnabled ? 'Desativar modo aleatório' : 'Ativar modo aleatório'}
+        aria-pressed={playback?.shuffleEnabled ?? false}
+        disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleShuffle}
+        onClick={controls.onToggleShuffle}
+      >
+        <Shuffle aria-hidden="true" className="h-5 w-5" />
+      </button>
       <button
         className={secondaryButtonClassName}
         type="button"
@@ -54,6 +65,20 @@ export function MinimalistTransportControls({
         onClick={controls.onNext}
       >
         <SkipForward aria-hidden="true" className="h-6 w-6" fill="currentColor" />
+      </button>
+      <button
+        className={`${secondaryButtonClassName} aria-pressed:bg-white/10 aria-pressed:text-white`}
+        type="button"
+        aria-label={getRepeatControlLabel(playback?.repeatMode ?? 'off')}
+        aria-pressed={playback?.repeatMode !== 'off'}
+        disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleRepeat}
+        onClick={controls.onCycleRepeat}
+      >
+        {playback?.repeatMode === 'track' ? (
+          <Repeat1 aria-hidden="true" className="h-5 w-5" />
+        ) : (
+          <Repeat2 aria-hidden="true" className="h-5 w-5" />
+        )}
       </button>
     </div>
   )

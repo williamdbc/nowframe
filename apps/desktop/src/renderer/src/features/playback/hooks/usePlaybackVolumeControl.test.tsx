@@ -15,7 +15,9 @@ const playback: PlaybackState = {
     canSeek: true,
     canSetVolume: true,
     canSkipNext: true,
-    canSkipPrevious: true
+    canSkipPrevious: true,
+    canToggleRepeat: true,
+    canToggleShuffle: true
   },
   device: {
     id: 'device-id',
@@ -28,6 +30,8 @@ const playback: PlaybackState = {
   isPlaying: true,
   item: null,
   progressMs: 0,
+  repeatMode: 'off',
+  shuffleEnabled: false,
   synchronizedAt: 1_000
 }
 

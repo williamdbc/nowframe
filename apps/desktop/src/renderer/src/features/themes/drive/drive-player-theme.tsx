@@ -1,4 +1,4 @@
-import { Disc3, MonitorSpeaker, Navigation } from 'lucide-react'
+import { Disc3, Heart, MonitorSpeaker, Navigation } from 'lucide-react'
 
 import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
@@ -56,9 +56,25 @@ export function DrivePlayerTheme({
             Modo direção
           </p>
 
-          <h1 className="line-clamp-2 pb-1 text-[clamp(3rem,5.2vw,6.5rem)] leading-[0.98] font-bold tracking-[-0.055em] text-balance">
-            {content.title}
-          </h1>
+          <div className="flex items-start gap-4">
+            <h1 className="line-clamp-2 min-w-0 flex-1 pb-1 text-[clamp(3rem,5.2vw,6.5rem)] leading-[0.98] font-bold tracking-[-0.055em] text-balance">
+              {content.title}
+            </h1>
+            <button
+              className={`mt-1 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border transition focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#66e4ff] disabled:cursor-not-allowed disabled:opacity-30 ${controls.isSaved ? 'border-[#66e4ff]/45 bg-[#66e4ff]/14 text-[#66e4ff]' : 'border-white/10 bg-white/[0.06] text-white/54 hover:bg-white/[0.1] hover:text-white'}`}
+              type="button"
+              aria-label={controls.isSaved ? 'Remover da biblioteca' : 'Adicionar à biblioteca'}
+              aria-pressed={controls.isSaved}
+              disabled={!item || !controls.canToggleSaved || controls.isLibraryPending}
+              onClick={controls.onToggleSaved}
+            >
+              <Heart
+                aria-hidden="true"
+                className="h-6 w-6"
+                fill={controls.isSaved ? 'currentColor' : 'none'}
+              />
+            </button>
+          </div>
           <p className="mt-5 truncate text-[clamp(1.45rem,2.6vw,2.7rem)] font-semibold text-white/58">
             {content.creatorNames}
           </p>

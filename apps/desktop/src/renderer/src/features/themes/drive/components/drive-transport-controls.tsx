@@ -1,7 +1,8 @@
-import { Pause, Play, SkipBack, SkipForward } from 'lucide-react'
+import { Pause, Play, Repeat1, Repeat2, Shuffle, SkipBack, SkipForward } from 'lucide-react'
 
 import type { PlaybackState } from '@/features/playback/types/playback-state'
 import type { PlaybackControls } from '@/features/themes/types/player-theme'
+import { getRepeatControlLabel } from '@/features/themes/utils/get-repeat-control-label'
 
 interface DriveTransportControlsProps {
   controls: PlaybackControls
@@ -21,9 +22,19 @@ export function DriveTransportControls({
 
   return (
     <div
-      className="grid grid-cols-[1fr_1.3fr_1fr] items-center gap-3"
+      className="grid grid-cols-[1fr_1fr_1.3fr_1fr_1fr] items-center gap-3"
       aria-busy={controls.isCommandPending}
     >
+      <button
+        className={`${secondaryButtonClassName} aria-pressed:border-[#66e4ff]/45 aria-pressed:bg-[#66e4ff]/12 aria-pressed:text-[#66e4ff]`}
+        type="button"
+        aria-label={playback?.shuffleEnabled ? 'Desativar modo aleatório' : 'Ativar modo aleatório'}
+        aria-pressed={playback?.shuffleEnabled ?? false}
+        disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleShuffle}
+        onClick={controls.onToggleShuffle}
+      >
+        <Shuffle aria-hidden="true" className="h-7 w-7" />
+      </button>
       <button
         className={secondaryButtonClassName}
         type="button"
@@ -54,6 +65,20 @@ export function DriveTransportControls({
         onClick={controls.onNext}
       >
         <SkipForward aria-hidden="true" className="h-9 w-9" fill="currentColor" />
+      </button>
+      <button
+        className={`${secondaryButtonClassName} aria-pressed:border-[#66e4ff]/45 aria-pressed:bg-[#66e4ff]/12 aria-pressed:text-[#66e4ff]`}
+        type="button"
+        aria-label={getRepeatControlLabel(playback?.repeatMode ?? 'off')}
+        aria-pressed={playback?.repeatMode !== 'off'}
+        disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleRepeat}
+        onClick={controls.onCycleRepeat}
+      >
+        {playback?.repeatMode === 'track' ? (
+          <Repeat1 aria-hidden="true" className="h-7 w-7" />
+        ) : (
+          <Repeat2 aria-hidden="true" className="h-7 w-7" />
+        )}
       </button>
     </div>
   )

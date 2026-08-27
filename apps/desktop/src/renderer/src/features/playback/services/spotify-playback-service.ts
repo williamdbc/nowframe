@@ -45,6 +45,26 @@ export class SpotifyPlaybackService {
     }
   }
 
+  static async setRepeatMode(
+    repeatMode: Parameters<typeof window.musicDisplay.spotify.setPlaybackRepeatMode>[0]
+  ): ReturnType<typeof window.musicDisplay.spotify.setPlaybackRepeatMode> {
+    try {
+      return await window.musicDisplay.spotify.setPlaybackRepeatMode(repeatMode)
+    } catch (error) {
+      throw normalizeIpcError(error, 'Não foi possível alterar o modo de repetição.')
+    }
+  }
+
+  static async setShuffle(
+    enabled: boolean
+  ): ReturnType<typeof window.musicDisplay.spotify.setPlaybackShuffle> {
+    try {
+      return await window.musicDisplay.spotify.setPlaybackShuffle(enabled)
+    } catch (error) {
+      throw normalizeIpcError(error, 'Não foi possível alterar o modo aleatório.')
+    }
+  }
+
   static async skipToNext(): ReturnType<typeof window.musicDisplay.spotify.skipPlaybackToNext> {
     try {
       return await window.musicDisplay.spotify.skipPlaybackToNext()

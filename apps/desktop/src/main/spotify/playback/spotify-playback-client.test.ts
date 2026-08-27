@@ -30,6 +30,8 @@ describe('SpotifyPlaybackClient', () => {
         JSON.stringify({
           device,
           is_playing: true,
+          repeat_state: 'context',
+          shuffle_state: true,
           progress_ms: 42_000,
           item: {
             id: 'track-id',
@@ -40,7 +42,8 @@ describe('SpotifyPlaybackClient', () => {
             album: {
               name: 'Hurry Up, We’re Dreaming',
               images: [{ url: 'https://i.scdn.co/image/album-cover' }]
-            }
+            },
+            uri: 'spotify:track:trackid'
           }
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -60,7 +63,9 @@ describe('SpotifyPlaybackClient', () => {
         canSeek: true,
         canSetVolume: true,
         canSkipNext: true,
-        canSkipPrevious: true
+        canSkipPrevious: true,
+        canToggleRepeat: true,
+        canToggleShuffle: true
       },
       device: {
         id: 'device-id',
@@ -78,9 +83,12 @@ describe('SpotifyPlaybackClient', () => {
         id: 'track-id',
         imageUrl: 'https://i.scdn.co/image/album-cover',
         title: 'Midnight City',
-        type: 'track'
+        type: 'track',
+        uri: 'spotify:track:trackid'
       },
       progressMs: 42_000,
+      repeatMode: 'context',
+      shuffleEnabled: true,
       synchronizedAt: 1_000_000
     })
   })
@@ -93,8 +101,17 @@ describe('SpotifyPlaybackClient', () => {
           JSON.stringify({
             device: { ...device, volume_percent: null, supports_volume: false },
             is_playing: false,
+            repeat_state: 'off',
+            shuffle_state: false,
             progress_ms: null,
-            actions: { pausing: true, seeking: true, skipping_next: true },
+            actions: {
+              pausing: true,
+              seeking: true,
+              skipping_next: true,
+              toggling_repeat_context: true,
+              toggling_repeat_track: true,
+              toggling_shuffle: true
+            },
             item: {
               id: 'episode-id',
               type: 'episode',
@@ -104,7 +121,8 @@ describe('SpotifyPlaybackClient', () => {
               show: {
                 name: 'Construindo Produtos',
                 images: [{ url: 'https://i.scdn.co/image/show-cover' }]
-              }
+              },
+              uri: 'spotify:episode:episodeid'
             }
           }),
           { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -131,7 +149,9 @@ describe('SpotifyPlaybackClient', () => {
       canSeek: false,
       canSetVolume: false,
       canSkipNext: false,
-      canSkipPrevious: true
+      canSkipPrevious: true,
+      canToggleRepeat: false,
+      canToggleShuffle: false
     })
   })
 
@@ -143,6 +163,8 @@ describe('SpotifyPlaybackClient', () => {
     await SpotifyPlaybackClient.resume('access-token')
     await SpotifyPlaybackClient.seek('access-token', 75_000)
     await SpotifyPlaybackClient.setVolume('access-token', 42)
+    await SpotifyPlaybackClient.setRepeatMode('access-token', 'track')
+    await SpotifyPlaybackClient.setShuffle('access-token', true)
     await SpotifyPlaybackClient.skipToNext('access-token')
     await SpotifyPlaybackClient.skipToPrevious('access-token')
 
@@ -173,11 +195,21 @@ describe('SpotifyPlaybackClient', () => {
     )
     expect(fetchMock).toHaveBeenNthCalledWith(
       5,
+      'https://api.spotify.com/v1/me/player/repeat?state=track',
+      request('PUT')
+    )
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      6,
+      'https://api.spotify.com/v1/me/player/shuffle?state=true',
+      request('PUT')
+    )
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      7,
       'https://api.spotify.com/v1/me/player/next',
       request('POST')
     )
     expect(fetchMock).toHaveBeenNthCalledWith(
-      6,
+      8,
       'https://api.spotify.com/v1/me/player/previous',
       request('POST')
     )

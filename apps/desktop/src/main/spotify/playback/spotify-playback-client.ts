@@ -2,7 +2,8 @@ import { z } from 'zod'
 
 import type {
   SpotifyPlaybackItem,
-  SpotifyPlaybackState
+  SpotifyPlaybackState,
+  SpotifyRepeatMode
 } from '../../../contracts/music-display-api'
 
 const spotifyPlaybackUrl = 'https://api.spotify.com/v1/me/player'
@@ -14,6 +15,8 @@ type SpotifyPlaybackCommandPath =
   | '/play'
   | '/previous'
   | `/seek?position_ms=${number}`
+  | `/repeat?state=${SpotifyRepeatMode}`
+  | `/shuffle?state=${boolean}`
   | `/volume?volume_percent=${number}`
 
 const spotifyImageSchema = z.object({
@@ -29,7 +32,8 @@ const spotifyTrackSchema = z.object({
   album: z.object({
     name: z.string(),
     images: z.array(spotifyImageSchema)
-  })
+  }),
+  uri: z.string().nullable().optional()
 })
 
 const spotifyEpisodeSchema = z.object({
@@ -41,7 +45,8 @@ const spotifyEpisodeSchema = z.object({
   show: z.object({
     name: z.string(),
     images: z.array(spotifyImageSchema).optional().default([])
-  })
+  }),
+  uri: z.string().nullable().optional()
 })
 
 const spotifyPlaybackResponseSchema = z.object({
@@ -54,6 +59,8 @@ const spotifyPlaybackResponseSchema = z.object({
     supports_volume: z.boolean()
   }),
   is_playing: z.boolean(),
+  repeat_state: z.enum(['context', 'off', 'track']),
+  shuffle_state: z.boolean(),
   item: z.unknown().nullable(),
   progress_ms: z.number().int().nonnegative().nullable(),
   actions: z
@@ -62,7 +69,10 @@ const spotifyPlaybackResponseSchema = z.object({
       resuming: z.boolean().optional(),
       seeking: z.boolean().optional(),
       skipping_next: z.boolean().optional(),
-      skipping_prev: z.boolean().optional()
+      skipping_prev: z.boolean().optional(),
+      toggling_repeat_context: z.boolean().optional(),
+      toggling_repeat_track: z.boolean().optional(),
+      toggling_shuffle: z.boolean().optional()
     })
     .optional()
     .default({})
@@ -86,7 +96,8 @@ function mapPlaybackItem(item: unknown): SpotifyPlaybackItem | null {
       id: track.data.id ?? null,
       imageUrl: track.data.album.images[0]?.url ?? null,
       title: track.data.name,
-      type: 'track'
+      type: 'track',
+      uri: track.data.uri ?? null
     }
   }
 
@@ -100,7 +111,8 @@ function mapPlaybackItem(item: unknown): SpotifyPlaybackItem | null {
       id: episode.data.id ?? null,
       imageUrl: episode.data.images[0]?.url ?? episode.data.show.images[0]?.url ?? null,
       title: episode.data.name,
-      type: 'episode'
+      type: 'episode',
+      uri: episode.data.uri ?? null
     }
   }
 
@@ -187,6 +199,10 @@ export class SpotifyPlaybackClient {
     const payload: unknown = await response.json().catch(() => null)
     const playback = spotifyPlaybackResponseSchema.parse(payload)
     const isRestricted = playback.device.is_restricted
+    const isNextRepeatModeRestricted =
+      playback.repeat_state === 'off'
+        ? playback.actions.toggling_repeat_context
+        : playback.actions.toggling_repeat_track
 
     return {
       capabilities: {
@@ -195,7 +211,9 @@ export class SpotifyPlaybackClient {
         canSeek: !isRestricted && !playback.actions.seeking,
         canSetVolume: !isRestricted && playback.device.supports_volume,
         canSkipNext: !isRestricted && !playback.actions.skipping_next,
-        canSkipPrevious: !isRestricted && !playback.actions.skipping_prev
+        canSkipPrevious: !isRestricted && !playback.actions.skipping_prev,
+        canToggleRepeat: !isRestricted && !isNextRepeatModeRestricted,
+        canToggleShuffle: !isRestricted && !playback.actions.toggling_shuffle
       },
       device: {
         id: playback.device.id,
@@ -208,6 +226,8 @@ export class SpotifyPlaybackClient {
       isPlaying: playback.is_playing,
       item: mapPlaybackItem(playback.item),
       progressMs: playback.progress_ms ?? 0,
+      repeatMode: playback.repeat_state,
+      shuffleEnabled: playback.shuffle_state,
       synchronizedAt: Date.now()
     }
   }
@@ -245,6 +265,24 @@ export class SpotifyPlaybackClient {
       `/volume?volume_percent=${volumePercent}`,
       'PUT',
       'Não foi possível alterar o volume da reprodução.'
+    )
+  }
+
+  static setRepeatMode(accessToken: string, repeatMode: SpotifyRepeatMode): Promise<void> {
+    return sendPlaybackCommand(
+      accessToken,
+      `/repeat?state=${repeatMode}`,
+      'PUT',
+      'Não foi possível alterar o modo de repetição.'
+    )
+  }
+
+  static setShuffle(accessToken: string, enabled: boolean): Promise<void> {
+    return sendPlaybackCommand(
+      accessToken,
+      `/shuffle?state=${enabled}`,
+      'PUT',
+      'Não foi possível alterar o modo aleatório.'
     )
   }
 

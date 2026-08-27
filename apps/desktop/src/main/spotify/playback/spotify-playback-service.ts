@@ -1,4 +1,4 @@
-import type { SpotifyPlaybackState } from '../../../contracts/music-display-api'
+import type { SpotifyPlaybackState, SpotifyRepeatMode } from '../../../contracts/music-display-api'
 import { SpotifyAuthService } from '../authentication/spotify-auth-service'
 import { SpotifyPlaybackClient } from './spotify-playback-client'
 
@@ -34,6 +34,22 @@ export class SpotifyPlaybackService {
     }
 
     return SpotifyPlaybackClient.setVolume(await this.getAccessToken(), volumePercent)
+  }
+
+  static async setRepeatMode(repeatMode: unknown): Promise<void> {
+    if (repeatMode !== 'context' && repeatMode !== 'off' && repeatMode !== 'track') {
+      throw new Error('O modo de repetição é inválido.')
+    }
+
+    return SpotifyPlaybackClient.setRepeatMode(
+      await this.getAccessToken(),
+      repeatMode satisfies SpotifyRepeatMode
+    )
+  }
+
+  static async setShuffle(enabled: unknown): Promise<void> {
+    if (typeof enabled !== 'boolean') throw new Error('O modo aleatório é inválido.')
+    return SpotifyPlaybackClient.setShuffle(await this.getAccessToken(), enabled)
   }
 
   static async skipToNext(): Promise<void> {

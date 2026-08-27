@@ -1,7 +1,9 @@
 export const spotifyAuthorizationScopes = [
   'user-read-private',
   'user-read-playback-state',
-  'user-modify-playback-state'
+  'user-modify-playback-state',
+  'user-library-read',
+  'user-library-modify'
 ] as const
 
 export function getSpotifyAuthorizationScope(): string {

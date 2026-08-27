@@ -7,6 +7,8 @@ import { SpotifyConnectionStatus } from '@/features/authentication/components/sp
 import { SpotifyProfileMenu } from '@/features/authentication/components/spotify-profile-menu'
 import { useGetSpotifyProfileQuery } from '@/features/authentication/hooks/useGetSpotifyProfileQuery'
 import { useLogoutFromSpotifyMutation } from '@/features/authentication/hooks/useLogoutFromSpotifyMutation'
+import { useGetSpotifyLibraryItemQuery } from '@/features/library/hooks/useGetSpotifyLibraryItemQuery'
+import { useToggleSpotifyLibraryItemMutation } from '@/features/library/hooks/useToggleSpotifyLibraryItemMutation'
 import { ThemeSelector } from '@/features/themes/components/theme-selector'
 import { useSelectedTheme } from '@/features/themes/hooks/useSelectedTheme'
 import { availableThemes } from '@/features/themes/theme-registry'
@@ -19,13 +21,16 @@ import { useGetSpotifyPlaybackQuery } from '../hooks/useGetSpotifyPlaybackQuery'
 import { useLivePlaybackState } from '../hooks/useLivePlaybackState'
 import { usePlaybackVolumeControl } from '../hooks/usePlaybackVolumeControl'
 import { useSeekSpotifyPlaybackMutation } from '../hooks/useSeekSpotifyPlaybackMutation'
+import { useSetSpotifyPlaybackOptionMutation } from '../hooks/useSetSpotifyPlaybackOptionMutation'
 import type { PlaybackLoadStatus } from '../types/playback-state'
+import { getNextRepeatMode } from '../utils/get-next-repeat-mode'
 
 export function MusicDisplayPage(): React.JSX.Element {
   const bootstrapQuery = useGetAppBootstrapQuery()
   const profileQuery = useGetSpotifyProfileQuery()
   const playbackQuery = useGetSpotifyPlaybackQuery()
   const playbackControlMutation = useControlSpotifyPlaybackMutation()
+  const playbackOptionMutation = useSetSpotifyPlaybackOptionMutation()
   const seekMutation = useSeekSpotifyPlaybackMutation()
   const logoutMutation = useLogoutFromSpotifyMutation()
   const navigate = useNavigate()
@@ -34,6 +39,11 @@ export function MusicDisplayPage(): React.JSX.Element {
   const presentationMode = useWindowPresentationMode()
   const playback = useLivePlaybackState(playbackQuery.data ?? null)
   const volumeControl = usePlaybackVolumeControl(playback)
+  const libraryItemUri = playback?.item?.uri?.startsWith(`spotify:${playback.item.type}:`)
+    ? playback.item.uri
+    : null
+  const libraryItemQuery = useGetSpotifyLibraryItemQuery(libraryItemUri)
+  const toggleLibraryItemMutation = useToggleSpotifyLibraryItemMutation()
 
   if (bootstrapQuery.isPending) {
     return <AppBootstrapLoadingState />
@@ -91,14 +101,30 @@ export function MusicDisplayPage(): React.JSX.Element {
       <ActiveTheme
         chrome={chrome}
         controls={{
+          canToggleSaved: Boolean(libraryItemUri && libraryItemQuery.data),
           errorMessage:
             playbackControlMutation.error?.message ??
+            playbackOptionMutation.error?.message ??
             seekMutation.error?.message ??
             volumeControl.error?.message ??
+            toggleLibraryItemMutation.error?.message ??
+            libraryItemQuery.error?.message ??
             null,
           isCommandPending: playbackControlMutation.isPending,
+          isLibraryPending:
+            Boolean(libraryItemUri && libraryItemQuery.isPending) ||
+            toggleLibraryItemMutation.isPending,
+          isPlaybackOptionPending: playbackOptionMutation.isPending,
+          isSaved: libraryItemQuery.data?.isSaved ?? false,
           isSeekPending: seekMutation.isPending,
           isVolumePending: volumeControl.isPending,
+          onCycleRepeat: () => {
+            if (!playback) return
+            playbackOptionMutation.mutate({
+              repeatMode: getNextRepeatMode(playback.repeatMode),
+              type: 'repeat'
+            })
+          },
           onNext: () => playbackControlMutation.mutate('next'),
           onPauseOrResume: () =>
             playbackControlMutation.mutate(playback?.isPlaying ? 'pause' : 'resume'),
@@ -106,6 +132,20 @@ export function MusicDisplayPage(): React.JSX.Element {
           onSeek: (positionMs) => seekMutation.mutate(Math.round(positionMs)),
           onCommitVolume: volumeControl.commitVolume,
           onSetVolume: volumeControl.setVolume,
+          onToggleSaved: () => {
+            if (!libraryItemUri || !libraryItemQuery.data) return
+            toggleLibraryItemMutation.mutate({
+              shouldSave: !libraryItemQuery.data.isSaved,
+              uri: libraryItemUri
+            })
+          },
+          onToggleShuffle: () => {
+            if (!playback) return
+            playbackOptionMutation.mutate({
+              enabled: !playback.shuffleEnabled,
+              type: 'shuffle'
+            })
+          },
           onToggleMute: volumeControl.toggleMute
         }}
         playback={playback}

@@ -16,7 +16,7 @@ describe('Spotify PKCE authorization', () => {
     expect(authorization.state).toMatch(/^[A-Za-z0-9_-]+$/)
   })
 
-  it('requests only the profile and playback scopes currently used by the application', () => {
+  it('requests only the profile, playback and library scopes used by the application', () => {
     const environment: SpotifyEnvironment = {
       clientId: 'client-id',
       redirectUri: 'http://127.0.0.1:8888/callback'
@@ -27,7 +27,7 @@ describe('Spotify PKCE authorization', () => {
     expect(authorizationUrl.origin).toBe('https://accounts.spotify.com')
     expect(authorizationUrl.pathname).toBe('/authorize')
     expect(authorizationUrl.searchParams.get('scope')).toBe(
-      'user-read-private user-read-playback-state user-modify-playback-state'
+      'user-read-private user-read-playback-state user-modify-playback-state user-library-read user-library-modify'
     )
     expect(authorizationUrl.searchParams.get('code_challenge_method')).toBe('S256')
     expect(authorizationUrl.searchParams.get('redirect_uri')).toBe(environment.redirectUri)
@@ -37,7 +37,7 @@ describe('Spotify PKCE authorization', () => {
   it('requires a new authorization when a stored session lacks a current scope', () => {
     expect(
       hasRequiredSpotifyAuthorizationScopes(
-        'user-read-private user-read-playback-state user-modify-playback-state'
+        'user-read-private user-read-playback-state user-modify-playback-state user-library-read user-library-modify'
       )
     ).toBe(true)
     expect(

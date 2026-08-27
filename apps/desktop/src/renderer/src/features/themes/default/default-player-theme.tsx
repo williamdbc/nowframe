@@ -1,4 +1,4 @@
-import { Disc3, MonitorSpeaker } from 'lucide-react'
+import { Disc3, Heart, MonitorSpeaker } from 'lucide-react'
 
 import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
@@ -51,9 +51,25 @@ export function DefaultPlayerTheme({
             Music Display
           </p>
 
-          <h1 className="line-clamp-2 pb-[0.08em] text-[clamp(2.75rem,5vw,6.25rem)] leading-[1.04] font-semibold tracking-[-0.055em] text-balance">
-            {content.title}
-          </h1>
+          <div className="flex items-start gap-4">
+            <h1 className="line-clamp-2 min-w-0 flex-1 pb-[0.08em] text-[clamp(2.75rem,5vw,6.25rem)] leading-[1.04] font-semibold tracking-[-0.055em] text-balance">
+              {content.title}
+            </h1>
+            <button
+              className={`mt-2 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border transition focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#1ed760] disabled:cursor-not-allowed disabled:opacity-30 ${controls.isSaved ? 'border-[#1ed760]/40 bg-[#1ed760]/12 text-[#1ed760]' : 'border-white/10 bg-white/[0.04] text-white/48 hover:bg-white/[0.08] hover:text-white'}`}
+              type="button"
+              aria-label={controls.isSaved ? 'Remover da biblioteca' : 'Adicionar à biblioteca'}
+              aria-pressed={controls.isSaved}
+              disabled={!item || !controls.canToggleSaved || controls.isLibraryPending}
+              onClick={controls.onToggleSaved}
+            >
+              <Heart
+                aria-hidden="true"
+                className="h-5 w-5"
+                fill={controls.isSaved ? 'currentColor' : 'none'}
+              />
+            </button>
+          </div>
 
           <p className="mt-6 truncate text-[clamp(1.3rem,2.5vw,2.3rem)] font-medium text-white/55">
             {content.creatorNames}

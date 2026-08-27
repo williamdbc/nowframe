@@ -66,6 +66,10 @@ select {
   background: white;
 }
 
+.player-control[aria-pressed='true'] {
+  color: #1ed760;
+}
+
 .player-control:disabled {
   cursor: not-allowed;
   opacity: 0.72;
