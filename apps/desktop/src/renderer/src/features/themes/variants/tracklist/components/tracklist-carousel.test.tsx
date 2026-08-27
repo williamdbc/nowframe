@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -55,6 +55,85 @@ describe('TracklistCarousel', () => {
     expect(screen.getByRole('img', { name: 'Capa de Midnight City' })).toBeVisible()
 
     await user.click(screen.getByRole('button', { name: 'Reproduzir Intro' }))
+    expect(onPlayTrack).toHaveBeenCalledWith(tracks[0])
+  })
+
+  it('scrolls by dragging without playing the track under the pointer', () => {
+    const onPlayTrack = vi.fn()
+
+    render(
+      <TracklistCarousel
+        contextName="Hurry Up, We’re Dreaming"
+        currentTrackId="track-2"
+        fallbackImageUrl="https://i.scdn.co/image/album-cover"
+        isPending={false}
+        isPlayPending={false}
+        onPlayTrack={onPlayTrack}
+        tracks={tracks}
+      />
+    )
+
+    const carousel = screen.getByLabelText('Faixas de Hurry Up, We’re Dreaming')
+    const trackButton = screen.getByRole('button', { name: 'Reproduzir Intro' })
+    carousel.scrollLeft = 120
+
+    fireEvent.pointerDown(carousel, {
+      button: 0,
+      clientX: 200,
+      pointerId: 1,
+      pointerType: 'mouse'
+    })
+
+    expect(carousel).toHaveClass('tracklist-scroll-dragging')
+
+    fireEvent.pointerMove(carousel, {
+      clientX: 150,
+      pointerId: 1,
+      pointerType: 'mouse'
+    })
+
+    expect(carousel).toHaveClass('tracklist-scroll-dragging')
+    expect(carousel.scrollLeft).toBe(170)
+
+    fireEvent.pointerUp(carousel, { pointerId: 1, pointerType: 'mouse' })
+    fireEvent.click(trackButton)
+
+    expect(carousel).not.toHaveClass('tracklist-scroll-dragging')
+    expect(onPlayTrack).not.toHaveBeenCalled()
+  })
+
+  it('keeps a short pointer movement as a normal track click', () => {
+    const onPlayTrack = vi.fn()
+
+    render(
+      <TracklistCarousel
+        contextName="Hurry Up, We’re Dreaming"
+        currentTrackId="track-2"
+        fallbackImageUrl="https://i.scdn.co/image/album-cover"
+        isPending={false}
+        isPlayPending={false}
+        onPlayTrack={onPlayTrack}
+        tracks={tracks}
+      />
+    )
+
+    const carousel = screen.getByLabelText('Faixas de Hurry Up, We’re Dreaming')
+    const trackButton = screen.getByRole('button', { name: 'Reproduzir Intro' })
+
+    fireEvent.pointerDown(carousel, {
+      button: 0,
+      clientX: 200,
+      pointerId: 1,
+      pointerType: 'mouse'
+    })
+    fireEvent.pointerMove(carousel, {
+      clientX: 196,
+      pointerId: 1,
+      pointerType: 'mouse'
+    })
+    fireEvent.pointerUp(carousel, { pointerId: 1, pointerType: 'mouse' })
+    fireEvent.click(trackButton)
+
     expect(onPlayTrack).toHaveBeenCalledWith(tracks[0])
   })
 })

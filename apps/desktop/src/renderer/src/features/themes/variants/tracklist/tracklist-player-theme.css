@@ -1,5 +1,24 @@
 .tracklist-scroll {
+  cursor: grab;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
   scrollbar-width: none;
+}
+
+.tracklist-scroll-dragging {
+  scroll-behavior: auto;
+  scroll-snap-type: none;
+}
+
+.tracklist-scroll-dragging,
+.tracklist-scroll-dragging .tracklist-card {
+  cursor: grabbing;
+}
+
+.tracklist-scroll-dragging .tracklist-card {
+  pointer-events: none;
+  transform: none;
+  transition: none;
 }
 
 .tracklist-scroll::-webkit-scrollbar {

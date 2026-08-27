@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Disc3, LoaderCircle } from 'lucide-react'
 
 import type { SpotifyTracklistTrack } from '../../../../../../../contracts/music-display-api'
@@ -13,6 +13,15 @@ interface TracklistCarouselProps {
   tracks: readonly SpotifyTracklistTrack[]
 }
 
+interface TracklistDragState {
+  hasDragged: boolean
+  pointerId: number
+  startScrollLeft: number
+  startX: number
+}
+
+const dragThresholdPx = 4
+
 export function TracklistCarousel({
   contextName,
   currentTrackId,
@@ -23,6 +32,9 @@ export function TracklistCarousel({
   tracks
 }: TracklistCarouselProps): React.JSX.Element {
   const currentTrackRef = useRef<HTMLButtonElement>(null)
+  const dragStateRef = useRef<TracklistDragState | null>(null)
+  const suppressClickRef = useRef(false)
+  const [isDragging, setIsDragging] = useState(false)
   const currentTrack = tracks.find((track) => track.id === currentTrackId)
 
   useEffect(() => {
@@ -32,6 +44,60 @@ export function TracklistCarousel({
       inline: 'center'
     })
   }, [currentTrackId, tracks])
+
+  const finishDrag = (container: HTMLDivElement, pointerId: number): void => {
+    const dragState = dragStateRef.current
+    if (!dragState || dragState.pointerId !== pointerId) return
+
+    suppressClickRef.current = dragState.hasDragged
+    dragStateRef.current = null
+    setIsDragging(false)
+
+    if (container.hasPointerCapture?.(pointerId)) {
+      container.releasePointerCapture(pointerId)
+    }
+
+    if (suppressClickRef.current) {
+      window.setTimeout(() => {
+        suppressClickRef.current = false
+      }, 0)
+    }
+  }
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>): void => {
+    if (event.button !== 0 || event.pointerType !== 'mouse') return
+
+    dragStateRef.current = {
+      hasDragged: false,
+      pointerId: event.pointerId,
+      startScrollLeft: event.currentTarget.scrollLeft,
+      startX: event.clientX
+    }
+    suppressClickRef.current = false
+    setIsDragging(true)
+    event.currentTarget.setPointerCapture?.(event.pointerId)
+  }
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>): void => {
+    const dragState = dragStateRef.current
+    if (!dragState || dragState.pointerId !== event.pointerId) return
+
+    const movementX = event.clientX - dragState.startX
+    if (!dragState.hasDragged && Math.abs(movementX) <= dragThresholdPx) return
+
+    dragState.hasDragged = true
+
+    event.preventDefault()
+    event.currentTarget.scrollLeft = dragState.startScrollLeft - movementX
+  }
+
+  const handleClickCapture = (event: React.MouseEvent<HTMLDivElement>): void => {
+    if (!suppressClickRef.current) return
+
+    event.preventDefault()
+    event.stopPropagation()
+    suppressClickRef.current = false
+  }
 
   if (isPending) {
     return (
@@ -52,8 +118,13 @@ export function TracklistCarousel({
 
   return (
     <div
-      className="tracklist-scroll flex snap-x snap-mandatory items-end gap-5 overflow-x-auto px-[calc(50%-5.5rem)] pt-2 pb-2"
+      className={`tracklist-scroll flex items-end gap-5 overflow-x-auto px-[calc(50%-5.5rem)] pt-2 pb-2 ${isDragging ? 'tracklist-scroll-dragging' : ''}`}
       aria-label={`Faixas de ${contextName}`}
+      onClickCapture={handleClickCapture}
+      onPointerCancel={(event) => finishDrag(event.currentTarget, event.pointerId)}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={(event) => finishDrag(event.currentTarget, event.pointerId)}
     >
       {tracks.map((track) => {
         const isCurrent = track === currentTrack
@@ -62,7 +133,7 @@ export function TracklistCarousel({
           <button
             key={`${track.id}:${track.position}`}
             ref={isCurrent ? currentTrackRef : undefined}
-            className={`tracklist-card group w-[7.5rem] shrink-0 snap-center text-left transition duration-300 focus-visible:rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8ee3c2] disabled:cursor-not-allowed ${isCurrent ? 'tracklist-card-current w-[11rem] opacity-100' : 'opacity-52 hover:-translate-y-1 hover:opacity-85'}`}
+            className={`tracklist-card group w-[7.5rem] shrink-0 snap-center text-left transition duration-300 focus-visible:rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8ee3c2] ${isCurrent ? 'tracklist-card-current w-[11rem] opacity-100' : 'opacity-52 hover:-translate-y-1 hover:opacity-85'}`}
             type="button"
             aria-current={isCurrent ? 'true' : undefined}
             aria-label={`${isCurrent ? 'Tocando agora: ' : 'Reproduzir '}${track.title}`}
@@ -78,6 +149,7 @@ export function TracklistCarousel({
                   alt={isCurrent ? `Capa de ${track.title}` : ''}
                   aria-hidden={isCurrent ? undefined : 'true'}
                   className="h-full w-full object-cover"
+                  draggable={false}
                 />
               ) : (
                 <span className="flex h-full w-full items-center justify-center bg-white/[0.04]">
