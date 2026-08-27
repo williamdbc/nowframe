@@ -120,21 +120,36 @@ function ensureSpotifyIsReadyForRequest(): void {
   }
 }
 
-async function createSpotifyApiError(response: Response, fallbackMessage: string): Promise<Error> {
+async function createSpotifyApiError(
+  response: Response,
+  fallbackMessage: string,
+  restrictionMessage?: string
+): Promise<Error> {
   if (response.status === 429) {
     rateLimitedUntil = Date.now() + getRetryAfterMilliseconds(response)
   }
 
   const payload: unknown = await response.json().catch(() => null)
   const apiError = spotifyApiErrorSchema.safeParse(payload)
-  return new Error(apiError.success ? apiError.data.error.message : fallbackMessage)
+  const apiMessage = apiError.success ? apiError.data.error.message : null
+
+  if (
+    response.status === 403 &&
+    restrictionMessage &&
+    apiMessage?.toLowerCase().includes('restriction violated')
+  ) {
+    return new Error(restrictionMessage)
+  }
+
+  return new Error(apiMessage ?? fallbackMessage)
 }
 
 async function sendPlaybackCommand(
   accessToken: string,
   path: SpotifyPlaybackCommandPath,
   method: 'POST' | 'PUT',
-  fallbackMessage: string
+  fallbackMessage: string,
+  restrictionMessage?: string
 ): Promise<void> {
   ensureSpotifyIsReadyForRequest()
 
@@ -145,7 +160,9 @@ async function sendPlaybackCommand(
     }
   })
 
-  if (!response.ok) throw await createSpotifyApiError(response, fallbackMessage)
+  if (!response.ok) {
+    throw await createSpotifyApiError(response, fallbackMessage, restrictionMessage)
+  }
 }
 
 export class SpotifyPlaybackClient {
@@ -236,7 +253,8 @@ export class SpotifyPlaybackClient {
       accessToken,
       '/next',
       'POST',
-      'Não foi possível avançar para o próximo conteúdo.'
+      'Não foi possível avançar para o próximo conteúdo.',
+      'Não é possível avançar agora. Você pode estar no fim da fila ou este conteúdo não permite essa ação.'
     )
   }
 
@@ -245,7 +263,8 @@ export class SpotifyPlaybackClient {
       accessToken,
       '/previous',
       'POST',
-      'Não foi possível voltar para o conteúdo anterior.'
+      'Não foi possível voltar para o conteúdo anterior.',
+      'Não é possível voltar agora. Você pode já estar na primeira faixa ou este conteúdo não permite essa ação.'
     )
   }
 }

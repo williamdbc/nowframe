@@ -183,6 +183,27 @@ describe('SpotifyPlaybackClient', () => {
     )
   })
 
+  it('explains when Spotify restricts going back from the current content', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            error: {
+              status: 403,
+              message: 'Player command failed: Restriction violated'
+            }
+          }),
+          { status: 403, headers: { 'Content-Type': 'application/json' } }
+        )
+      )
+    )
+
+    await expect(SpotifyPlaybackClient.skipToPrevious('access-token')).rejects.toThrow(
+      'Não é possível voltar agora. Você pode já estar na primeira faixa ou este conteúdo não permite essa ação.'
+    )
+  })
+
   it('respects the retry window returned by Spotify after rate limiting', async () => {
     vi.spyOn(Date, 'now').mockReturnValue(1_000_000)
     const fetchMock = vi.fn().mockResolvedValue(
