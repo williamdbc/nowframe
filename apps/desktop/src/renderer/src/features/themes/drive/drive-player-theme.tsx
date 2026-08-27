@@ -31,10 +31,9 @@ export function DrivePlayerTheme({
         {chrome.fullscreenControl}
       </nav>
 
-      <div className="relative mx-auto grid min-h-screen max-w-[1680px] grid-cols-[minmax(360px,0.92fr)_minmax(460px,1.08fr)] items-center gap-[clamp(3rem,6vw,7rem)] px-[clamp(3rem,6vw,7rem)] pt-24 pb-12 max-[900px]:grid-cols-1 max-[900px]:py-32">
-        <section className="relative">
-          <div className="absolute -inset-5 rounded-[3rem] border border-[#66e4ff]/10 bg-[#66e4ff]/[0.025]" />
-          <div className="relative aspect-square overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#151c20] shadow-[0_35px_100px_rgba(0,0,0,0.55)]">
+      <div className="relative mx-auto grid min-h-screen max-w-[1680px] grid-cols-[minmax(280px,0.85fr)_minmax(400px,1.15fr)] items-center gap-[clamp(2rem,4vw,6rem)] px-[clamp(2rem,4vw,7rem)] pt-24 pb-12 max-[1100px]:pt-20 max-[1100px]:pb-2 max-[800px]:grid-cols-1 max-[800px]:py-32">
+        <section>
+          <div className="aspect-square overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#151c20] shadow-[0_35px_100px_rgba(0,0,0,0.55)]">
             {content.imageUrl ? (
               <img
                 src={content.imageUrl}
@@ -114,9 +113,7 @@ export function DrivePlayerTheme({
             trackColor="rgba(255,255,255,0.1)"
           />
 
-          <div className="mt-8 rounded-[2rem] border border-white/8 bg-black/20 p-3 shadow-[0_20px_60px_rgba(0,0,0,0.22)]">
-            <DriveTransportControls controls={controls} playback={playback} />
-          </div>
+          <DriveTransportControls controls={controls} playback={playback} />
 
           {controls.errorMessage && (
             <p className="mt-5 max-w-xl text-sm font-semibold text-red-200" role="alert">
