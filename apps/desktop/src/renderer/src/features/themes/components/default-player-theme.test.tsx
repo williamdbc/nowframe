@@ -1,10 +1,25 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { vi } from 'vitest'
 
+import type { PlaybackControls } from '../types/player-theme'
 import { DefaultPlayerTheme } from './default-player-theme'
+
+function createControls(): PlaybackControls {
+  return {
+    errorMessage: null,
+    isPending: false,
+    onNext: vi.fn(),
+    onPauseOrResume: vi.fn(),
+    onPrevious: vi.fn()
+  }
+}
 
 describe('DefaultPlayerTheme', () => {
   it('renders the real empty playback state', () => {
-    render(<DefaultPlayerTheme playback={null} playbackStatus="ready" />)
+    render(
+      <DefaultPlayerTheme controls={createControls()} playback={null} playbackStatus="ready" />
+    )
 
     expect(screen.getByRole('heading', { name: 'Nada tocando agora' })).toBeInTheDocument()
     expect(screen.getByText('Dê o play no Spotify para ver a música aqui.')).toBeInTheDocument()
@@ -12,20 +27,33 @@ describe('DefaultPlayerTheme', () => {
   })
 
   it('distinguishes initial synchronization and errors from an empty player', () => {
-    const { rerender } = render(<DefaultPlayerTheme playback={null} playbackStatus="loading" />)
+    const controls = createControls()
+    const { rerender } = render(
+      <DefaultPlayerTheme controls={controls} playback={null} playbackStatus="loading" />
+    )
 
     expect(screen.getByRole('heading', { name: 'Sincronizando com Spotify' })).toBeInTheDocument()
 
-    rerender(<DefaultPlayerTheme playback={null} playbackStatus="error" />)
+    rerender(<DefaultPlayerTheme controls={controls} playback={null} playbackStatus="error" />)
 
     expect(screen.getByRole('heading', { name: 'Não foi possível atualizar' })).toBeInTheDocument()
   })
 
-  it('renders synchronized playback metadata and device information', () => {
+  it('renders metadata and sends available playback controls', async () => {
+    const user = userEvent.setup()
+    const controls = createControls()
+
     render(
       <DefaultPlayerTheme
+        controls={controls}
         playbackStatus="ready"
         playback={{
+          capabilities: {
+            canPause: true,
+            canResume: true,
+            canSkipNext: true,
+            canSkipPrevious: true
+          },
           device: {
             id: 'device-id',
             isRestricted: false,
@@ -55,6 +83,11 @@ describe('DefaultPlayerTheme', () => {
     expect(screen.getByText('Hurry Up, We’re Dreaming')).toBeInTheDocument()
     expect(screen.getByText('MacBook Pro')).toBeInTheDocument()
     expect(screen.getByText('64%')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Pausar' })).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: 'Faixa anterior' }))
+    await user.click(screen.getByRole('button', { name: 'Pausar' }))
+    await user.click(screen.getByRole('button', { name: 'Próxima faixa' }))
+    expect(controls.onPrevious).toHaveBeenCalledOnce()
+    expect(controls.onPauseOrResume).toHaveBeenCalledOnce()
+    expect(controls.onNext).toHaveBeenCalledOnce()
   })
 })

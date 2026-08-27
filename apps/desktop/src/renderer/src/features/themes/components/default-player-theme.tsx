@@ -10,6 +10,7 @@ function formatDuration(milliseconds: number): string {
 }
 
 export function DefaultPlayerTheme({
+  controls,
   playback,
   playbackStatus
 }: PlayerThemeProps): React.JSX.Element {
@@ -33,6 +34,9 @@ export function DefaultPlayerTheme({
         : playback
           ? 'O Spotify não disponibilizou os dados deste conteúdo.'
           : 'Dê o play no Spotify para ver a música aqui.'
+  const canPauseOrResume = playback?.isPlaying
+    ? playback.capabilities.canPause
+    : playback?.capabilities.canResume
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#08090a] text-white">
@@ -101,15 +105,22 @@ export function DefaultPlayerTheme({
             </div>
           </div>
 
-          <div className="mt-10 flex items-center gap-7">
-            <button className="player-control" type="button" aria-label="Faixa anterior" disabled>
+          <div className="mt-10 flex items-center gap-7" aria-busy={controls.isPending}>
+            <button
+              className="player-control"
+              type="button"
+              aria-label="Faixa anterior"
+              disabled={controls.isPending || !playback?.capabilities.canSkipPrevious}
+              onClick={controls.onPrevious}
+            >
               <SkipBack aria-hidden="true" className="h-8 w-8" fill="currentColor" />
             </button>
             <button
               className="player-control player-control-primary"
               type="button"
               aria-label={playback?.isPlaying ? 'Pausar' : 'Reproduzir'}
-              disabled
+              disabled={controls.isPending || !canPauseOrResume}
+              onClick={controls.onPauseOrResume}
             >
               {playback?.isPlaying ? (
                 <Pause aria-hidden="true" className="h-9 w-9" fill="currentColor" />
@@ -117,10 +128,22 @@ export function DefaultPlayerTheme({
                 <Play aria-hidden="true" className="ml-1 h-9 w-9" fill="currentColor" />
               )}
             </button>
-            <button className="player-control" type="button" aria-label="Próxima faixa" disabled>
+            <button
+              className="player-control"
+              type="button"
+              aria-label="Próxima faixa"
+              disabled={controls.isPending || !playback?.capabilities.canSkipNext}
+              onClick={controls.onNext}
+            >
               <SkipForward aria-hidden="true" className="h-8 w-8" fill="currentColor" />
             </button>
           </div>
+
+          {controls.errorMessage && (
+            <p className="mt-4 text-sm font-medium text-red-300" role="alert">
+              {controls.errorMessage}
+            </p>
+          )}
         </section>
       </div>
     </main>

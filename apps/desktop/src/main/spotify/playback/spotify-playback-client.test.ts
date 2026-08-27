@@ -54,6 +54,12 @@ describe('SpotifyPlaybackClient', () => {
       headers: { Authorization: 'Bearer access-token' }
     })
     expect(playback).toEqual({
+      capabilities: {
+        canPause: true,
+        canResume: true,
+        canSkipNext: true,
+        canSkipPrevious: true
+      },
       device: {
         id: 'device-id',
         isRestricted: false,
@@ -86,6 +92,7 @@ describe('SpotifyPlaybackClient', () => {
             device: { ...device, volume_percent: null, supports_volume: false },
             is_playing: false,
             progress_ms: null,
+            actions: { pausing: true, skipping_next: true },
             item: {
               id: 'episode-id',
               type: 'episode',
@@ -116,6 +123,48 @@ describe('SpotifyPlaybackClient', () => {
       supportsVolume: false,
       volumePercent: null
     })
+    expect(playback?.capabilities).toEqual({
+      canPause: false,
+      canResume: true,
+      canSkipNext: false,
+      canSkipPrevious: true
+    })
+  })
+
+  it('sends playback controls to the active Spotify device', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await SpotifyPlaybackClient.pause('access-token')
+    await SpotifyPlaybackClient.resume('access-token')
+    await SpotifyPlaybackClient.skipToNext('access-token')
+    await SpotifyPlaybackClient.skipToPrevious('access-token')
+
+    const request = (method: 'POST' | 'PUT'): RequestInit => ({
+      method,
+      headers: { Authorization: 'Bearer access-token' }
+    })
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      'https://api.spotify.com/v1/me/player/pause',
+      request('PUT')
+    )
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'https://api.spotify.com/v1/me/player/play',
+      request('PUT')
+    )
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      3,
+      'https://api.spotify.com/v1/me/player/next',
+      request('POST')
+    )
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      4,
+      'https://api.spotify.com/v1/me/player/previous',
+      request('POST')
+    )
   })
 
   it('respects the retry window returned by Spotify after rate limiting', async () => {
@@ -132,7 +181,7 @@ describe('SpotifyPlaybackClient', () => {
       'Too many requests'
     )
     await expect(SpotifyPlaybackClient.getCurrentPlayback('access-token')).rejects.toThrow(
-      'O Spotify solicitou uma pausa antes da próxima sincronização.'
+      'O Spotify solicitou uma pausa antes da próxima solicitação.'
     )
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })

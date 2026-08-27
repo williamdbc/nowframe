@@ -4,6 +4,12 @@ import type { PlaybackState } from '../types/playback-state'
 import { calculatePlaybackProgress } from './calculate-playback-progress'
 
 const playback: PlaybackState = {
+  capabilities: {
+    canPause: true,
+    canResume: true,
+    canSkipNext: true,
+    canSkipPrevious: true
+  },
   device: {
     id: 'device-id',
     isRestricted: false,

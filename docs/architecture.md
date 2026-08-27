@@ -59,7 +59,9 @@ O processo `main` consulta `GET /me/player` e entrega ao renderer um contrato re
 
 Enquanto há reprodução ativa, a query sincroniza a cada 3 segundos; pausada ou sem reprodução, a cada 10 segundos; após falhas, a cada 30 segundos. O polling para quando a janela fica em segundo plano e volta imediatamente ao foco. Entre respostas do Spotify, o progresso visual avança localmente a cada 250 ms e é corrigido na próxima sincronização. Respostas de rate limit respeitam o `Retry-After` antes de uma nova chamada externa.
 
-Nesta etapa, os controles continuam desabilitados. Comandos de play, pause, faixa e volume serão adicionados sobre o mesmo limite IPC, antes da avaliação do Web Playback SDK.
+Play, pause, faixa anterior e próxima são enviados pelo processo `main` ao dispositivo ativo. O renderer aplica uma atualização otimista apenas ao estado play/pause, restaura o cache se o comando falhar e reconcilia com a Web API ao concluir. Restrições de dispositivo e contexto retornadas pelo Spotify determinam quais botões ficam disponíveis.
+
+Seek e volume serão adicionados sobre o mesmo limite IPC antes da avaliação do Web Playback SDK.
 
 ## Modo apresentação
 

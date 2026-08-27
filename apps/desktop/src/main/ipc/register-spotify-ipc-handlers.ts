@@ -9,6 +9,12 @@ export function registerSpotifyIpcHandlers(): void {
   ipcMain.handle(ipcChannels.getSpotifySession, () => SpotifyAuthService.getSession())
   ipcMain.handle(ipcChannels.getSpotifyProfile, () => SpotifyProfileService.getCurrentProfile())
   ipcMain.handle(ipcChannels.getSpotifyPlayback, () => SpotifyPlaybackService.getCurrentPlayback())
+  ipcMain.handle(ipcChannels.pauseSpotifyPlayback, () => SpotifyPlaybackService.pause())
+  ipcMain.handle(ipcChannels.resumeSpotifyPlayback, () => SpotifyPlaybackService.resume())
+  ipcMain.handle(ipcChannels.skipSpotifyPlaybackToNext, () => SpotifyPlaybackService.skipToNext())
+  ipcMain.handle(ipcChannels.skipSpotifyPlaybackToPrevious, () =>
+    SpotifyPlaybackService.skipToPrevious()
+  )
   ipcMain.handle(ipcChannels.loginWithSpotify, () => SpotifyAuthService.login())
   ipcMain.handle(ipcChannels.logoutFromSpotify, () => SpotifyAuthService.logout())
 }

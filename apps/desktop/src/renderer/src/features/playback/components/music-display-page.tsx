@@ -12,6 +12,7 @@ import { FullscreenHint } from '@/features/window-controls/components/fullscreen
 import { useWindowPresentationMode } from '@/features/window-controls/hooks/useWindowPresentationMode'
 
 import { DisplayToolbar } from './display-toolbar'
+import { useControlSpotifyPlaybackMutation } from '../hooks/useControlSpotifyPlaybackMutation'
 import { useGetSpotifyPlaybackQuery } from '../hooks/useGetSpotifyPlaybackQuery'
 import { useLivePlaybackState } from '../hooks/useLivePlaybackState'
 import type { PlaybackLoadStatus } from '../types/playback-state'
@@ -20,6 +21,7 @@ export function MusicDisplayPage(): React.JSX.Element {
   const bootstrapQuery = useGetAppBootstrapQuery()
   const profileQuery = useGetSpotifyProfileQuery()
   const playbackQuery = useGetSpotifyPlaybackQuery()
+  const playbackControlMutation = useControlSpotifyPlaybackMutation()
   const logoutMutation = useLogoutFromSpotifyMutation()
   const navigate = useNavigate()
   const ActiveTheme = themeRegistry.default.component
@@ -68,7 +70,18 @@ export function MusicDisplayPage(): React.JSX.Element {
         </>
       )}
       <FullscreenHint isFullScreen={presentationMode.isFullScreen} />
-      <ActiveTheme playback={playback} playbackStatus={playbackStatus} />
+      <ActiveTheme
+        controls={{
+          errorMessage: playbackControlMutation.error?.message ?? null,
+          isPending: playbackControlMutation.isPending,
+          onNext: () => playbackControlMutation.mutate('next'),
+          onPauseOrResume: () =>
+            playbackControlMutation.mutate(playback?.isPlaying ? 'pause' : 'resume'),
+          onPrevious: () => playbackControlMutation.mutate('previous')
+        }}
+        playback={playback}
+        playbackStatus={playbackStatus}
+      />
     </>
   )
 }

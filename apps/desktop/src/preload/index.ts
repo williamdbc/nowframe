@@ -11,6 +11,10 @@ const musicDisplayApi: MusicDisplayApi = {
     getSession: () => ipcRenderer.invoke(ipcChannels.getSpotifySession),
     getProfile: () => ipcRenderer.invoke(ipcChannels.getSpotifyProfile),
     getPlayback: () => ipcRenderer.invoke(ipcChannels.getSpotifyPlayback),
+    pausePlayback: () => ipcRenderer.invoke(ipcChannels.pauseSpotifyPlayback),
+    resumePlayback: () => ipcRenderer.invoke(ipcChannels.resumeSpotifyPlayback),
+    skipPlaybackToNext: () => ipcRenderer.invoke(ipcChannels.skipSpotifyPlaybackToNext),
+    skipPlaybackToPrevious: () => ipcRenderer.invoke(ipcChannels.skipSpotifyPlaybackToPrevious),
     login: () => ipcRenderer.invoke(ipcChannels.loginWithSpotify),
     logout: () => ipcRenderer.invoke(ipcChannels.logoutFromSpotify)
   },

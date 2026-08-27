@@ -47,7 +47,16 @@ const spotifyPlaybackResponseSchema = z.object({
   }),
   is_playing: z.boolean(),
   item: z.unknown().nullable(),
-  progress_ms: z.number().int().nonnegative().nullable()
+  progress_ms: z.number().int().nonnegative().nullable(),
+  actions: z
+    .object({
+      pausing: z.boolean().optional(),
+      resuming: z.boolean().optional(),
+      skipping_next: z.boolean().optional(),
+      skipping_prev: z.boolean().optional()
+    })
+    .optional()
+    .default({})
 })
 
 const spotifyApiErrorSchema = z.object({
@@ -96,11 +105,43 @@ function getRetryAfterMilliseconds(response: Response): number {
     : 30_000
 }
 
+function ensureSpotifyIsReadyForRequest(): void {
+  if (Date.now() < rateLimitedUntil) {
+    throw new Error('O Spotify solicitou uma pausa antes da próxima solicitação.')
+  }
+}
+
+async function createSpotifyApiError(response: Response, fallbackMessage: string): Promise<Error> {
+  if (response.status === 429) {
+    rateLimitedUntil = Date.now() + getRetryAfterMilliseconds(response)
+  }
+
+  const payload: unknown = await response.json().catch(() => null)
+  const apiError = spotifyApiErrorSchema.safeParse(payload)
+  return new Error(apiError.success ? apiError.data.error.message : fallbackMessage)
+}
+
+async function sendPlaybackCommand(
+  accessToken: string,
+  path: '/next' | '/pause' | '/play' | '/previous',
+  method: 'POST' | 'PUT',
+  fallbackMessage: string
+): Promise<void> {
+  ensureSpotifyIsReadyForRequest()
+
+  const response = await fetch(`${spotifyPlaybackUrl}${path}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+
+  if (!response.ok) throw await createSpotifyApiError(response, fallbackMessage)
+}
+
 export class SpotifyPlaybackClient {
   static async getCurrentPlayback(accessToken: string): Promise<SpotifyPlaybackState | null> {
-    if (Date.now() < rateLimitedUntil) {
-      throw new Error('O Spotify solicitou uma pausa antes da próxima sincronização.')
-    }
+    ensureSpotifyIsReadyForRequest()
 
     const response = await fetch(spotifyPlaybackUrl, {
       headers: {
@@ -110,24 +151,24 @@ export class SpotifyPlaybackClient {
 
     if (response.status === 204) return null
 
-    const payload: unknown = await response.json().catch(() => null)
-
     if (!response.ok) {
-      if (response.status === 429) {
-        rateLimitedUntil = Date.now() + getRetryAfterMilliseconds(response)
-      }
-
-      const apiError = spotifyApiErrorSchema.safeParse(payload)
-      throw new Error(
-        apiError.success
-          ? apiError.data.error.message
-          : 'Não foi possível sincronizar a reprodução do Spotify.'
+      throw await createSpotifyApiError(
+        response,
+        'Não foi possível sincronizar a reprodução do Spotify.'
       )
     }
 
+    const payload: unknown = await response.json().catch(() => null)
     const playback = spotifyPlaybackResponseSchema.parse(payload)
+    const isRestricted = playback.device.is_restricted
 
     return {
+      capabilities: {
+        canPause: !isRestricted && !playback.actions.pausing,
+        canResume: !isRestricted && !playback.actions.resuming,
+        canSkipNext: !isRestricted && !playback.actions.skipping_next,
+        canSkipPrevious: !isRestricted && !playback.actions.skipping_prev
+      },
       device: {
         id: playback.device.id,
         isRestricted: playback.device.is_restricted,
@@ -141,5 +182,41 @@ export class SpotifyPlaybackClient {
       progressMs: playback.progress_ms ?? 0,
       synchronizedAt: Date.now()
     }
+  }
+
+  static pause(accessToken: string): Promise<void> {
+    return sendPlaybackCommand(
+      accessToken,
+      '/pause',
+      'PUT',
+      'Não foi possível pausar a reprodução do Spotify.'
+    )
+  }
+
+  static resume(accessToken: string): Promise<void> {
+    return sendPlaybackCommand(
+      accessToken,
+      '/play',
+      'PUT',
+      'Não foi possível retomar a reprodução do Spotify.'
+    )
+  }
+
+  static skipToNext(accessToken: string): Promise<void> {
+    return sendPlaybackCommand(
+      accessToken,
+      '/next',
+      'POST',
+      'Não foi possível avançar para o próximo conteúdo.'
+    )
+  }
+
+  static skipToPrevious(accessToken: string): Promise<void> {
+    return sendPlaybackCommand(
+      accessToken,
+      '/previous',
+      'POST',
+      'Não foi possível voltar para o conteúdo anterior.'
+    )
   }
 }

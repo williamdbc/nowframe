@@ -3,6 +3,10 @@ export const ipcChannels = {
   getSpotifySession: 'spotify:get-session',
   getSpotifyProfile: 'spotify:get-profile',
   getSpotifyPlayback: 'spotify:get-playback',
+  pauseSpotifyPlayback: 'spotify:pause-playback',
+  resumeSpotifyPlayback: 'spotify:resume-playback',
+  skipSpotifyPlaybackToNext: 'spotify:skip-playback-to-next',
+  skipSpotifyPlaybackToPrevious: 'spotify:skip-playback-to-previous',
   loginWithSpotify: 'spotify:login',
   logoutFromSpotify: 'spotify:logout',
   getWindowState: 'window:get-state',
@@ -58,6 +62,12 @@ export interface SpotifyPlaybackItem {
 }
 
 export interface SpotifyPlaybackState {
+  capabilities: {
+    canPause: boolean
+    canResume: boolean
+    canSkipNext: boolean
+    canSkipPrevious: boolean
+  }
   device: SpotifyPlaybackDevice
   isPlaying: boolean
   item: SpotifyPlaybackItem | null
@@ -73,6 +83,10 @@ export interface MusicDisplayApi {
     getSession: () => Promise<SpotifySessionState>
     getProfile: () => Promise<SpotifyProfile>
     getPlayback: () => Promise<SpotifyPlaybackState | null>
+    pausePlayback: () => Promise<void>
+    resumePlayback: () => Promise<void>
+    skipPlaybackToNext: () => Promise<void>
+    skipPlaybackToPrevious: () => Promise<void>
     login: () => Promise<SpotifySessionState>
     logout: () => Promise<SpotifySessionState>
   }
