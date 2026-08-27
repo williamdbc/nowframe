@@ -1,39 +1,36 @@
 import { Pause, Play, Repeat1, Repeat2, Shuffle, SkipBack, SkipForward } from 'lucide-react'
 
 import type { PlaybackState } from '@/features/playback/types/playback-state'
-import type { PlaybackControls } from '@/features/themes/types/player-theme'
-import { getRepeatControlLabel } from '@/features/themes/utils/get-repeat-control-label'
+import type { PlaybackControls } from '@/features/themes/core/types/player-theme'
+import { getRepeatControlLabel } from '@/features/themes/core/utils/get-repeat-control-label'
 
-interface DriveTransportControlsProps {
+interface MinimalistTransportControlsProps {
   controls: PlaybackControls
   playback: PlaybackState | null
 }
 
 const secondaryButtonClassName =
-  'flex h-28 w-full items-center justify-center rounded-[1.75rem] border border-white/10 bg-white/[0.07] text-white/76 transition hover:bg-white/[0.12] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#66e4ff] disabled:cursor-not-allowed disabled:opacity-30 max-[1100px]:h-20 max-[1100px]:rounded-[1.35rem]'
+  'flex h-12 w-12 items-center justify-center rounded-full text-white/55 transition hover:bg-white/8 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-25'
 
-export function DriveTransportControls({
+export function MinimalistTransportControls({
   controls,
   playback
-}: DriveTransportControlsProps): React.JSX.Element {
+}: MinimalistTransportControlsProps): React.JSX.Element {
   const canPauseOrResume = playback?.isPlaying
     ? playback.capabilities.canPause
     : playback?.capabilities.canResume
 
   return (
-    <div
-      className="mt-8 grid grid-cols-[1fr_1fr_1.3fr_1fr_1fr] items-center gap-3 max-[1100px]:gap-2"
-      aria-busy={controls.isCommandPending}
-    >
+    <div className="flex items-center justify-center gap-3" aria-busy={controls.isCommandPending}>
       <button
-        className={`${secondaryButtonClassName} aria-pressed:border-[#66e4ff]/45 aria-pressed:bg-[#66e4ff]/12 aria-pressed:text-[#66e4ff]`}
+        className={`${secondaryButtonClassName} aria-pressed:bg-white/10 aria-pressed:text-white`}
         type="button"
         aria-label={playback?.shuffleEnabled ? 'Desativar modo aleatório' : 'Ativar modo aleatório'}
         aria-pressed={playback?.shuffleEnabled ?? false}
         disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleShuffle}
         onClick={controls.onToggleShuffle}
       >
-        <Shuffle aria-hidden="true" className="h-8 w-8" />
+        <Shuffle aria-hidden="true" className="h-5 w-5" />
       </button>
       <button
         className={secondaryButtonClassName}
@@ -42,19 +39,19 @@ export function DriveTransportControls({
         disabled={controls.isCommandPending || !playback?.capabilities.canSkipPrevious}
         onClick={controls.onPrevious}
       >
-        <SkipBack aria-hidden="true" className="h-10 w-10" fill="currentColor" />
+        <SkipBack aria-hidden="true" className="h-6 w-6" fill="currentColor" />
       </button>
       <button
-        className="flex h-30 w-full items-center justify-center rounded-[2rem] bg-[#66e4ff] text-[#071014] shadow-[0_16px_50px_rgba(102,228,255,0.24)] transition hover:bg-[#8aecff] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-35 max-[1100px]:h-24 max-[1100px]:rounded-[1.5rem]"
+        className="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-white text-[#111] shadow-xl transition hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-30"
         type="button"
         aria-label={playback?.isPlaying ? 'Pausar' : 'Reproduzir'}
         disabled={controls.isCommandPending || !canPauseOrResume}
         onClick={controls.onPauseOrResume}
       >
         {playback?.isPlaying ? (
-          <Pause aria-hidden="true" className="h-12 w-12" fill="currentColor" />
+          <Pause aria-hidden="true" className="h-7 w-7" fill="currentColor" />
         ) : (
-          <Play aria-hidden="true" className="ml-1 h-12 w-12" fill="currentColor" />
+          <Play aria-hidden="true" className="ml-0.5 h-7 w-7" fill="currentColor" />
         )}
       </button>
       <button
@@ -64,10 +61,10 @@ export function DriveTransportControls({
         disabled={controls.isCommandPending || !playback?.capabilities.canSkipNext}
         onClick={controls.onNext}
       >
-        <SkipForward aria-hidden="true" className="h-10 w-10" fill="currentColor" />
+        <SkipForward aria-hidden="true" className="h-6 w-6" fill="currentColor" />
       </button>
       <button
-        className={`${secondaryButtonClassName} aria-pressed:border-[#66e4ff]/45 aria-pressed:bg-[#66e4ff]/12 aria-pressed:text-[#66e4ff]`}
+        className={`${secondaryButtonClassName} aria-pressed:bg-white/10 aria-pressed:text-white`}
         type="button"
         aria-label={getRepeatControlLabel(playback?.repeatMode ?? 'off')}
         aria-pressed={playback?.repeatMode !== 'off'}
@@ -75,9 +72,9 @@ export function DriveTransportControls({
         onClick={controls.onCycleRepeat}
       >
         {playback?.repeatMode === 'track' ? (
-          <Repeat1 aria-hidden="true" className="h-8 w-8" />
+          <Repeat1 aria-hidden="true" className="h-5 w-5" />
         ) : (
-          <Repeat2 aria-hidden="true" className="h-8 w-8" />
+          <Repeat2 aria-hidden="true" className="h-5 w-5" />
         )}
       </button>
     </div>

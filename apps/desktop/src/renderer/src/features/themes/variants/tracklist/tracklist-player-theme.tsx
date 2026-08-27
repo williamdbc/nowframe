@@ -3,11 +3,12 @@ import { Disc3, Heart, MonitorSpeaker } from 'lucide-react'
 import { PlaybackErrorMessage } from '@/features/playback/components/playback-error-message'
 import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
-import type { PlayerThemeProps } from '@/features/themes/types/player-theme'
-import { getPlayerThemeContent } from '@/features/themes/utils/get-player-theme-content'
+import type { PlayerThemeProps } from '@/features/themes/core/types/player-theme'
+import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
 
 import { TracklistCarousel } from './components/tracklist-carousel'
 import { TracklistTransportControls } from './components/tracklist-transport-controls'
+import './tracklist-player-theme.css'
 
 export function TracklistPlayerTheme({
   chrome,

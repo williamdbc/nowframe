@@ -1,0 +1,11 @@
+.drive-player-range::-webkit-slider-runnable-track {
+  height: 0.7rem;
+}
+
+.drive-player-range::-webkit-slider-thumb {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: -0.225rem;
+  background: #66e4ff;
+  opacity: 1;
+}

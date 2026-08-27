@@ -1,7 +1,7 @@
 import type { ComponentType, ReactNode } from 'react'
 
 import type { PlaybackLoadStatus, PlaybackState } from '@/features/playback/types/playback-state'
-import type { SpotifyTracklistTrack } from '../../../../../contracts/music-display-api'
+import type { SpotifyTracklistTrack } from '../../../../../../contracts/music-display-api'
 
 export interface PlaybackControls {
   canToggleSaved: boolean

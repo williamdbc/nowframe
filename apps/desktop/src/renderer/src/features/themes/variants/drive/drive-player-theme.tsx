@@ -3,10 +3,11 @@ import { Disc3, Heart, MonitorSpeaker } from 'lucide-react'
 import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
 import { PlaybackErrorMessage } from '@/features/playback/components/playback-error-message'
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
-import type { PlayerThemeProps } from '@/features/themes/types/player-theme'
-import { getPlayerThemeContent } from '@/features/themes/utils/get-player-theme-content'
+import type { PlayerThemeProps } from '@/features/themes/core/types/player-theme'
+import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
 
 import { DriveTransportControls } from './components/drive-transport-controls'
+import './drive-player-theme.css'
 
 export function DrivePlayerTheme({
   chrome,

@@ -1,7 +1,11 @@
 import { useCallback, useState } from 'react'
 
-import { defaultThemeId, isPlayerThemeId, themeRegistry } from '@/features/themes/theme-registry'
-import type { PlayerTheme, PlayerThemeId } from '@/features/themes/types/player-theme'
+import {
+  defaultThemeId,
+  isPlayerThemeId,
+  themeRegistry
+} from '@/features/themes/core/theme-registry'
+import type { PlayerTheme, PlayerThemeId } from '@/features/themes/core/types/player-theme'
 
 export const selectedThemeStorageKey = 'music-display:selected-theme'
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Disc3, LoaderCircle } from 'lucide-react'
 
-import type { SpotifyTracklistTrack } from '../../../../../../contracts/music-display-api'
+import type { SpotifyTracklistTrack } from '../../../../../../../contracts/music-display-api'
 
 interface TracklistCarouselProps {
   contextName: string
