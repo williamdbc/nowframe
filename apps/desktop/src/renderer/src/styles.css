@@ -92,6 +92,18 @@ select {
   outline-offset: 4px;
 }
 
+@media (max-width: 1100px) {
+  .default-transport-controls .player-control {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .default-transport-controls .player-control-primary {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+}
+
 .player-range {
   appearance: none;
   width: 100%;

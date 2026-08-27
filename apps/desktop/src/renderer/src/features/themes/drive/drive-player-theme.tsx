@@ -1,4 +1,4 @@
-import { Disc3, Heart, MonitorSpeaker, Navigation } from 'lucide-react'
+import { Disc3, Heart, MonitorSpeaker } from 'lucide-react'
 
 import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
@@ -51,11 +51,6 @@ export function DrivePlayerTheme({
         </section>
 
         <section className="min-w-0">
-          <p className="mb-5 inline-flex items-center gap-2 text-sm font-bold tracking-[0.24em] text-[#66e4ff] uppercase">
-            <Navigation aria-hidden="true" className="h-4 w-4" />
-            Modo direção
-          </p>
-
           <div className="flex items-start gap-4">
             <h1 className="line-clamp-2 min-w-0 flex-1 pb-1 text-[clamp(3rem,5.2vw,6.5rem)] leading-[0.98] font-bold tracking-[-0.055em] text-balance">
               {content.title}

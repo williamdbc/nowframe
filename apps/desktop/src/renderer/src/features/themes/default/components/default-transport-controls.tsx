@@ -18,7 +18,10 @@ export function DefaultTransportControls({
     : playback?.capabilities.canResume
 
   return (
-    <div className="mt-10 flex items-center gap-4" aria-busy={controls.isCommandPending}>
+    <div
+      className="default-transport-controls flex items-center gap-4 max-[1100px]:gap-2"
+      aria-busy={controls.isCommandPending}
+    >
       <button
         className="player-control aria-pressed:text-[#1ed760]"
         type="button"

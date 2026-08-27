@@ -21,10 +21,7 @@ export function MinimalistTransportControls({
     : playback?.capabilities.canResume
 
   return (
-    <div
-      className="mt-7 flex items-center justify-center gap-3"
-      aria-busy={controls.isCommandPending}
-    >
+    <div className="flex items-center justify-center gap-3" aria-busy={controls.isCommandPending}>
       <button
         className={`${secondaryButtonClassName} aria-pressed:bg-white/10 aria-pressed:text-white`}
         type="button"

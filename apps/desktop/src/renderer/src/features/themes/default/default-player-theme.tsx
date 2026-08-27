@@ -47,29 +47,9 @@ export function DefaultPlayerTheme({
         </section>
 
         <section className="flex min-w-0 flex-col">
-          <p className="mb-6 text-sm font-semibold tracking-[0.28em] text-[#1ed760] uppercase">
-            Music Display
-          </p>
-
-          <div className="flex items-start gap-4">
-            <h1 className="line-clamp-2 min-w-0 flex-1 pb-[0.08em] text-[clamp(2.75rem,5vw,6.25rem)] leading-[1.04] font-semibold tracking-[-0.055em] text-balance">
-              {content.title}
-            </h1>
-            <button
-              className={`mt-2 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border transition focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#1ed760] disabled:cursor-not-allowed disabled:opacity-30 ${controls.isSaved ? 'border-[#1ed760]/40 bg-[#1ed760]/12 text-[#1ed760]' : 'border-white/10 bg-white/[0.04] text-white/48 hover:bg-white/[0.08] hover:text-white'}`}
-              type="button"
-              aria-label={controls.isSaved ? 'Remover da biblioteca' : 'Adicionar à biblioteca'}
-              aria-pressed={controls.isSaved}
-              disabled={!item || !controls.canToggleSaved || controls.isLibraryPending}
-              onClick={controls.onToggleSaved}
-            >
-              <Heart
-                aria-hidden="true"
-                className="h-5 w-5"
-                fill={controls.isSaved ? 'currentColor' : 'none'}
-              />
-            </button>
-          </div>
+          <h1 className="line-clamp-2 min-w-0 pb-[0.08em] text-[clamp(2.75rem,5vw,6.25rem)] leading-[1.04] font-semibold tracking-[-0.055em] text-balance">
+            {content.title}
+          </h1>
 
           <p className="mt-6 truncate text-[clamp(1.3rem,2.5vw,2.3rem)] font-medium text-white/55">
             {content.creatorNames}
@@ -107,7 +87,23 @@ export function DefaultPlayerTheme({
             positionMs={playback?.progressMs ?? 0}
           />
 
-          <DefaultTransportControls controls={controls} playback={playback} />
+          <div className="relative mt-10">
+            <DefaultTransportControls controls={controls} playback={playback} />
+            <button
+              className={`absolute top-1/2 right-0 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border transition focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#1ed760] disabled:cursor-not-allowed disabled:opacity-30 ${controls.isSaved ? 'border-[#1ed760]/40 bg-[#1ed760]/12 text-[#1ed760]' : 'border-white/10 bg-white/[0.04] text-white/48 hover:bg-white/[0.08] hover:text-white'}`}
+              type="button"
+              aria-label={controls.isSaved ? 'Remover da biblioteca' : 'Adicionar à biblioteca'}
+              aria-pressed={controls.isSaved}
+              disabled={!item || !controls.canToggleSaved || controls.isLibraryPending}
+              onClick={controls.onToggleSaved}
+            >
+              <Heart
+                aria-hidden="true"
+                className="h-5 w-5"
+                fill={controls.isSaved ? 'currentColor' : 'none'}
+              />
+            </button>
+          </div>
 
           {controls.errorMessage && (
             <p className="mt-4 text-sm font-medium text-red-300" role="alert">

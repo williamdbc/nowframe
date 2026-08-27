@@ -54,27 +54,10 @@ export function MinimalistPlayerTheme({
           )}
         </div>
 
-        <p className="mt-8 text-[0.68rem] font-semibold tracking-[0.34em] text-white/34 uppercase">
-          Music Display
-        </p>
-        <div className="mt-3 flex max-w-2xl items-start justify-center gap-3">
+        <div className="mt-8 flex max-w-2xl items-start justify-center gap-3">
           <h1 className="line-clamp-2 min-w-0 pb-1 text-[clamp(2rem,4.2vw,4.4rem)] leading-[1.02] font-medium tracking-[-0.045em] text-balance">
             {content.title}
           </h1>
-          <button
-            className={`mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-25 ${controls.isSaved ? 'bg-white/12 text-white' : 'text-white/36 hover:bg-white/[0.07] hover:text-white/70'}`}
-            type="button"
-            aria-label={controls.isSaved ? 'Remover da biblioteca' : 'Adicionar à biblioteca'}
-            aria-pressed={controls.isSaved}
-            disabled={!item || !controls.canToggleSaved || controls.isLibraryPending}
-            onClick={controls.onToggleSaved}
-          >
-            <Heart
-              aria-hidden="true"
-              className="h-5 w-5"
-              fill={controls.isSaved ? 'currentColor' : 'none'}
-            />
-          </button>
         </div>
         <p className="mt-3 max-w-xl truncate text-[clamp(1rem,1.8vw,1.45rem)] font-medium text-white/52">
           {content.creatorNames}
@@ -96,7 +79,23 @@ export function MinimalistPlayerTheme({
           trackColor="rgba(255,255,255,0.14)"
         />
 
-        <MinimalistTransportControls controls={controls} playback={playback} />
+        <div className="relative mt-7 w-full max-w-xl">
+          <MinimalistTransportControls controls={controls} playback={playback} />
+          <button
+            className={`absolute top-1 right-0 flex h-10 w-10 items-center justify-center rounded-full transition focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-25 ${controls.isSaved ? 'bg-white/12 text-white' : 'text-white/36 hover:bg-white/[0.07] hover:text-white/70'}`}
+            type="button"
+            aria-label={controls.isSaved ? 'Remover da biblioteca' : 'Adicionar à biblioteca'}
+            aria-pressed={controls.isSaved}
+            disabled={!item || !controls.canToggleSaved || controls.isLibraryPending}
+            onClick={controls.onToggleSaved}
+          >
+            <Heart
+              aria-hidden="true"
+              className="h-5 w-5"
+              fill={controls.isSaved ? 'currentColor' : 'none'}
+            />
+          </button>
+        </div>
 
         {playback && (
           <div className="mt-6 flex items-center gap-4 text-white/38">

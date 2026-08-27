@@ -97,6 +97,8 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     expect(screen.getByRole('button', { name: 'Ativar modo aleatório' })).toBeEnabled()
     expect(screen.getByRole('button', { name: 'Ativar repetição' })).toBeEnabled()
     expect(screen.getByRole('button', { name: 'Adicionar à biblioteca' })).toBeEnabled()
+    expect(screen.queryByText('Music Display')).not.toBeInTheDocument()
+    expect(screen.queryByText('Modo direção')).not.toBeInTheDocument()
     expect(screen.getByText('Conta')).toBeInTheDocument()
     expect(screen.getByText('Conectado')).toBeInTheDocument()
     expect(screen.getByText('Tela cheia')).toBeInTheDocument()
