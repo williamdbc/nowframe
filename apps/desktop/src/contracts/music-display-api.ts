@@ -2,6 +2,7 @@ export const ipcChannels = {
   getAppBootstrapState: 'app:get-bootstrap-state',
   getSpotifySession: 'spotify:get-session',
   getSpotifyProfile: 'spotify:get-profile',
+  getSpotifyPlayback: 'spotify:get-playback',
   loginWithSpotify: 'spotify:login',
   logoutFromSpotify: 'spotify:logout',
   getWindowState: 'window:get-state',
@@ -37,6 +38,33 @@ export interface SpotifyProfile {
   profileUrl: string
 }
 
+export interface SpotifyPlaybackDevice {
+  id: string | null
+  isRestricted: boolean
+  name: string
+  supportsVolume: boolean
+  type: string
+  volumePercent: number | null
+}
+
+export interface SpotifyPlaybackItem {
+  collectionName: string
+  creatorNames: string[]
+  durationMs: number
+  id: string | null
+  imageUrl: string | null
+  title: string
+  type: 'episode' | 'track'
+}
+
+export interface SpotifyPlaybackState {
+  device: SpotifyPlaybackDevice
+  isPlaying: boolean
+  item: SpotifyPlaybackItem | null
+  progressMs: number
+  synchronizedAt: number
+}
+
 export interface MusicDisplayApi {
   app: {
     getBootstrapState: () => Promise<AppBootstrapState>
@@ -44,6 +72,7 @@ export interface MusicDisplayApi {
   spotify: {
     getSession: () => Promise<SpotifySessionState>
     getProfile: () => Promise<SpotifyProfile>
+    getPlayback: () => Promise<SpotifyPlaybackState | null>
     login: () => Promise<SpotifySessionState>
     logout: () => Promise<SpotifySessionState>
   }

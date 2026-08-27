@@ -1,9 +1,4 @@
-function normalizeIpcError(error: unknown): Error {
-  if (!(error instanceof Error)) return new Error('Não foi possível comunicar com o Spotify.')
-
-  const message = error.message.replace(/^Error invoking remote method '[^']+': (?:Error: )?/, '')
-  return new Error(message)
-}
+import { normalizeIpcError } from '@/shared/utils/normalize-ipc-error'
 
 export class SpotifyAuthenticationService {
   static getSession(): ReturnType<typeof window.musicDisplay.spotify.getSession> {
@@ -14,7 +9,7 @@ export class SpotifyAuthenticationService {
     try {
       return await window.musicDisplay.spotify.getProfile()
     } catch (error) {
-      throw normalizeIpcError(error)
+      throw normalizeIpcError(error, 'Não foi possível carregar o perfil do Spotify.')
     }
   }
 
@@ -22,7 +17,7 @@ export class SpotifyAuthenticationService {
     try {
       return await window.musicDisplay.spotify.login()
     } catch (error) {
-      throw normalizeIpcError(error)
+      throw normalizeIpcError(error, 'Não foi possível conectar com o Spotify.')
     }
   }
 
@@ -30,7 +25,7 @@ export class SpotifyAuthenticationService {
     try {
       return await window.musicDisplay.spotify.logout()
     } catch (error) {
-      throw normalizeIpcError(error)
+      throw normalizeIpcError(error, 'Não foi possível desconectar do Spotify.')
     }
   }
 }

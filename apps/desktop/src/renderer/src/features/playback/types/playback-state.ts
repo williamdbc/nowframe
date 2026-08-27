@@ -1,9 +1,7 @@
-export interface PlaybackState {
-  isPlaying: boolean
-  trackName: string
-  artistNames: string[]
-  albumName: string
-  albumImageUrl: string | null
-  durationMs: number
-  progressMs: number
-}
+import type { SpotifyPlaybackService } from '../services/spotify-playback-service'
+
+export type PlaybackState = NonNullable<
+  Awaited<ReturnType<typeof SpotifyPlaybackService.getCurrentPlayback>>
+>
+
+export type PlaybackLoadStatus = 'error' | 'loading' | 'ready'

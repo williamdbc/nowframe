@@ -12,14 +12,19 @@ import { FullscreenHint } from '@/features/window-controls/components/fullscreen
 import { useWindowPresentationMode } from '@/features/window-controls/hooks/useWindowPresentationMode'
 
 import { DisplayToolbar } from './display-toolbar'
+import { useGetSpotifyPlaybackQuery } from '../hooks/useGetSpotifyPlaybackQuery'
+import { useLivePlaybackState } from '../hooks/useLivePlaybackState'
+import type { PlaybackLoadStatus } from '../types/playback-state'
 
 export function MusicDisplayPage(): React.JSX.Element {
   const bootstrapQuery = useGetAppBootstrapQuery()
   const profileQuery = useGetSpotifyProfileQuery()
+  const playbackQuery = useGetSpotifyPlaybackQuery()
   const logoutMutation = useLogoutFromSpotifyMutation()
   const navigate = useNavigate()
   const ActiveTheme = themeRegistry.default.component
   const presentationMode = useWindowPresentationMode()
+  const playback = useLivePlaybackState(playbackQuery.data ?? null)
 
   if (bootstrapQuery.isPending) {
     return <AppBootstrapLoadingState />
@@ -34,6 +39,9 @@ export function MusicDisplayPage(): React.JSX.Element {
       onSuccess: () => void navigate({ to: '/login' })
     })
   }
+
+  const playbackStatus: PlaybackLoadStatus =
+    playbackQuery.data !== undefined ? 'ready' : playbackQuery.isError ? 'error' : 'loading'
 
   return (
     <>
@@ -60,7 +68,7 @@ export function MusicDisplayPage(): React.JSX.Element {
         </>
       )}
       <FullscreenHint isFullScreen={presentationMode.isFullScreen} />
-      <ActiveTheme playback={null} />
+      <ActiveTheme playback={playback} playbackStatus={playbackStatus} />
     </>
   )
 }

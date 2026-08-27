@@ -53,6 +53,14 @@ O processo `main` cria o verifier, challenge e state do PKCE, inicia temporariam
 
 O access token é renovado antes de expirar. Um refresh token expirado, revogado ou sem os scopes atuais remove a sessão local e exige nova autorização. O renderer recebe por IPC apenas o estado da sessão e os campos públicos de perfil usados pelo menu; tokens permanecem no processo principal.
 
+## Sincronização da reprodução
+
+O processo `main` consulta `GET /me/player` e entrega ao renderer um contrato reduzido com conteúdo atual, progresso, dispositivo e volume. O renderer não recebe o access token nem a resposta completa do Spotify.
+
+Enquanto há reprodução ativa, a query sincroniza a cada 3 segundos; pausada ou sem reprodução, a cada 10 segundos; após falhas, a cada 30 segundos. O polling para quando a janela fica em segundo plano e volta imediatamente ao foco. Entre respostas do Spotify, o progresso visual avança localmente a cada 250 ms e é corrigido na próxima sincronização. Respostas de rate limit respeitam o `Retry-After` antes de uma nova chamada externa.
+
+Nesta etapa, os controles continuam desabilitados. Comandos de play, pause, faixa e volume serão adicionados sobre o mesmo limite IPC, antes da avaliação do Web Playback SDK.
+
 ## Modo apresentação
 
 O renderer solicita fullscreen por uma API tipada do preload. O processo `main` controla a `BrowserWindow` e publica as transições de entrada e saída para manter a interface sincronizada. Em fullscreen, a barra de ações desaparece e `ESC` encerra o modo apresentação.

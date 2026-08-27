@@ -1,4 +1,4 @@
-import { Disc3, Pause, Play, SkipBack, SkipForward } from 'lucide-react'
+import { Disc3, MonitorSpeaker, Pause, Play, SkipBack, SkipForward, Volume2 } from 'lucide-react'
 
 import type { PlayerThemeProps } from '../types/player-theme'
 
@@ -9,10 +9,30 @@ function formatDuration(milliseconds: number): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }
 
-export function DefaultPlayerTheme({ playback }: PlayerThemeProps): React.JSX.Element {
-  const progressPercentage = playback?.durationMs
-    ? Math.min(100, (playback.progressMs / playback.durationMs) * 100)
+export function DefaultPlayerTheme({
+  playback,
+  playbackStatus
+}: PlayerThemeProps): React.JSX.Element {
+  const item = playback?.item ?? null
+  const progressPercentage = item?.durationMs
+    ? Math.min(100, ((playback?.progressMs ?? 0) / item.durationMs) * 100)
     : 0
+  const emptyTitle =
+    playbackStatus === 'loading'
+      ? 'Sincronizando com Spotify'
+      : playbackStatus === 'error'
+        ? 'Não foi possível atualizar'
+        : playback
+          ? 'Conteúdo sem detalhes'
+          : 'Nada tocando agora'
+  const emptyDescription =
+    playbackStatus === 'loading'
+      ? 'Buscando a reprodução atual...'
+      : playbackStatus === 'error'
+        ? 'Verifique sua conexão. Tentaremos novamente automaticamente.'
+        : playback
+          ? 'O Spotify não disponibilizou os dados deste conteúdo.'
+          : 'Dê o play no Spotify para ver a música aqui.'
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#08090a] text-white">
@@ -20,10 +40,10 @@ export function DefaultPlayerTheme({ playback }: PlayerThemeProps): React.JSX.El
 
       <div className="relative mx-auto grid min-h-screen max-w-[1500px] grid-cols-[minmax(280px,0.78fr)_minmax(430px,1.22fr)] items-center gap-[clamp(3rem,7vw,8rem)] px-[clamp(3rem,7vw,8rem)] py-12">
         <section className="aspect-square w-full overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] shadow-[0_40px_100px_rgba(0,0,0,0.52)]">
-          {playback?.albumImageUrl ? (
+          {item?.imageUrl ? (
             <img
-              src={playback.albumImageUrl}
-              alt={`Capa do álbum ${playback.albumName}`}
+              src={item.imageUrl}
+              alt={`Capa de ${item.collectionName}`}
               className="h-full w-full object-cover"
             />
           ) : (
@@ -40,14 +60,35 @@ export function DefaultPlayerTheme({ playback }: PlayerThemeProps): React.JSX.El
           </p>
 
           <h1 className="line-clamp-2 pb-[0.08em] text-[clamp(2.75rem,5vw,6.25rem)] leading-[1.04] font-semibold tracking-[-0.055em] text-balance">
-            {playback?.trackName ?? 'Nada tocando agora'}
+            {item?.title ?? emptyTitle}
           </h1>
 
           <p className="mt-6 truncate text-[clamp(1.3rem,2.5vw,2.3rem)] font-medium text-white/55">
-            {playback?.artistNames.join(', ') ?? 'Dê o play no Spotify para ver a música aqui.'}
+            {item?.creatorNames.join(', ') ?? emptyDescription}
           </p>
 
-          <div className="mt-14">
+          {item && (
+            <p className="mt-2 truncate text-base font-medium text-white/32">
+              {item.collectionName}
+            </p>
+          )}
+
+          {playback && (
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium text-white/38">
+              <span className="inline-flex items-center gap-2">
+                <MonitorSpeaker aria-hidden="true" className="h-4 w-4" />
+                {playback.device.name}
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <Volume2 aria-hidden="true" className="h-4 w-4" />
+                {playback.device.volumePercent === null
+                  ? 'Volume indisponível'
+                  : `${playback.device.volumePercent}%`}
+              </span>
+            </div>
+          )}
+
+          <div className={item || playback ? 'mt-10' : 'mt-14'}>
             <div className="h-2 overflow-hidden rounded-full bg-white/12">
               <div
                 className="h-full rounded-full bg-white transition-[width] duration-300"
@@ -56,7 +97,7 @@ export function DefaultPlayerTheme({ playback }: PlayerThemeProps): React.JSX.El
             </div>
             <div className="mt-3 flex justify-between text-sm font-medium text-white/38 tabular-nums">
               <span>{formatDuration(playback?.progressMs ?? 0)}</span>
-              <span>{formatDuration(playback?.durationMs ?? 0)}</span>
+              <span>{formatDuration(item?.durationMs ?? 0)}</span>
             </div>
           </div>
 
