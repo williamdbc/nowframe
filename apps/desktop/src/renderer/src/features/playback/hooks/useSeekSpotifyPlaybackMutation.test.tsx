@@ -20,6 +20,7 @@ const playback: PlaybackState = {
     canToggleRepeat: true,
     canToggleShuffle: true
   },
+  context: null,
   device: {
     id: 'device-id',
     isRestricted: false,
@@ -30,6 +31,7 @@ const playback: PlaybackState = {
   },
   isPlaying: true,
   item: {
+    album: { id: 'album-id', uri: 'spotify:album:album-id' },
     collectionName: 'Album',
     creatorNames: ['Artist'],
     durationMs: 120_000,

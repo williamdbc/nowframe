@@ -17,6 +17,17 @@ export class SpotifyPlaybackService {
     }
   }
 
+  static async playContextTrack(
+    contextUri: string,
+    position: number
+  ): ReturnType<typeof window.musicDisplay.spotify.playContextTrack> {
+    try {
+      return await window.musicDisplay.spotify.playContextTrack(contextUri, position)
+    } catch (error) {
+      throw normalizeIpcError(error, 'Não foi possível reproduzir esta faixa.')
+    }
+  }
+
   static async resume(): ReturnType<typeof window.musicDisplay.spotify.resumePlayback> {
     try {
       return await window.musicDisplay.spotify.resumePlayback()

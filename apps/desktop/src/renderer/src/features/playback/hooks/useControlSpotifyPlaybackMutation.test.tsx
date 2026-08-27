@@ -20,6 +20,7 @@ const playback: PlaybackState = {
     canToggleRepeat: true,
     canToggleShuffle: true
   },
+  context: null,
   device: {
     id: 'device-id',
     isRestricted: false,
@@ -30,6 +31,7 @@ const playback: PlaybackState = {
   },
   isPlaying: true,
   item: {
+    album: { id: 'album-id', uri: 'spotify:album:album-id' },
     collectionName: 'Album',
     creatorNames: ['Artist'],
     durationMs: 120_000,
@@ -111,6 +113,7 @@ describe('useControlSpotifyPlaybackMutation', () => {
     const nextPlayback: PlaybackState = {
       ...playback,
       item: {
+        album: { id: 'next-album-id', uri: 'spotify:album:next-album-id' },
         collectionName: 'Next Album',
         creatorNames: ['Next Artist'],
         durationMs: 180_000,

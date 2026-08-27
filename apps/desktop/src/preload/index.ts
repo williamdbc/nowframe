@@ -11,8 +11,13 @@ const musicDisplayApi: MusicDisplayApi = {
     getSession: () => ipcRenderer.invoke(ipcChannels.getSpotifySession),
     getProfile: () => ipcRenderer.invoke(ipcChannels.getSpotifyProfile),
     getPlayback: () => ipcRenderer.invoke(ipcChannels.getSpotifyPlayback),
+    getAlbumTracks: (albumId) => ipcRenderer.invoke(ipcChannels.getSpotifyAlbumTracks, albumId),
+    getPlaylistTracks: (playlistId) =>
+      ipcRenderer.invoke(ipcChannels.getSpotifyPlaylistTracks, playlistId),
     getLibraryItemState: (uri) => ipcRenderer.invoke(ipcChannels.getSpotifyLibraryItemState, uri),
     pausePlayback: () => ipcRenderer.invoke(ipcChannels.pauseSpotifyPlayback),
+    playContextTrack: (contextUri, position) =>
+      ipcRenderer.invoke(ipcChannels.playSpotifyContextTrack, contextUri, position),
     removeLibraryItem: (uri) => ipcRenderer.invoke(ipcChannels.removeSpotifyLibraryItem, uri),
     resumePlayback: () => ipcRenderer.invoke(ipcChannels.resumeSpotifyPlayback),
     saveLibraryItem: (uri) => ipcRenderer.invoke(ipcChannels.saveSpotifyLibraryItem, uri),

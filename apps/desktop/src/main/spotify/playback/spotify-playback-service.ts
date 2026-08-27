@@ -15,6 +15,21 @@ export class SpotifyPlaybackService {
     return SpotifyPlaybackClient.resume(await this.getAccessToken())
   }
 
+  static async playContextTrack(contextUri: unknown, position: unknown): Promise<void> {
+    if (
+      typeof contextUri !== 'string' ||
+      (!contextUri.startsWith('spotify:album:') && !contextUri.startsWith('spotify:playlist:'))
+    ) {
+      throw new Error('O contexto de reprodução selecionado é inválido.')
+    }
+
+    if (typeof position !== 'number' || !Number.isSafeInteger(position) || position < 0) {
+      throw new Error('A posição da faixa selecionada é inválida.')
+    }
+
+    return SpotifyPlaybackClient.playContextTrack(await this.getAccessToken(), contextUri, position)
+  }
+
   static async seek(positionMs: unknown): Promise<void> {
     if (typeof positionMs !== 'number' || !Number.isSafeInteger(positionMs) || positionMs < 0) {
       throw new Error('A posição da reprodução é inválida.')

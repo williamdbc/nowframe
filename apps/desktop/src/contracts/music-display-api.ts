@@ -3,8 +3,11 @@ export const ipcChannels = {
   getSpotifySession: 'spotify:get-session',
   getSpotifyProfile: 'spotify:get-profile',
   getSpotifyPlayback: 'spotify:get-playback',
+  getSpotifyAlbumTracks: 'spotify:get-album-tracks',
+  getSpotifyPlaylistTracks: 'spotify:get-playlist-tracks',
   getSpotifyLibraryItemState: 'spotify:get-library-item-state',
   pauseSpotifyPlayback: 'spotify:pause-playback',
+  playSpotifyContextTrack: 'spotify:play-context-track',
   removeSpotifyLibraryItem: 'spotify:remove-library-item',
   resumeSpotifyPlayback: 'spotify:resume-playback',
   saveSpotifyLibraryItem: 'spotify:save-library-item',
@@ -59,6 +62,10 @@ export interface SpotifyPlaybackDevice {
 }
 
 export interface SpotifyPlaybackItem {
+  album: {
+    id: string
+    uri: string
+  } | null
   collectionName: string
   creatorNames: string[]
   durationMs: number
@@ -67,6 +74,37 @@ export interface SpotifyPlaybackItem {
   title: string
   type: 'episode' | 'track'
   uri: string | null
+}
+
+export interface SpotifyTracklistTrack {
+  creatorNames: string[]
+  discNumber: number
+  durationMs: number
+  id: string
+  imageUrl: string | null
+  isPlayable: boolean
+  position: number
+  title: string
+  trackNumber: number
+  uri: string
+}
+
+export interface SpotifyAlbumTracklist {
+  albumId: string
+  tracks: SpotifyTracklistTrack[]
+}
+
+export interface SpotifyPlaylistTracklist {
+  imageUrl: string | null
+  name: string
+  playlistId: string
+  tracks: SpotifyTracklistTrack[]
+}
+
+export interface SpotifyPlaybackContext {
+  id: string
+  type: 'album' | 'playlist'
+  uri: string
 }
 
 export type SpotifyRepeatMode = 'context' | 'off' | 'track'
@@ -83,6 +121,7 @@ export interface SpotifyPlaybackState {
     canToggleShuffle: boolean
   }
   device: SpotifyPlaybackDevice
+  context: SpotifyPlaybackContext | null
   isPlaying: boolean
   item: SpotifyPlaybackItem | null
   progressMs: number
@@ -104,8 +143,11 @@ export interface MusicDisplayApi {
     getSession: () => Promise<SpotifySessionState>
     getProfile: () => Promise<SpotifyProfile>
     getPlayback: () => Promise<SpotifyPlaybackState | null>
+    getAlbumTracks: (albumId: string) => Promise<SpotifyAlbumTracklist>
+    getPlaylistTracks: (playlistId: string) => Promise<SpotifyPlaylistTracklist>
     getLibraryItemState: (uri: string) => Promise<SpotifyLibraryItemState>
     pausePlayback: () => Promise<void>
+    playContextTrack: (contextUri: string, position: number) => Promise<void>
     removeLibraryItem: (uri: string) => Promise<void>
     resumePlayback: () => Promise<void>
     saveLibraryItem: (uri: string) => Promise<void>

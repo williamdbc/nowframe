@@ -37,6 +37,51 @@ body {
   user-select: none;
 }
 
+.tracklist-scroll {
+  scrollbar-width: none;
+}
+
+.tracklist-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-height: 600px) {
+  .tracklist-theme {
+    padding-top: 3.25rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .tracklist-theme .tracklist-main-cover {
+    width: 3.5rem;
+  }
+
+  .tracklist-theme .tracklist-title {
+    margin-top: 0.5rem;
+    font-size: 2rem;
+  }
+
+  .tracklist-theme .tracklist-progress {
+    margin-top: 0.75rem;
+  }
+
+  .tracklist-theme .tracklist-controls,
+  .tracklist-theme .tracklist-device {
+    margin-top: 0.5rem;
+  }
+
+  .tracklist-theme .tracklist-carousel {
+    padding-top: 0;
+  }
+
+  .tracklist-theme .tracklist-card {
+    width: 5.75rem;
+  }
+
+  .tracklist-theme .tracklist-card-current {
+    width: 8rem;
+  }
+}
+
 button,
 input,
 textarea,

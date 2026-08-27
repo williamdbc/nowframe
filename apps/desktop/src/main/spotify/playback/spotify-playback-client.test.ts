@@ -28,6 +28,10 @@ describe('SpotifyPlaybackClient', () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
+          context: {
+            type: 'playlist',
+            uri: 'spotify:playlist:playlistid'
+          },
           device,
           is_playing: true,
           repeat_state: 'context',
@@ -40,8 +44,10 @@ describe('SpotifyPlaybackClient', () => {
             duration_ms: 244_000,
             artists: [{ name: 'M83' }],
             album: {
+              id: 'album-id',
               name: 'Hurry Up, We’re Dreaming',
-              images: [{ url: 'https://i.scdn.co/image/album-cover' }]
+              images: [{ url: 'https://i.scdn.co/image/album-cover' }],
+              uri: 'spotify:album:album-id'
             },
             uri: 'spotify:track:trackid'
           }
@@ -67,6 +73,11 @@ describe('SpotifyPlaybackClient', () => {
         canToggleRepeat: true,
         canToggleShuffle: true
       },
+      context: {
+        id: 'playlistid',
+        type: 'playlist',
+        uri: 'spotify:playlist:playlistid'
+      },
       device: {
         id: 'device-id',
         isRestricted: false,
@@ -77,6 +88,7 @@ describe('SpotifyPlaybackClient', () => {
       },
       isPlaying: true,
       item: {
+        album: { id: 'album-id', uri: 'spotify:album:album-id' },
         collectionName: 'Hurry Up, We’re Dreaming',
         creatorNames: ['M83'],
         durationMs: 244_000,
@@ -213,6 +225,26 @@ describe('SpotifyPlaybackClient', () => {
       'https://api.spotify.com/v1/me/player/previous',
       request('POST')
     )
+  })
+
+  it('starts a playback context from the selected position', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await SpotifyPlaybackClient.playContextTrack('access-token', 'spotify:playlist:playlist-id', 3)
+
+    expect(fetchMock).toHaveBeenCalledWith('https://api.spotify.com/v1/me/player/play', {
+      method: 'PUT',
+      headers: {
+        Authorization: 'Bearer access-token',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        context_uri: 'spotify:playlist:playlist-id',
+        offset: { position: 3 },
+        position_ms: 0
+      })
+    })
   })
 
   it('explains when Spotify restricts going back from the current content', async () => {

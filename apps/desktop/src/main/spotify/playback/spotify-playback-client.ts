@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import type {
+  SpotifyPlaybackContext,
   SpotifyPlaybackItem,
   SpotifyPlaybackState,
   SpotifyRepeatMode
@@ -30,8 +31,10 @@ const spotifyTrackSchema = z.object({
   duration_ms: z.number().int().nonnegative(),
   artists: z.array(z.object({ name: z.string() })),
   album: z.object({
+    id: z.string(),
     name: z.string(),
-    images: z.array(spotifyImageSchema)
+    images: z.array(spotifyImageSchema),
+    uri: z.string()
   }),
   uri: z.string().nullable().optional()
 })
@@ -50,6 +53,14 @@ const spotifyEpisodeSchema = z.object({
 })
 
 const spotifyPlaybackResponseSchema = z.object({
+  context: z
+    .object({
+      type: z.string(),
+      uri: z.string()
+    })
+    .nullable()
+    .optional()
+    .default(null),
   device: z.object({
     id: z.string().nullable(),
     is_restricted: z.boolean(),
@@ -78,6 +89,20 @@ const spotifyPlaybackResponseSchema = z.object({
     .default({})
 })
 
+function mapPlaybackContext(
+  context: z.infer<typeof spotifyPlaybackResponseSchema>['context']
+): SpotifyPlaybackContext | null {
+  if (!context || (context.type !== 'album' && context.type !== 'playlist')) return null
+
+  const uriPrefix = `spotify:${context.type}:`
+  if (!context.uri.startsWith(uriPrefix)) return null
+
+  const id = context.uri.slice(uriPrefix.length)
+  if (!/^[A-Za-z0-9]+$/.test(id)) return null
+
+  return { id, type: context.type, uri: context.uri }
+}
+
 const spotifyApiErrorSchema = z.object({
   error: z.object({
     status: z.number().int(),
@@ -90,6 +115,10 @@ function mapPlaybackItem(item: unknown): SpotifyPlaybackItem | null {
 
   if (track.success) {
     return {
+      album: {
+        id: track.data.album.id,
+        uri: track.data.album.uri
+      },
       collectionName: track.data.album.name,
       creatorNames: track.data.artists.map((artist) => artist.name),
       durationMs: track.data.duration_ms,
@@ -105,6 +134,7 @@ function mapPlaybackItem(item: unknown): SpotifyPlaybackItem | null {
 
   if (episode.success) {
     return {
+      album: null,
       collectionName: episode.data.show.name,
       creatorNames: [episode.data.show.name],
       durationMs: episode.data.duration_ms,
@@ -161,15 +191,18 @@ async function sendPlaybackCommand(
   path: SpotifyPlaybackCommandPath,
   method: 'POST' | 'PUT',
   fallbackMessage: string,
-  restrictionMessage?: string
+  restrictionMessage?: string,
+  body?: unknown
 ): Promise<void> {
   ensureSpotifyIsReadyForRequest()
 
   const response = await fetch(`${spotifyPlaybackUrl}${path}`, {
     method,
     headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
+      Authorization: `Bearer ${accessToken}`,
+      ...(body ? { 'Content-Type': 'application/json' } : {})
+    },
+    ...(body ? { body: JSON.stringify(body) } : {})
   })
 
   if (!response.ok) {
@@ -215,6 +248,7 @@ export class SpotifyPlaybackClient {
         canToggleRepeat: !isRestricted && !isNextRepeatModeRestricted,
         canToggleShuffle: !isRestricted && !playback.actions.toggling_shuffle
       },
+      context: mapPlaybackContext(playback.context),
       device: {
         id: playback.device.id,
         isRestricted: playback.device.is_restricted,
@@ -247,6 +281,25 @@ export class SpotifyPlaybackClient {
       '/play',
       'PUT',
       'Não foi possível retomar a reprodução do Spotify.'
+    )
+  }
+
+  static playContextTrack(
+    accessToken: string,
+    contextUri: string,
+    position: number
+  ): Promise<void> {
+    return sendPlaybackCommand(
+      accessToken,
+      '/play',
+      'PUT',
+      'Não foi possível reproduzir a faixa selecionada.',
+      undefined,
+      {
+        context_uri: contextUri,
+        offset: { position },
+        position_ms: 0
+      }
     )
   }
 

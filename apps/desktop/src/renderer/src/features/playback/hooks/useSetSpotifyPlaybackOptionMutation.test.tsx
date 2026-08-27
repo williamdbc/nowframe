@@ -20,6 +20,7 @@ const playback: PlaybackState = {
     canToggleRepeat: true,
     canToggleShuffle: true
   },
+  context: null,
   device: {
     id: 'device-id',
     isRestricted: false,

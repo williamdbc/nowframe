@@ -12,16 +12,23 @@ describe('SpotifyPlaybackService', () => {
   it('validates and forwards playback settings with the current access token', async () => {
     vi.spyOn(SpotifyAuthService, 'getAccessToken').mockResolvedValue('access-token')
     vi.spyOn(SpotifyPlaybackClient, 'seek').mockResolvedValue(undefined)
+    vi.spyOn(SpotifyPlaybackClient, 'playContextTrack').mockResolvedValue(undefined)
     vi.spyOn(SpotifyPlaybackClient, 'setVolume').mockResolvedValue(undefined)
     vi.spyOn(SpotifyPlaybackClient, 'setRepeatMode').mockResolvedValue(undefined)
     vi.spyOn(SpotifyPlaybackClient, 'setShuffle').mockResolvedValue(undefined)
 
     await SpotifyPlaybackService.seek(75_000)
+    await SpotifyPlaybackService.playContextTrack('spotify:playlist:playlist-id', 3)
     await SpotifyPlaybackService.setVolume(42)
     await SpotifyPlaybackService.setRepeatMode('track')
     await SpotifyPlaybackService.setShuffle(true)
 
     expect(SpotifyPlaybackClient.seek).toHaveBeenCalledWith('access-token', 75_000)
+    expect(SpotifyPlaybackClient.playContextTrack).toHaveBeenCalledWith(
+      'access-token',
+      'spotify:playlist:playlist-id',
+      3
+    )
     expect(SpotifyPlaybackClient.setVolume).toHaveBeenCalledWith('access-token', 42)
     expect(SpotifyPlaybackClient.setRepeatMode).toHaveBeenCalledWith('access-token', 'track')
     expect(SpotifyPlaybackClient.setShuffle).toHaveBeenCalledWith('access-token', true)
@@ -48,6 +55,12 @@ describe('SpotifyPlaybackService', () => {
     await expect(SpotifyPlaybackService.setShuffle('true')).rejects.toThrow(
       'O modo aleatório é inválido.'
     )
+    await expect(SpotifyPlaybackService.playContextTrack('playlist-id', 3)).rejects.toThrow(
+      'O contexto de reprodução selecionado é inválido.'
+    )
+    await expect(
+      SpotifyPlaybackService.playContextTrack('spotify:album:album-id', -1)
+    ).rejects.toThrow('A posição da faixa selecionada é inválida.')
     expect(accessTokenSpy).not.toHaveBeenCalled()
   })
 })

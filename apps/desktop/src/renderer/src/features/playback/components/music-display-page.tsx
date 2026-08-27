@@ -3,12 +3,14 @@ import { useNavigate } from '@tanstack/react-router'
 import { AppBootstrapErrorState } from '@/features/app-bootstrap/components/app-bootstrap-error-state'
 import { AppBootstrapLoadingState } from '@/features/app-bootstrap/components/app-bootstrap-loading-state'
 import { useGetAppBootstrapQuery } from '@/features/app-bootstrap/hooks/useGetAppBootstrapQuery'
+import { useGetSpotifyAlbumTracksQuery } from '@/features/albums/hooks/useGetSpotifyAlbumTracksQuery'
 import { SpotifyConnectionStatus } from '@/features/authentication/components/spotify-connection-status'
 import { SpotifyProfileMenu } from '@/features/authentication/components/spotify-profile-menu'
 import { useGetSpotifyProfileQuery } from '@/features/authentication/hooks/useGetSpotifyProfileQuery'
 import { useLogoutFromSpotifyMutation } from '@/features/authentication/hooks/useLogoutFromSpotifyMutation'
 import { useGetSpotifyLibraryItemQuery } from '@/features/library/hooks/useGetSpotifyLibraryItemQuery'
 import { useToggleSpotifyLibraryItemMutation } from '@/features/library/hooks/useToggleSpotifyLibraryItemMutation'
+import { useGetSpotifyPlaylistTracksQuery } from '@/features/playlists/hooks/useGetSpotifyPlaylistTracksQuery'
 import { ThemeSelector } from '@/features/themes/components/theme-selector'
 import { useSelectedTheme } from '@/features/themes/hooks/useSelectedTheme'
 import { availableThemes } from '@/features/themes/theme-registry'
@@ -20,6 +22,7 @@ import { useControlSpotifyPlaybackMutation } from '../hooks/useControlSpotifyPla
 import { useGetSpotifyPlaybackQuery } from '../hooks/useGetSpotifyPlaybackQuery'
 import { useLivePlaybackState } from '../hooks/useLivePlaybackState'
 import { usePlaybackVolumeControl } from '../hooks/usePlaybackVolumeControl'
+import { usePlaySpotifyContextTrackMutation } from '../hooks/usePlaySpotifyContextTrackMutation'
 import { useSeekSpotifyPlaybackMutation } from '../hooks/useSeekSpotifyPlaybackMutation'
 import { useSetSpotifyPlaybackOptionMutation } from '../hooks/useSetSpotifyPlaybackOptionMutation'
 import type { PlaybackLoadStatus } from '../types/playback-state'
@@ -30,6 +33,7 @@ export function MusicDisplayPage(): React.JSX.Element {
   const profileQuery = useGetSpotifyProfileQuery()
   const playbackQuery = useGetSpotifyPlaybackQuery()
   const playbackControlMutation = useControlSpotifyPlaybackMutation()
+  const playContextTrackMutation = usePlaySpotifyContextTrackMutation()
   const playbackOptionMutation = useSetSpotifyPlaybackOptionMutation()
   const seekMutation = useSeekSpotifyPlaybackMutation()
   const logoutMutation = useLogoutFromSpotifyMutation()
@@ -38,6 +42,27 @@ export function MusicDisplayPage(): React.JSX.Element {
   const ActiveTheme = selectedTheme.activeTheme.component
   const presentationMode = useWindowPresentationMode()
   const playback = useLivePlaybackState(playbackQuery.data ?? null)
+  const isTracklistTheme = selectedTheme.activeThemeId === 'tracklist'
+  const playbackContext =
+    playback?.context ??
+    (playback?.item?.album
+      ? {
+          id: playback.item.album.id,
+          type: 'album' as const,
+          uri: playback.item.album.uri
+        }
+      : null)
+  const albumTracksQuery = useGetSpotifyAlbumTracksQuery(
+    playbackContext?.type === 'album' ? playbackContext.id : null,
+    isTracklistTheme && playbackContext?.type === 'album'
+  )
+  const playlistTracksQuery = useGetSpotifyPlaylistTracksQuery(
+    playbackContext?.type === 'playlist' ? playbackContext.id : null,
+    isTracklistTheme && playbackContext?.type === 'playlist'
+  )
+  const activeTracklistQuery =
+    playbackContext?.type === 'playlist' ? playlistTracksQuery : albumTracksQuery
+  const activeTracklist = activeTracklistQuery.data
   const volumeControl = usePlaybackVolumeControl(playback)
   const libraryItemUri = playback?.item?.uri?.startsWith(`spotify:${playback.item.type}:`)
     ? playback.item.uri
@@ -103,6 +128,8 @@ export function MusicDisplayPage(): React.JSX.Element {
         controls={{
           canToggleSaved: Boolean(libraryItemUri && libraryItemQuery.data),
           errorMessage:
+            playContextTrackMutation.error?.message ??
+            (isTracklistTheme ? activeTracklistQuery.error?.message : null) ??
             playbackControlMutation.error?.message ??
             playbackOptionMutation.error?.message ??
             seekMutation.error?.message ??
@@ -150,6 +177,23 @@ export function MusicDisplayPage(): React.JSX.Element {
         }}
         playback={playback}
         playbackStatus={playbackStatus}
+        tracklist={{
+          contextImageUrl:
+            playbackContext?.type === 'playlist' && playlistTracksQuery.data
+              ? playlistTracksQuery.data.imageUrl
+              : (playback?.item?.imageUrl ?? null),
+          contextName:
+            playbackContext?.type === 'playlist' && playlistTracksQuery.data
+              ? playlistTracksQuery.data.name
+              : (playback?.item?.collectionName ?? 'conteúdo atual'),
+          isPending: Boolean(playbackContext) && activeTracklistQuery.isPending,
+          isPlayPending: playContextTrackMutation.isPending,
+          onPlayTrack: (track) => {
+            if (!playbackContext) return
+            playContextTrackMutation.mutate({ contextUri: playbackContext.uri, track })
+          },
+          tracks: activeTracklist?.tracks ?? []
+        }}
       />
     </>
   )

@@ -1,6 +1,7 @@
 import type { ComponentType, ReactNode } from 'react'
 
 import type { PlaybackLoadStatus, PlaybackState } from '@/features/playback/types/playback-state'
+import type { SpotifyTracklistTrack } from '../../../../../contracts/music-display-api'
 
 export interface PlaybackControls {
   canToggleSaved: boolean
@@ -30,14 +31,24 @@ export interface PlayerThemeChrome {
   themeSelector: ReactNode
 }
 
+export interface PlayerThemeTracklist {
+  contextImageUrl: string | null
+  contextName: string
+  isPending: boolean
+  isPlayPending: boolean
+  onPlayTrack: (track: SpotifyTracklistTrack) => void
+  tracks: readonly SpotifyTracklistTrack[]
+}
+
 export interface PlayerThemeProps {
   chrome: PlayerThemeChrome
   controls: PlaybackControls
   playback: PlaybackState | null
   playbackStatus: PlaybackLoadStatus
+  tracklist: PlayerThemeTracklist
 }
 
-export type PlayerThemeId = 'default' | 'drive' | 'minimalist'
+export type PlayerThemeId = 'default' | 'drive' | 'minimalist' | 'tracklist'
 
 export interface PlayerTheme {
   id: PlayerThemeId
