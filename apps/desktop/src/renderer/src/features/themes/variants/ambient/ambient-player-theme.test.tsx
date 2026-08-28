@@ -153,6 +153,15 @@ describe('AmbientPlayerTheme', () => {
     expect(screen.getByRole('button', { name: 'Sair do modo imersivo' })).toBeEnabled()
   })
 
+  it('caps the title at two lines and the album at one', () => {
+    renderTheme(false)
+
+    // Sem layout no jsdom, o recorte só dá para conferir pela classe que o
+    // aplica — títulos e álbuns longos passariam a engolir a coluna sem ela.
+    expect(screen.getByRole('heading', { name: 'Entombed' })).toHaveClass('ambient-title')
+    expect(screen.getByText('Koi No Yokan')).toHaveClass('truncate')
+  })
+
   it('swaps the whole layout for the lyrics stage when the letter is toggled on', async () => {
     const user = userEvent.setup()
     renderTheme(false, syncedLyrics)

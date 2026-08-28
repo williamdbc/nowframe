@@ -243,14 +243,12 @@ export function AmbientPlayerTheme({
             >
               <div className="ambient-stagger flex flex-col gap-[24px]">
                 {content.collectionName && (
-                  <div className="flex items-center justify-center self-start rounded-[4px] bg-white/12 px-[8px] py-[4px]">
-                    <p className="text-[length:var(--ambient-label-size)] leading-[1.15] font-medium tracking-[-0.01em] text-white">
-                      {content.collectionName}
-                    </p>
-                  </div>
+                  <p className="max-w-full self-start truncate rounded-[4px] bg-white/12 px-[8px] py-[4px] text-[length:var(--ambient-label-size)] leading-[1.15] font-medium tracking-[-0.01em] text-white">
+                    {content.collectionName}
+                  </p>
                 )}
                 <div className="flex flex-col gap-[12px] text-white">
-                  <h1 className="text-[length:var(--ambient-title-size)] leading-[1.084] font-semibold tracking-[-0.018em] text-balance">
+                  <h1 className="ambient-title text-[length:var(--ambient-title-size)] leading-[1.084] font-semibold tracking-[-0.018em]">
                     <AmbientRevealedText text={content.title} />
                   </h1>
                   <p className="text-[length:var(--ambient-body-size)] leading-[1.167] font-medium tracking-[-0.01em] opacity-80">
