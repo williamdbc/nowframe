@@ -3,19 +3,17 @@ import { normalizeIpcError } from '@/shared/utils/normalize-ipc-error'
 export class SpotifyLibraryService {
   static async getItemState(
     uri: string
-  ): ReturnType<typeof window.musicDisplay.spotify.getLibraryItemState> {
+  ): ReturnType<typeof window.nowframe.spotify.getLibraryItemState> {
     try {
-      return await window.musicDisplay.spotify.getLibraryItemState(uri)
+      return await window.nowframe.spotify.getLibraryItemState(uri)
     } catch (error) {
       throw normalizeIpcError(error, 'Não foi possível consultar a biblioteca do Spotify.')
     }
   }
 
-  static async saveItem(
-    uri: string
-  ): ReturnType<typeof window.musicDisplay.spotify.saveLibraryItem> {
+  static async saveItem(uri: string): ReturnType<typeof window.nowframe.spotify.saveLibraryItem> {
     try {
-      return await window.musicDisplay.spotify.saveLibraryItem(uri)
+      return await window.nowframe.spotify.saveLibraryItem(uri)
     } catch (error) {
       throw normalizeIpcError(error, 'Não foi possível adicionar o conteúdo à biblioteca.')
     }
@@ -23,9 +21,9 @@ export class SpotifyLibraryService {
 
   static async removeItem(
     uri: string
-  ): ReturnType<typeof window.musicDisplay.spotify.removeLibraryItem> {
+  ): ReturnType<typeof window.nowframe.spotify.removeLibraryItem> {
     try {
-      return await window.musicDisplay.spotify.removeLibraryItem(uri)
+      return await window.nowframe.spotify.removeLibraryItem(uri)
     } catch (error) {
       throw normalizeIpcError(error, 'Não foi possível remover o conteúdo da biblioteca.')
     }

@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import type { IpcMainInvokeEvent } from 'electron'
 
-import { ipcChannels, type WindowState } from '../../contracts/music-display-api'
+import { ipcChannels, type WindowState } from '../../contracts/nowframe-api'
 
 function getSenderWindow(event: IpcMainInvokeEvent): BrowserWindow {
   const senderWindow = BrowserWindow.fromWebContents(event.sender)

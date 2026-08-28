@@ -169,7 +169,7 @@ export interface LyricsResult {
   trackName: string
 }
 
-export interface MusicDisplayApi {
+export interface NowframeApi {
   app: {
     getBootstrapState: () => Promise<AppBootstrapState>
   }

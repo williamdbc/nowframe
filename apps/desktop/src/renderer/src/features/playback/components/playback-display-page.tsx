@@ -30,7 +30,7 @@ import { useSetSpotifyPlaybackOptionMutation } from '../hooks/useSetSpotifyPlayb
 import type { PlaybackLoadStatus } from '../types/playback-state'
 import { getNextRepeatMode } from '../utils/get-next-repeat-mode'
 
-export function MusicDisplayPage(): React.JSX.Element {
+export function PlaybackDisplayPage(): React.JSX.Element {
   const bootstrapQuery = useGetAppBootstrapQuery()
   const profileQuery = useGetSpotifyProfileQuery()
   const playbackQuery = useGetSpotifyPlaybackQuery()

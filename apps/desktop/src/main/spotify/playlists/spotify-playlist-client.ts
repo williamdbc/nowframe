@@ -3,7 +3,7 @@ import { z } from 'zod'
 import type {
   SpotifyPlaylistTracklist,
   SpotifyTracklistTrack
-} from '../../../contracts/music-display-api'
+} from '../../../contracts/nowframe-api'
 
 const spotifyPlaylistsUrl = 'https://api.spotify.com/v1/playlists'
 const playlistItemsPageSize = 50

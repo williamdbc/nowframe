@@ -7,7 +7,7 @@ import {
 } from '@/features/themes/core/theme-registry'
 import type { PlayerTheme, PlayerThemeId } from '@/features/themes/core/types/player-theme'
 
-export const selectedThemeStorageKey = 'music-display:selected-theme'
+export const selectedThemeStorageKey = 'nowframe:selected-theme'
 
 function getStoredThemeId(): PlayerThemeId {
   const storedThemeId = window.localStorage.getItem(selectedThemeStorageKey)

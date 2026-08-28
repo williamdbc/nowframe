@@ -1,6 +1,6 @@
 import { shell } from 'electron'
 
-import type { SpotifySessionState } from '../../../contracts/music-display-api'
+import type { SpotifySessionState } from '../../../contracts/nowframe-api'
 import { getSpotifyEnvironment } from '../../config/spotify-environment'
 import { SpotifyAccountsClient, SpotifyAccountsError } from './spotify-accounts-client'
 import { waitForSpotifyAuthorizationCode } from './spotify-authorization-callback'

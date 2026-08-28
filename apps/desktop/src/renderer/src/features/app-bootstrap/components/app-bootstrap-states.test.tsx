@@ -8,7 +8,7 @@ describe('app bootstrap states', () => {
   it('announces that the application is loading', () => {
     render(<AppBootstrapLoadingState />)
 
-    expect(screen.getByRole('status')).toHaveTextContent('Preparando o Music Display...')
+    expect(screen.getByRole('status')).toHaveTextContent('Preparando o Nowframe...')
   })
 
   it('allows retrying after an initialization error', () => {

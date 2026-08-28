@@ -1,4 +1,4 @@
-import type { LyricsQuery } from '../../../../../contracts/music-display-api'
+import type { LyricsQuery } from '../../../../../contracts/nowframe-api'
 
 export const lyricsQueryKeys = {
   all: ['lyrics'] as const,

@@ -1,11 +1,11 @@
 export class WindowService {
-  static getState(): ReturnType<typeof window.musicDisplay.window.getState> {
-    return window.musicDisplay.window.getState()
+  static getState(): ReturnType<typeof window.nowframe.window.getState> {
+    return window.nowframe.window.getState()
   }
 
   static setFullScreen(
     isFullScreen: boolean
-  ): ReturnType<typeof window.musicDisplay.window.setFullScreen> {
-    return window.musicDisplay.window.setFullScreen(isFullScreen)
+  ): ReturnType<typeof window.nowframe.window.setFullScreen> {
+    return window.nowframe.window.setFullScreen(isFullScreen)
   }
 }

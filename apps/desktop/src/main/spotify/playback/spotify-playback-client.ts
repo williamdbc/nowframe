@@ -5,7 +5,7 @@ import type {
   SpotifyPlaybackItem,
   SpotifyPlaybackState,
   SpotifyRepeatMode
-} from '../../../contracts/music-display-api'
+} from '../../../contracts/nowframe-api'
 
 const spotifyPlaybackUrl = 'https://api.spotify.com/v1/me/player'
 let rateLimitedUntil = 0

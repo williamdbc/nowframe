@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 
-import { ipcChannels } from '../../contracts/music-display-api'
+import { ipcChannels } from '../../contracts/nowframe-api'
 import { LyricsService } from '../lyrics/lyrics-service'
 
 export function registerLyricsIpcHandlers(): void {

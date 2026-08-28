@@ -8,7 +8,7 @@ import { registerWindowIpcHandlers } from './ipc/register-window-ipc-handlers'
 import { createMainWindow } from './windows/create-main-window'
 
 void app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.musicdisplay.desktop')
+  electronApp.setAppUserModelId('app.nowframe.desktop')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

@@ -1,5 +1,6 @@
 {
-  "name": "music-display-desktop",
+  "name": "nowframe-desktop",
+  "productName": "Nowframe",
   "version": "0.1.0",
   "description": "A customizable second screen for your music.",
   "main": "./out/main/index.js",

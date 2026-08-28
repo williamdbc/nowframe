@@ -82,7 +82,7 @@ lines:
       track_name: 'Wind Of Change'
     })
     expect(options.headers).toEqual({
-      'User-Agent': 'MusicDisplay/0.1.0 (https://github.com/williamdbc/music-display)'
+      'User-Agent': 'Nowframe/0.1.0 (https://github.com/williamdbc/nowframe)'
     })
   })
 

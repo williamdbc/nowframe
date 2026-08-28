@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import type { UseQueryResult } from '@tanstack/react-query'
 
-import type { SpotifyPlaylistTracklist } from '../../../../../contracts/music-display-api'
+import type { SpotifyPlaylistTracklist } from '../../../../../contracts/nowframe-api'
 import { spotifyPlaylistQueryKeys } from '../queries/spotify-playlist-query-keys'
 import { SpotifyPlaylistService } from '../services/spotify-playlist-service'
 

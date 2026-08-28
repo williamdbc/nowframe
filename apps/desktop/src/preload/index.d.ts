@@ -1,7 +1,7 @@
-import type { MusicDisplayApi } from '../contracts/music-display-api'
+import type { NowframeApi } from '../contracts/nowframe-api'
 
 declare global {
   interface Window {
-    musicDisplay: MusicDisplayApi
+    nowframe: NowframeApi
   }
 }

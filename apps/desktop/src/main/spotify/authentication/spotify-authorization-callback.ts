@@ -106,7 +106,7 @@ export async function waitForSpotifyAuthorizationCode({
       sendCallbackPage(
         response,
         'Não foi possível conectar',
-        'A validação de segurança falhou. Volte ao Music Display e tente novamente.'
+        'A validação de segurança falhou. Volte ao Nowframe e tente novamente.'
       )
       rejectAuthorization(new Error('A validação de segurança do login Spotify falhou.'))
       return
@@ -116,7 +116,7 @@ export async function waitForSpotifyAuthorizationCode({
       sendCallbackPage(
         response,
         'Autorização cancelada',
-        'Você pode fechar esta aba e voltar ao Music Display.'
+        'Você pode fechar esta aba e voltar ao Nowframe.'
       )
       rejectAuthorization(new SpotifyAuthorizationCancelledError())
       return
@@ -137,7 +137,7 @@ export async function waitForSpotifyAuthorizationCode({
     sendCallbackPage(
       response,
       'Spotify conectado',
-      'Você pode fechar esta aba e voltar ao Music Display.'
+      'Você pode fechar esta aba e voltar ao Nowframe.'
     )
     resolveAuthorization(code)
   })

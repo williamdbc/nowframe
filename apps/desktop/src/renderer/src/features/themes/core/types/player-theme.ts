@@ -2,7 +2,7 @@ import type { ComponentType, ReactNode } from 'react'
 
 import type { PlaybackLoadStatus, PlaybackState } from '@/features/playback/types/playback-state'
 import type { LyricsDisplayState } from '@/features/lyrics/types/lyrics-display-state'
-import type { SpotifyTracklistTrack } from '../../../../../../contracts/music-display-api'
+import type { SpotifyTracklistTrack } from '../../../../../../contracts/nowframe-api'
 
 export interface PlaybackControls {
   canToggleSaved: boolean

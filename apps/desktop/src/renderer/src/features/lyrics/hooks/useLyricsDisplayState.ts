@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import type { UseQueryResult } from '@tanstack/react-query'
 
-import type { LyricsResult } from '../../../../../contracts/music-display-api'
+import type { LyricsResult } from '../../../../../contracts/nowframe-api'
 import type { LyricsDisplayState } from '../types/lyrics-display-state'
 import { parsePlainLyrics, parseSyncedLyrics } from '../utils/parse-synced-lyrics'
 

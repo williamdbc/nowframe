@@ -1,7 +1,7 @@
 import { parseDocument } from 'yaml'
 import { z } from 'zod'
 
-import type { LyricsTimedLine } from '../../contracts/music-display-api'
+import type { LyricsTimedLine } from '../../contracts/nowframe-api'
 
 const maximumLyricsfileLength = 500_000
 

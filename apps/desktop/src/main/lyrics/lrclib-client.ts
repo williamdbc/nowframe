@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
-import type { LyricsQuery, LyricsResult } from '../../contracts/music-display-api'
+import type { LyricsQuery, LyricsResult } from '../../contracts/nowframe-api'
 import { parseLyricsfile } from './lyricsfile-parser'
 
 const lrclibGetUrl = 'https://lrclib.net/api/get'
 const requestTimeoutMs = 8_000
-const userAgent = 'MusicDisplay/0.1.0 (https://github.com/williamdbc/music-display)'
+const userAgent = 'Nowframe/0.1.0 (https://github.com/williamdbc/nowframe)'
 
 const lrclibLyricsSchema = z.object({
   albumName: z.string(),

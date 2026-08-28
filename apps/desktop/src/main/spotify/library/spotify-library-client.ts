@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { SpotifyLibraryItemState } from '../../../contracts/music-display-api'
+import type { SpotifyLibraryItemState } from '../../../contracts/nowframe-api'
 
 const spotifyLibraryUrl = 'https://api.spotify.com/v1/me/library'
 

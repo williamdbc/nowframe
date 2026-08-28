@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { LyricsResult } from '../../contracts/music-display-api'
+import type { LyricsResult } from '../../contracts/nowframe-api'
 import { LrclibClient } from './lrclib-client'
 
 const lyricsQuerySchema = z.object({
