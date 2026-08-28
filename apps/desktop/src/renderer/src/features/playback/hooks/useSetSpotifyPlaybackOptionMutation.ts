@@ -5,6 +5,10 @@ import { spotifyPlaybackQueryKeys } from '@/features/playback/queries/spotify-pl
 import { SpotifyPlaybackService } from '@/features/playback/services/spotify-playback-service'
 import type { PlaybackOptionCommand } from '@/features/playback/types/playback-option-command'
 import type { PlaybackState } from '@/features/playback/types/playback-state'
+import {
+  clearPlaybackExpectation,
+  expectPlayback
+} from '@/features/playback/utils/playback-expectation'
 
 interface PlaybackOptionMutationContext {
   previousPlayback: PlaybackState | null | undefined
@@ -46,9 +50,18 @@ export function useSetSpotifyPlaybackOptionMutation(): UseMutationResult<
         optimisticallySetPlaybackOption(playback, command)
       )
 
+      // Até o Spotify publicar o novo estado, o polling ainda relata o anterior. Sem esta
+      // expectativa o ícone voltava atrás e piscava no ciclo seguinte.
+      expectPlayback((playback) =>
+        command.type === 'shuffle'
+          ? playback.shuffleEnabled === command.enabled
+          : playback.repeatMode === command.repeatMode
+      )
+
       return { previousPlayback }
     },
     onError: (_error, _command, context) => {
+      clearPlaybackExpectation()
       queryClient.setQueryData(queryKey, context?.previousPlayback)
     }
   })

@@ -1,6 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 
 import { SpotifyPlaybackService } from '../services/spotify-playback-service'
+import { shouldDiscardPlayback } from '../utils/playback-expectation'
 import { spotifyPlaybackQueryKeys } from './spotify-playback-query-keys'
 
 export const activePlaybackRefetchIntervalMs = 1_000
@@ -50,6 +51,21 @@ export function getSpotifyPlaybackRefetchInterval(
     : activePlaybackRefetchIntervalMs
 }
 
+/**
+ * Todo resultado de polling passa por aqui antes de virar cache, então é o ponto onde a
+ * resposta velha do Spotify é descartada em favor do que já está na tela. Atualização
+ * otimista usa `setQueryData`, que não passa por este caminho — é justamente o que se quer
+ * preservar.
+ */
+export function keepPlaybackWhenResponseIsStale(
+  previousPlayback: unknown,
+  nextPlayback: unknown
+): unknown {
+  if (previousPlayback === undefined) return nextPlayback
+
+  return shouldDiscardPlayback(nextPlayback as SpotifyPlayback) ? previousPlayback : nextPlayback
+}
+
 export function spotifyPlaybackQueryOptions(): SpotifyPlaybackQueryOptions {
   return queryOptions<SpotifyPlayback, Error, SpotifyPlayback, SpotifyPlaybackQueryKey>({
     queryKey: spotifyPlaybackQueryKeys.current(),
@@ -62,6 +78,7 @@ export function spotifyPlaybackQueryOptions(): SpotifyPlaybackQueryOptions {
       ),
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: 'always',
-    retry: false
+    retry: false,
+    structuralSharing: keepPlaybackWhenResponseIsStale
   })
 }

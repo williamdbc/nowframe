@@ -10,6 +10,10 @@ import {
   getPlaybackContentKey,
   getPlaybackItemKey
 } from '@/features/playback/utils/get-playback-content-key'
+import {
+  clearPlaybackExpectation,
+  expectPlayback
+} from '@/features/playback/utils/playback-expectation'
 
 import type {
   SpotifyPlaybackItem,
@@ -199,6 +203,15 @@ export function useControlSpotifyPlaybackMutation(): UseMutationResult<
           : optimisticallyUpdatePlayingState(playback, command)
       )
 
+      // Ao trocar de faixa, o polling ainda relata a anterior por um tempo. Sem esta
+      // expectativa o cache oscilava entre as duas, e como o tema usa a identidade da
+      // faixa como `key`, cada oscilação remontava a seção e reiniciava as animações —
+      // era o conteúdo "piscando" ao pular.
+      if (command === 'next' || command === 'previous') {
+        const previousContentKey = getPlaybackContentKey(previousPlayback)
+        expectPlayback((playback) => getPlaybackContentKey(playback) !== previousContentKey)
+      }
+
       return {
         dispatchedAt: Date.now(),
         hasOptimisticItem: queuedNextItem !== null,
@@ -207,6 +220,7 @@ export function useControlSpotifyPlaybackMutation(): UseMutationResult<
       }
     },
     onError: (_error, _command, context) => {
+      clearPlaybackExpectation()
       if (context?.reconciliationSequence !== reconciliationSequenceRef.current) return
       queryClient.setQueryData(queryKey, context?.previousPlayback)
     },
