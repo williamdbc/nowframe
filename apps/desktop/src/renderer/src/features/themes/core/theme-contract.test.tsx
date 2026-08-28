@@ -52,6 +52,13 @@ const chrome: PlayerThemeChrome = {
   themeSelector: <span>Temas</span>
 }
 
+const fullscreenChrome: PlayerThemeChrome = {
+  accountMenu: null,
+  connectionStatus: null,
+  fullscreenControl: null,
+  themeSelector: null
+}
+
 const tracklist = {
   contextImageUrl: 'https://i.scdn.co/image/album-cover',
   contextName: 'Hurry Up, We’re Dreaming',
@@ -180,6 +187,35 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     expect(controls.onToggleShuffle).toHaveBeenCalledOnce()
     expect(controls.onCycleRepeat).toHaveBeenCalledOnce()
     expect(controls.onToggleSaved).toHaveBeenCalledOnce()
+  })
+
+  it('uses the shared chrome behavior and keeps a fullscreen exit action', async () => {
+    const user = userEvent.setup()
+    const onExitFullScreen = vi.fn()
+    const { container } = render(
+      <Theme
+        chrome={fullscreenChrome}
+        isFullScreen
+        onExitFullScreen={onExitFullScreen}
+        controls={createControls()}
+        lyrics={lyrics}
+        playback={playback}
+        playbackStatus="ready"
+        tracklist={tracklist}
+      />
+    )
+
+    expect(container.querySelector('.player-theme-root')).toBeInTheDocument()
+    expect(container.querySelectorAll('.player-theme-chrome')).toHaveLength(2)
+    expect(screen.queryByText('Conta')).not.toBeInTheDocument()
+    expect(screen.queryByText('Conectado')).not.toBeInTheDocument()
+    expect(screen.queryByText('Temas')).not.toBeInTheDocument()
+    expect(screen.queryByText('Tela cheia')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Mostrar letra' }) !== null).toBe(id === 'ambient')
+
+    await user.click(screen.getByRole('button', { name: 'Sair da tela cheia' }))
+
+    expect(onExitFullScreen).toHaveBeenCalledOnce()
   })
 
   it('renders a genuine empty state with disabled transport controls', () => {

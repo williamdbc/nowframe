@@ -5,6 +5,7 @@ import { PlaybackErrorMessage } from '@/features/playback/components/playback-er
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
 import type { PlayerThemeProps } from '@/features/themes/core/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
+import { FullscreenExitControl } from '@/features/window-controls/components/fullscreen-exit-control'
 
 import { DriveTransportControls } from './components/drive-transport-controls'
 import './drive-player-theme.css'
@@ -12,6 +13,8 @@ import './drive-player-theme.css'
 export function DrivePlayerTheme({
   chrome,
   controls,
+  isFullScreen,
+  onExitFullScreen,
   playback,
   playbackStatus
 }: PlayerThemeProps): React.JSX.Element {
@@ -19,18 +22,22 @@ export function DrivePlayerTheme({
   const item = playback?.item ?? null
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#090d10] text-white">
+    <main className="player-theme-root relative min-h-screen overflow-hidden bg-[#090d10] text-white">
       <div className="absolute inset-0 bg-[linear-gradient(135deg,#151d22_0%,#090d10_52%,#11171b_100%)]" />
       <div className="absolute top-0 right-0 h-[38rem] w-[38rem] rounded-full bg-[#66e4ff]/8 blur-[140px]" />
 
-      <div className="fixed top-6 left-6 z-20">{chrome.connectionStatus}</div>
+      <div className="player-theme-chrome fixed top-6 left-6 z-20">{chrome.connectionStatus}</div>
       <nav
-        className="fixed top-6 right-6 z-20 flex items-start gap-2"
+        className="player-theme-chrome fixed top-6 right-6 z-20 flex items-start gap-2"
         aria-label="Ações do display"
       >
         {chrome.themeSelector}
         {chrome.accountMenu}
-        {chrome.fullscreenControl}
+        {isFullScreen ? (
+          <FullscreenExitControl onExitFullScreen={onExitFullScreen} />
+        ) : (
+          chrome.fullscreenControl
+        )}
       </nav>
 
       <div className="relative mx-auto grid min-h-screen max-w-[1680px] grid-cols-[minmax(280px,0.85fr)_minmax(400px,1.15fr)] items-center gap-[clamp(2rem,4vw,6rem)] px-[clamp(2rem,4vw,7rem)] pt-24 pb-12 max-[1100px]:pt-20 max-[1100px]:pb-2 max-[800px]:grid-cols-1 max-[800px]:py-32">

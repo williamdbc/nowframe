@@ -72,15 +72,6 @@
   pointer-events: none;
 }
 
-.poster-chrome {
-  opacity: 0;
-  transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
-}
-.poster-root:hover .poster-chrome,
-.poster-chrome:focus-within {
-  opacity: 1;
-}
-
 .poster-icon {
   display: block;
   background-color: currentColor;

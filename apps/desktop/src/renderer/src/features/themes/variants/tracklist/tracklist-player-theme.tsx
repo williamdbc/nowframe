@@ -5,6 +5,7 @@ import { PlaybackProgressControl } from '@/features/playback/components/playback
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
 import type { PlayerThemeProps } from '@/features/themes/core/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
+import { FullscreenExitControl } from '@/features/window-controls/components/fullscreen-exit-control'
 
 import { TracklistCarousel } from './components/tracklist-carousel'
 import { TracklistTransportControls } from './components/tracklist-transport-controls'
@@ -13,6 +14,8 @@ import './tracklist-player-theme.css'
 export function TracklistPlayerTheme({
   chrome,
   controls,
+  isFullScreen,
+  onExitFullScreen,
   playback,
   playbackStatus,
   tracklist
@@ -22,7 +25,7 @@ export function TracklistPlayerTheme({
   const backgroundImageUrl = tracklist.contextImageUrl ?? content.imageUrl
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#111a16] text-white">
+    <main className="player-theme-root relative min-h-screen overflow-hidden bg-[#111a16] text-white">
       {backgroundImageUrl && (
         <img
           src={backgroundImageUrl}
@@ -34,14 +37,18 @@ export function TracklistPlayerTheme({
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(10,18,14,0.4),rgba(7,13,10,0.76))]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_16%,rgba(255,255,255,0.055),transparent_42%)]" />
 
-      <div className="fixed top-6 left-6 z-20">{chrome.connectionStatus}</div>
+      <div className="player-theme-chrome fixed top-6 left-6 z-20">{chrome.connectionStatus}</div>
       <nav
-        className="fixed top-6 right-6 z-20 flex items-start gap-2"
+        className="player-theme-chrome fixed top-6 right-6 z-20 flex items-start gap-2"
         aria-label="Ações do display"
       >
         {chrome.themeSelector}
         {chrome.accountMenu}
-        {chrome.fullscreenControl}
+        {isFullScreen ? (
+          <FullscreenExitControl onExitFullScreen={onExitFullScreen} />
+        ) : (
+          chrome.fullscreenControl
+        )}
       </nav>
 
       <section className="tracklist-theme relative mx-auto flex min-h-screen w-full max-w-[1800px] flex-col px-6 pt-20 pb-5 text-center">

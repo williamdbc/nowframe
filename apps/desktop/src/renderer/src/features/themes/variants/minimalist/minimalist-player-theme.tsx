@@ -5,6 +5,7 @@ import { PlaybackErrorMessage } from '@/features/playback/components/playback-er
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
 import type { PlayerThemeProps } from '@/features/themes/core/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
+import { FullscreenExitControl } from '@/features/window-controls/components/fullscreen-exit-control'
 
 import { MinimalistTransportControls } from './components/minimalist-transport-controls'
 import './minimalist-player-theme.css'
@@ -12,6 +13,8 @@ import './minimalist-player-theme.css'
 export function MinimalistPlayerTheme({
   chrome,
   controls,
+  isFullScreen,
+  onExitFullScreen,
   playback,
   playbackStatus
 }: PlayerThemeProps): React.JSX.Element {
@@ -19,7 +22,7 @@ export function MinimalistPlayerTheme({
   const item = playback?.item ?? null
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#111] text-white">
+    <main className="player-theme-root relative min-h-screen overflow-hidden bg-[#111] text-white">
       {content.imageUrl && (
         <img
           src={content.imageUrl}
@@ -30,14 +33,18 @@ export function MinimalistPlayerTheme({
       )}
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(8,8,8,0.5),rgba(8,8,8,0.82))]" />
 
-      <div className="fixed top-6 left-6 z-20">{chrome.connectionStatus}</div>
+      <div className="player-theme-chrome fixed top-6 left-6 z-20">{chrome.connectionStatus}</div>
       <nav
-        className="fixed top-6 right-6 z-20 flex items-start gap-2"
+        className="player-theme-chrome fixed top-6 right-6 z-20 flex items-start gap-2"
         aria-label="Ações do display"
       >
         {chrome.themeSelector}
         {chrome.accountMenu}
-        {chrome.fullscreenControl}
+        {isFullScreen ? (
+          <FullscreenExitControl onExitFullScreen={onExitFullScreen} />
+        ) : (
+          chrome.fullscreenControl
+        )}
       </nav>
 
       <section className="relative mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center justify-center px-10 py-10 text-center">

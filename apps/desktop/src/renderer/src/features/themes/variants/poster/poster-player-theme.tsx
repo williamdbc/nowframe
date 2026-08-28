@@ -1,9 +1,10 @@
-import { Disc3, Minimize2 } from 'lucide-react'
+import { Disc3 } from 'lucide-react'
 
 import { PlaybackErrorMessage } from '@/features/playback/components/playback-error-message'
 import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
 import type { PlayerThemeProps } from '@/features/themes/core/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
+import { FullscreenExitControl } from '@/features/window-controls/components/fullscreen-exit-control'
 
 import { PosterRevealedText } from './components/poster-revealed-text'
 import { PosterTransportControls } from './components/poster-transport-controls'
@@ -32,7 +33,7 @@ export function PosterPlayerTheme({
 
   return (
     <main
-      className="poster-root relative h-screen overflow-hidden"
+      className="player-theme-root poster-root relative h-screen overflow-hidden"
       data-contrast={readableTextColor.isDark ? 'dark-on-light' : 'light-on-dark'}
       style={
         {
@@ -59,25 +60,20 @@ export function PosterPlayerTheme({
       )}
       <div aria-hidden="true" className="poster-fade" />
 
-      <div className="poster-chrome fixed top-6 left-6 z-20">{chrome.connectionStatus}</div>
+      <div className="player-theme-chrome poster-chrome fixed top-6 left-6 z-20">
+        {chrome.connectionStatus}
+      </div>
       <nav
-        className="poster-chrome fixed top-6 right-6 z-20 flex items-start gap-2"
+        className="player-theme-chrome poster-chrome fixed top-6 right-6 z-20 flex items-start gap-2"
         aria-label="Ações do display"
       >
         {chrome.themeSelector}
         {chrome.accountMenu}
-        {/* Em tela cheia a moldura do app não entrega chrome nenhum, então a
-            saída fica por conta do tema — é o único caminho de volta. */}
         {isFullScreen ? (
-          <button
+          <FullscreenExitControl
             className="poster-nav-button"
-            type="button"
-            aria-label="Sair da tela cheia"
-            title="Sair da tela cheia"
-            onClick={onExitFullScreen}
-          >
-            <Minimize2 aria-hidden="true" className="size-4" />
-          </button>
+            onExitFullScreen={onExitFullScreen}
+          />
         ) : (
           chrome.fullscreenControl
         )}

@@ -160,6 +160,22 @@ select {
   animation: fullscreen-hint 2.5s ease forwards;
 }
 
+.player-theme-chrome {
+  opacity: 0;
+  transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.player-theme-root:hover .player-theme-chrome,
+.player-theme-chrome:focus-within {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-theme-chrome {
+    transition: none;
+  }
+}
+
 @media (max-width: 900px) {
   body {
     overflow: auto;

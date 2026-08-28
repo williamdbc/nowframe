@@ -54,15 +54,6 @@
   --ambient-cover-size: clamp(280px, 60vh, 600px);
 }
 
-.ambient-chrome {
-  opacity: 0;
-  transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
-}
-.ambient-root:hover .ambient-chrome,
-.ambient-chrome:focus-within {
-  opacity: 1;
-}
-
 .ambient-icon {
   display: block;
   background-color: currentColor;

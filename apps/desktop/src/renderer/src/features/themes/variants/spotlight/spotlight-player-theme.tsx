@@ -1,9 +1,10 @@
-import { Disc3, Minimize2 } from 'lucide-react'
+import { Disc3 } from 'lucide-react'
 
 import { PlaybackErrorMessage } from '@/features/playback/components/playback-error-message'
 import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
 import type { PlaybackControls, PlayerThemeProps } from '@/features/themes/core/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
+import { FullscreenExitControl } from '@/features/window-controls/components/fullscreen-exit-control'
 
 import savedIcon from './assets/saved.svg'
 import { SpotlightRevealedText } from './components/spotlight-revealed-text'
@@ -79,7 +80,7 @@ export function SpotlightPlayerTheme({
   const trackKey = item?.id ?? content.title
 
   return (
-    <main className="spotlight-root group relative flex h-screen overflow-x-hidden overflow-y-auto px-[24px] py-[32px]">
+    <main className="player-theme-root spotlight-root group relative flex h-screen overflow-x-hidden overflow-y-auto px-[24px] py-[32px]">
       {/* O fundo do Figma é a própria capa, ampliada e desfocada. */}
       {content.imageUrl && (
         <div aria-hidden="true" className="spotlight-backdrop">
@@ -93,25 +94,20 @@ export function SpotlightPlayerTheme({
         </div>
       )}
 
-      <div className="spotlight-chrome fixed top-6 left-6 z-20">{chrome.connectionStatus}</div>
+      <div className="player-theme-chrome spotlight-chrome fixed top-6 left-6 z-20">
+        {chrome.connectionStatus}
+      </div>
       <nav
-        className="spotlight-chrome fixed top-6 right-6 z-20 flex items-start gap-2"
+        className="player-theme-chrome spotlight-chrome fixed top-6 right-6 z-20 flex items-start gap-2"
         aria-label="Ações do display"
       >
         {chrome.themeSelector}
         {chrome.accountMenu}
-        {/* Em tela cheia a moldura do app não entrega chrome nenhum, então a
-            saída fica por conta do tema — é o único caminho de volta. */}
         {isFullScreen ? (
-          <button
+          <FullscreenExitControl
             className="spotlight-nav-button"
-            type="button"
-            aria-label="Sair da tela cheia"
-            title="Sair da tela cheia"
-            onClick={onExitFullScreen}
-          >
-            <Minimize2 aria-hidden="true" className="size-4" />
-          </button>
+            onExitFullScreen={onExitFullScreen}
+          />
         ) : (
           chrome.fullscreenControl
         )}

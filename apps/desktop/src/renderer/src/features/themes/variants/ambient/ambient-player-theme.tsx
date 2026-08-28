@@ -1,10 +1,11 @@
-import { Captions, Disc3, Minimize2 } from 'lucide-react'
+import { Captions, Disc3 } from 'lucide-react'
 import { useState } from 'react'
 
 import { PlaybackErrorMessage } from '@/features/playback/components/playback-error-message'
 import { PlaybackProgressControl } from '@/features/playback/components/playback-progress-control'
 import type { PlayerThemeProps } from '@/features/themes/core/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
+import { FullscreenExitControl } from '@/features/window-controls/components/fullscreen-exit-control'
 
 import { AmbientLyricsPanel } from './components/ambient-lyrics-panel'
 import { AmbientRevealedText } from './components/ambient-revealed-text'
@@ -105,9 +106,11 @@ export function AmbientPlayerTheme({
 
   const windowChrome = (
     <>
-      <div className="ambient-chrome fixed top-6 left-6 z-20">{chrome.connectionStatus}</div>
+      <div className="player-theme-chrome ambient-chrome fixed top-6 left-6 z-20">
+        {chrome.connectionStatus}
+      </div>
       <nav
-        className="ambient-chrome fixed top-6 right-6 z-20 flex items-start gap-2"
+        className="player-theme-chrome ambient-chrome fixed top-6 right-6 z-20 flex items-start gap-2"
         aria-label="Ações do display"
       >
         <button
@@ -122,18 +125,11 @@ export function AmbientPlayerTheme({
         </button>
         {chrome.themeSelector}
         {chrome.accountMenu}
-        {/* Em tela cheia a moldura do app não entrega chrome nenhum, então a
-            saída fica por conta do tema — é o único caminho de volta. */}
         {isFullScreen ? (
-          <button
+          <FullscreenExitControl
             className="ambient-nav-button"
-            type="button"
-            aria-label="Sair da tela cheia"
-            title="Sair da tela cheia"
-            onClick={onExitFullScreen}
-          >
-            <Minimize2 aria-hidden="true" className="size-4" />
-          </button>
+            onExitFullScreen={onExitFullScreen}
+          />
         ) : (
           chrome.fullscreenControl
         )}
@@ -146,7 +142,7 @@ export function AmbientPlayerTheme({
   if (isImmersive) {
     return (
       <main
-        className="ambient-root ambient-root--immersive group relative min-h-screen overflow-hidden"
+        className="player-theme-root ambient-root ambient-root--immersive group relative min-h-screen overflow-hidden"
         style={{ backgroundColor: backdrop }}
       >
         {windowChrome}
@@ -179,7 +175,7 @@ export function AmbientPlayerTheme({
   if (showLyrics) {
     return (
       <main
-        className="ambient-root ambient-root--lyrics group relative min-h-screen overflow-hidden"
+        className="player-theme-root ambient-root ambient-root--lyrics group relative min-h-screen overflow-hidden"
         style={{ backgroundColor: backdrop }}
       >
         {windowChrome}
@@ -221,7 +217,7 @@ export function AmbientPlayerTheme({
 
   return (
     <main
-      className="ambient-root group relative min-h-screen overflow-hidden"
+      className="player-theme-root ambient-root group relative min-h-screen overflow-hidden"
       style={{ backgroundColor: backdrop }}
     >
       {windowChrome}

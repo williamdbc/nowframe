@@ -5,6 +5,7 @@ import { PlaybackProgressControl } from '@/features/playback/components/playback
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
 import type { PlayerThemeProps } from '@/features/themes/core/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
+import { FullscreenExitControl } from '@/features/window-controls/components/fullscreen-exit-control'
 
 import { LyricsPanel } from './components/lyrics-panel'
 import { LyricsTransportControls } from './components/lyrics-transport-controls'
@@ -13,7 +14,9 @@ import './lyrics-player-theme.css'
 export function LyricsPlayerTheme({
   chrome,
   controls,
+  isFullScreen,
   lyrics,
+  onExitFullScreen,
   playback,
   playbackStatus
 }: PlayerThemeProps): React.JSX.Element {
@@ -21,7 +24,7 @@ export function LyricsPlayerTheme({
   const item = playback?.item ?? null
 
   return (
-    <main className="lyrics-theme relative min-h-screen overflow-hidden bg-[#12100f] text-white">
+    <main className="player-theme-root lyrics-theme relative min-h-screen overflow-hidden bg-[#12100f] text-white">
       {content.imageUrl && (
         <img
           src={content.imageUrl}
@@ -33,14 +36,18 @@ export function LyricsPlayerTheme({
       <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(10,8,8,0.76),rgba(14,11,10,0.52)_45%,rgba(8,7,7,0.72))]" />
       <div className="absolute inset-0 bg-black/15" />
 
-      <div className="fixed top-6 left-6 z-30">{chrome.connectionStatus}</div>
+      <div className="player-theme-chrome fixed top-6 left-6 z-30">{chrome.connectionStatus}</div>
       <nav
-        className="fixed top-6 right-6 z-30 flex items-start gap-2"
+        className="player-theme-chrome fixed top-6 right-6 z-30 flex items-start gap-2"
         aria-label="Ações do display"
       >
         {chrome.themeSelector}
         {chrome.accountMenu}
-        {chrome.fullscreenControl}
+        {isFullScreen ? (
+          <FullscreenExitControl onExitFullScreen={onExitFullScreen} />
+        ) : (
+          chrome.fullscreenControl
+        )}
       </nav>
 
       <div className="lyrics-layout relative z-10 mx-auto grid min-h-screen max-w-[1800px] grid-cols-[minmax(280px,0.72fr)_minmax(440px,1.28fr)] gap-[clamp(2.5rem,6vw,7rem)] px-[clamp(2rem,5vw,6rem)] pt-24 pb-10">

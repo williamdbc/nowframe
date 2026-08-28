@@ -59,15 +59,6 @@
   }
 }
 
-.spotlight-chrome {
-  opacity: 0;
-  transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
-}
-.spotlight-root:hover .spotlight-chrome,
-.spotlight-chrome:focus-within {
-  opacity: 1;
-}
-
 .spotlight-icon {
   display: block;
   background-color: currentColor;

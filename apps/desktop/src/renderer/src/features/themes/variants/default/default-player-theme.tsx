@@ -5,6 +5,7 @@ import { PlaybackErrorMessage } from '@/features/playback/components/playback-er
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
 import type { PlayerThemeProps } from '@/features/themes/core/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
+import { FullscreenExitControl } from '@/features/window-controls/components/fullscreen-exit-control'
 
 import { DefaultTransportControls } from './components/default-transport-controls'
 import './default-player-theme.css'
@@ -12,6 +13,8 @@ import './default-player-theme.css'
 export function DefaultPlayerTheme({
   chrome,
   controls,
+  isFullScreen,
+  onExitFullScreen,
   playback,
   playbackStatus
 }: PlayerThemeProps): React.JSX.Element {
@@ -19,17 +22,21 @@ export function DefaultPlayerTheme({
   const item = playback?.item ?? null
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#08090a] text-white">
+    <main className="player-theme-root relative min-h-screen overflow-hidden bg-[#08090a] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(30,215,96,0.16),transparent_34%),radial-gradient(circle_at_78%_75%,rgba(61,90,254,0.12),transparent_36%)]" />
 
-      <div className="fixed top-6 left-6 z-20">{chrome.connectionStatus}</div>
+      <div className="player-theme-chrome fixed top-6 left-6 z-20">{chrome.connectionStatus}</div>
       <nav
-        className="fixed top-6 right-6 z-20 flex items-start gap-2"
+        className="player-theme-chrome fixed top-6 right-6 z-20 flex items-start gap-2"
         aria-label="Ações do display"
       >
         {chrome.themeSelector}
         {chrome.accountMenu}
-        {chrome.fullscreenControl}
+        {isFullScreen ? (
+          <FullscreenExitControl onExitFullScreen={onExitFullScreen} />
+        ) : (
+          chrome.fullscreenControl
+        )}
       </nav>
 
       <div className="relative mx-auto grid min-h-screen max-w-[1500px] grid-cols-[minmax(280px,0.78fr)_minmax(430px,1.22fr)] items-center gap-[clamp(3rem,7vw,8rem)] px-[clamp(3rem,7vw,8rem)] py-12 max-[900px]:grid-cols-1 max-[900px]:py-28">

@@ -5,6 +5,7 @@ import { PlaybackProgressControl } from '@/features/playback/components/playback
 import { PlaybackVolumeControl } from '@/features/playback/components/playback-volume-control'
 import type { PlayerThemeProps } from '@/features/themes/core/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
+import { FullscreenExitControl } from '@/features/window-controls/components/fullscreen-exit-control'
 
 import { KaraokeStage } from './components/karaoke-stage'
 import { KaraokeTransportControls } from './components/karaoke-transport-controls'
@@ -13,7 +14,9 @@ import './karaoke-player-theme.css'
 export function KaraokePlayerTheme({
   chrome,
   controls,
+  isFullScreen,
   lyrics,
+  onExitFullScreen,
   playback,
   playbackStatus
 }: PlayerThemeProps): React.JSX.Element {
@@ -21,7 +24,7 @@ export function KaraokePlayerTheme({
   const item = playback?.item ?? null
 
   return (
-    <main className="karaoke-theme relative min-h-screen overflow-hidden bg-[#130d18] text-white">
+    <main className="player-theme-root karaoke-theme relative min-h-screen overflow-hidden bg-[#130d18] text-white">
       {content.imageUrl && (
         <img
           src={content.imageUrl}
@@ -33,14 +36,18 @@ export function KaraokePlayerTheme({
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,8,18,0.7),rgba(15,8,20,0.42)_42%,rgba(9,6,14,0.86))]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(255,213,124,0.08),transparent_38%)]" />
 
-      <div className="fixed top-6 left-6 z-30">{chrome.connectionStatus}</div>
+      <div className="player-theme-chrome fixed top-6 left-6 z-30">{chrome.connectionStatus}</div>
       <nav
-        className="fixed top-6 right-6 z-30 flex items-start gap-2"
+        className="player-theme-chrome fixed top-6 right-6 z-30 flex items-start gap-2"
         aria-label="Ações do display"
       >
         {chrome.themeSelector}
         {chrome.accountMenu}
-        {chrome.fullscreenControl}
+        {isFullScreen ? (
+          <FullscreenExitControl onExitFullScreen={onExitFullScreen} />
+        ) : (
+          chrome.fullscreenControl
+        )}
       </nav>
 
       <section className="karaoke-layout relative z-10 mx-auto flex min-h-screen w-full max-w-[1800px] flex-col px-[clamp(2rem,6vw,7rem)] pt-24 pb-7">
