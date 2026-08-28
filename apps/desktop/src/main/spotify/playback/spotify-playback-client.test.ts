@@ -103,8 +103,34 @@ describe('SpotifyPlaybackClient', () => {
       progressMs: 42_000,
       repeatMode: 'context',
       shuffleEnabled: true,
+      stateChangedAt: null,
       synchronizedAt: 1_000_000
     })
+  })
+
+  it('carries the Spotify state timestamp through as a change signal', async () => {
+    vi.spyOn(Date, 'now').mockReturnValue(1_000_000)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            device,
+            is_playing: true,
+            timestamp: 1_699_999_999_000,
+            repeat_state: 'off',
+            shuffle_state: false,
+            progress_ms: 1_000,
+            item: null
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      )
+    )
+
+    const playback = await SpotifyPlaybackClient.getCurrentPlayback('access-token')
+
+    expect(playback?.stateChangedAt).toBe(1_699_999_999_000)
   })
 
   it('maps podcast episodes without assuming track metadata', async () => {

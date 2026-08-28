@@ -240,6 +240,33 @@ describe('useControlSpotifyPlaybackMutation', () => {
     expect(queryClient.getQueryData(spotifyPlaybackQueryKeys.current())).toEqual(actualNextPlayback)
   })
 
+  /**
+   * Sem o `stateChangedAt`, avançar para a mesma faixa (repeat, ou a mesma música duas vezes
+   * seguidas na fila) não é distinguível de uma resposta obsoleta: a chave de conteúdo é
+   * igual e o progresso não regrediu o bastante.
+   */
+  it('detects a change to the same content through the Spotify state timestamp', async () => {
+    vi.useFakeTimers()
+    const previousPlayback = { ...playback, progressMs: 1_000, stateChangedAt: 111 }
+    const restartedPlayback = { ...playback, progressMs: 200, stateChangedAt: 222 }
+    vi.spyOn(SpotifyPlaybackService, 'skipToNext').mockResolvedValue(undefined)
+    const getCurrentPlaybackSpy = vi
+      .spyOn(SpotifyPlaybackService, 'getCurrentPlayback')
+      .mockResolvedValue(restartedPlayback)
+    const queryClient = createQueryClient()
+    queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), previousPlayback)
+    const { result } = renderHook(() => useControlSpotifyPlaybackMutation(), {
+      wrapper: createWrapper(queryClient)
+    })
+
+    await act(() => result.current.mutateAsync('next'))
+    await act(() => vi.advanceTimersByTimeAsync(2_000))
+
+    expect(queryClient.getQueryData(spotifyPlaybackQueryKeys.current())).toEqual(restartedPlayback)
+    // Saiu na primeira tentativa, sem precisar percorrer o ladder inteiro.
+    expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('ignores a stale queue that still lists the current content', async () => {
     vi.useFakeTimers()
     vi.spyOn(SpotifyPlaybackService, 'skipToNext').mockResolvedValue(undefined)

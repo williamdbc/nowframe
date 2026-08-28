@@ -72,6 +72,7 @@ const spotifyPlaybackResponseSchema = z.object({
     supports_volume: z.boolean()
   }),
   is_playing: z.boolean(),
+  timestamp: z.number().int().nonnegative().nullable().optional().default(null),
   repeat_state: z.enum(['context', 'off', 'track']),
   shuffle_state: z.boolean(),
   item: z.unknown().nullable(),
@@ -285,6 +286,7 @@ export class SpotifyPlaybackClient {
       progressMs: playback.progress_ms ?? 0,
       repeatMode: playback.repeat_state,
       shuffleEnabled: playback.shuffle_state,
+      stateChangedAt: playback.timestamp,
       synchronizedAt: estimatePlaybackSynchronizedAt(requestStartedAt, Date.now())
     }
   }

@@ -130,6 +130,20 @@ export interface SpotifyPlaybackState {
   repeatMode: SpotifyRepeatMode
   shuffleEnabled: boolean
   synchronizedAt: number
+  /**
+   * `timestamp` do Spotify: instante da última mudança de estado do player (play, pause,
+   * skip, scrub, nova faixa).
+   *
+   * NÃO use para calcular posição. A fórmula que circula em fórum,
+   * `progress_ms + (agora - timestamp)`, vem de uma versão antiga da documentação que dizia
+   * "when data was fetched". Em reprodução contínua o `progress_ms` avança enquanto o
+   * `timestamp` fica parado na última mudança, então ela conta o tempo decorrido duas vezes
+   * e o erro cresce ao longo da faixa. Serve só como sinal de "algo mudou".
+   *
+   * Opcional porque o campo tem histórico de vir ausente ou zerado, e para que quem monta
+   * um estado de playback (temas, testes) não precise conhecê-lo.
+   */
+  stateChangedAt?: number | null
 }
 
 /**

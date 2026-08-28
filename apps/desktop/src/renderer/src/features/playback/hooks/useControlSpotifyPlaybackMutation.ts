@@ -40,6 +40,19 @@ function hasPlaybackChanged(
   previousPlayback: SpotifyPlayback | undefined,
   currentPlayback: NonNullable<SpotifyPlayback>
 ): boolean {
+  // `stateChangedAt` é o único sinal autoritativo de que o player mudou de estado, e pega
+  // casos que as heurísticas abaixo não veem — avançar para a mesma faixa em repeat, por
+  // exemplo. Só é usado como sinal positivo: o campo tem histórico de vir ausente ou
+  // zerado, então igualdade não vale como prova de que nada mudou.
+  const previousStateChangedAt = previousPlayback?.stateChangedAt
+  if (
+    previousStateChangedAt != null &&
+    currentPlayback.stateChangedAt != null &&
+    currentPlayback.stateChangedAt !== previousStateChangedAt
+  ) {
+    return true
+  }
+
   if (getPlaybackContentKey(currentPlayback) !== getPlaybackContentKey(previousPlayback))
     return true
 
