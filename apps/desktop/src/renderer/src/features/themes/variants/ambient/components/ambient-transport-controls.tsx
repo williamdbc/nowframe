@@ -15,17 +15,15 @@ import { AmbientIcon } from './ambient-icon'
 
 interface AmbientTransportControlsProps {
   controls: PlaybackControls
-  fullscreenControl: React.ReactNode
-  isFullScreen: boolean
-  onExitFullScreen: () => void
+  isImmersive: boolean
+  onToggleImmersive: () => void
   playback: PlaybackState | null
 }
 
 export function AmbientTransportControls({
   controls,
-  fullscreenControl,
-  isFullScreen,
-  onExitFullScreen,
+  isImmersive,
+  onToggleImmersive,
   playback
 }: AmbientTransportControlsProps): React.JSX.Element {
   const isPlaying = playback?.isPlaying ?? false
@@ -121,28 +119,19 @@ export function AmbientTransportControls({
             <AmbientIcon className="ambient-repeat-glyph" source={repeatIcon} />
           </span>
         </button>
-        {/* Em tela cheia a moldura do app não entrega chrome, então o mesmo
-            slot do Figma passa a ser o botão de saída. */}
-        {isFullScreen ? (
-          <button
-            className="ambient-control"
-            type="button"
-            aria-label="Sair da tela cheia"
-            title="Sair da tela cheia"
-            onClick={onExitFullScreen}
-          >
-            <AmbientIcon className="size-[24px]" source={fullscreenIcon} />
-          </button>
-        ) : (
-          <div
-            className="ambient-fullscreen-slot"
-            style={
-              { '--ambient-fullscreen-icon': `url("${fullscreenIcon}")` } as React.CSSProperties
-            }
-          >
-            {fullscreenControl}
-          </div>
-        )}
+        {/* O ícone de tela cheia do Figma alterna o layout reduzido do tema. A
+            janela do app em si continua sendo assunto do botão do canto. */}
+        <button
+          className="ambient-control"
+          type="button"
+          aria-label={isImmersive ? 'Sair do modo imersivo' : 'Entrar no modo imersivo'}
+          aria-pressed={isImmersive}
+          data-active={isImmersive}
+          title={isImmersive ? 'Sair do modo imersivo' : 'Entrar no modo imersivo'}
+          onClick={onToggleImmersive}
+        >
+          <AmbientIcon className="size-[24px]" source={fullscreenIcon} />
+        </button>
       </div>
     </div>
   )

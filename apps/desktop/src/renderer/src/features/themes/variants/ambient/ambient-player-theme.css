@@ -50,7 +50,7 @@
   --ambient-label-size: clamp(12px, 1vw, 14px);
   transition: background-color 900ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.ambient-root--fullscreen {
+.ambient-root--immersive {
   --ambient-cover-size: clamp(280px, 60vh, 600px);
 }
 
@@ -269,7 +269,7 @@
   }
 }
 
-.ambient-lyrics-toggle {
+.ambient-nav-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -287,18 +287,18 @@
     border-color 160ms cubic-bezier(0.2, 0, 0, 1),
     scale 160ms cubic-bezier(0.2, 0, 0, 1);
 }
-.ambient-lyrics-toggle:hover {
+.ambient-nav-button:hover {
   border-color: rgba(255, 255, 255, 0.2);
   background: rgba(0, 0, 0, 0.6);
   color: #ffffff;
 }
-.ambient-lyrics-toggle[aria-pressed='true'] {
+.ambient-nav-button[aria-pressed='true'] {
   color: #1ed760;
 }
-.ambient-lyrics-toggle:active {
+.ambient-nav-button:active {
   scale: 0.96;
 }
-.ambient-lyrics-toggle:focus-visible {
+.ambient-nav-button:focus-visible {
   outline: 2px solid #1ed760;
   outline-offset: 2px;
 }
@@ -419,55 +419,6 @@
   opacity: 0.3;
   scale: 1;
   box-shadow: none;
-}
-
-/* O controle de tela cheia é da moldura do app: aqui ele veste o slot do Figma. */
-.ambient-fullscreen-slot > button {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-  color: #ffffff;
-  opacity: 0.4;
-  cursor: pointer;
-  transition:
-    opacity 160ms cubic-bezier(0.2, 0, 0, 1),
-    scale 160ms cubic-bezier(0.2, 0, 0, 1);
-}
-.ambient-fullscreen-slot > button:disabled {
-  cursor: not-allowed;
-}
-.ambient-fullscreen-slot > button:hover,
-.ambient-fullscreen-slot > button:focus-visible {
-  opacity: 1;
-}
-.ambient-fullscreen-slot > button > svg {
-  display: none;
-}
-.ambient-fullscreen-slot > button::after {
-  content: '';
-  width: 24px;
-  height: 24px;
-  background-color: currentColor;
-  mask-image: var(--ambient-fullscreen-icon);
-  mask-repeat: no-repeat;
-  mask-position: center;
-  mask-size: contain;
-  -webkit-mask-image: var(--ambient-fullscreen-icon);
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  -webkit-mask-size: contain;
-}
-.ambient-fullscreen-slot > button:active {
-  scale: 0.96;
 }
 
 .ambient-volume-column {
@@ -600,7 +551,7 @@
   }
   .ambient-lyrics-line,
   .ambient-lyrics-track,
-  .ambient-lyrics-toggle {
+  .ambient-nav-button {
     transition: none !important;
   }
   .ambient-cover-image,

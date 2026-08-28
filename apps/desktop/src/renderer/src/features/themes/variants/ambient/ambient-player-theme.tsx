@@ -1,4 +1,4 @@
-import { Captions, Disc3 } from 'lucide-react'
+import { Captions, Disc3, Minimize2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { PlaybackErrorMessage } from '@/features/playback/components/playback-error-message'
@@ -53,19 +53,32 @@ export function AmbientPlayerTheme({
   playback,
   playbackStatus
 }: PlayerThemeProps): React.JSX.Element {
+  // O tema tem duas apresentações alternativas à padrão, e cada uma tem o seu
+  // botão. Ligar uma desliga a outra: senão o toggle da que ficou por baixo não
+  // teria efeito visível nenhum.
   const [showLyrics, setShowLyrics] = useState(false)
+  const [isImmersive, setIsImmersive] = useState(false)
   const content = getPlayerThemeContent(playback, playbackStatus)
   const item = playback?.item ?? null
   const backdrop = useDominantCoverColor(content.imageUrl)
   // Remontar o bloco de texto a cada faixa é o que dispara a entrada animada.
   const trackKey = item?.id ?? content.title
 
+  const toggleLyrics = (): void => {
+    setShowLyrics((isVisible) => !isVisible)
+    setIsImmersive(false)
+  }
+
+  const toggleImmersive = (): void => {
+    setIsImmersive((isOn) => !isOn)
+    setShowLyrics(false)
+  }
+
   const transportControls = (
     <AmbientTransportControls
       controls={controls}
-      fullscreenControl={chrome.fullscreenControl}
-      isFullScreen={isFullScreen}
-      onExitFullScreen={onExitFullScreen}
+      isImmersive={isImmersive}
+      onToggleImmersive={toggleImmersive}
       playback={playback}
     />
   )
@@ -98,27 +111,46 @@ export function AmbientPlayerTheme({
         aria-label="Ações do display"
       >
         <button
-          className="ambient-lyrics-toggle"
+          className="ambient-nav-button"
           type="button"
           aria-label={showLyrics ? 'Ocultar letra' : 'Mostrar letra'}
           aria-pressed={showLyrics}
           title={showLyrics ? 'Ocultar letra' : 'Mostrar letra'}
-          onClick={() => setShowLyrics((isVisible) => !isVisible)}
+          onClick={toggleLyrics}
         >
           <Captions aria-hidden="true" className="size-4" />
         </button>
         {chrome.themeSelector}
         {chrome.accountMenu}
+        {/* Em tela cheia a moldura do app não entrega chrome nenhum, então a
+            saída fica por conta do tema — é o único caminho de volta. */}
+        {isFullScreen ? (
+          <button
+            className="ambient-nav-button"
+            type="button"
+            aria-label="Sair da tela cheia"
+            title="Sair da tela cheia"
+            onClick={onExitFullScreen}
+          >
+            <Minimize2 aria-hidden="true" className="size-4" />
+          </button>
+        ) : (
+          chrome.fullscreenControl
+        )}
       </nav>
     </>
   )
 
-  if (isFullScreen) {
+  // Modo imersivo: o desenho reduz a tela à capa, ao transporte e ao volume.
+  // Vale com a janela normal ou expandida — são controles independentes.
+  if (isImmersive) {
     return (
       <main
-        className="ambient-root ambient-root--fullscreen group relative min-h-screen overflow-hidden"
+        className="ambient-root ambient-root--immersive group relative min-h-screen overflow-hidden"
         style={{ backgroundColor: backdrop }}
       >
+        {windowChrome}
+
         <section
           key={trackKey}
           className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-[var(--ambient-block-gap)]"
@@ -130,8 +162,8 @@ export function AmbientPlayerTheme({
           />
           {transportControls}
           {renderVolumeControl('horizontal')}
-          {/* O layout de tela cheia do Figma não traz texto; estes nós mantêm a
-              faixa descrita para leitores de tela sem alterar o desenho. */}
+          {/* O modo imersivo do Figma não traz texto; estes nós mantêm a faixa
+              descrita para leitores de tela sem alterar o desenho. */}
           <span className="sr-only">
             {content.title} — {content.creatorNames}
             {playback ? ` — ${playback.device.name}` : ''}

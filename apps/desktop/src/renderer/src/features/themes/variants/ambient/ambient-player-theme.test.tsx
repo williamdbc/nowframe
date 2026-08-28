@@ -122,16 +122,35 @@ describe('AmbientPlayerTheme', () => {
     expect(screen.getByRole('button', { name: 'Mostrar letra' })).toBeEnabled()
   })
 
-  it('reduces the full screen layout to cover, transport and volume', () => {
-    renderTheme(true)
+  it('reduces the layout to cover, transport and volume in immersive mode', async () => {
+    const user = userEvent.setup()
+    renderTheme(false)
+
+    await user.click(screen.getByRole('button', { name: 'Entrar no modo imersivo' }))
 
     expect(screen.getByRole('img', { name: 'Capa de Koi No Yokan' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Pausar' })).toBeEnabled()
     expect(screen.getByRole('slider', { name: 'Volume' })).toBeEnabled()
+    // Sem texto no desenho, a faixa segue descrita para leitores de tela.
+    expect(screen.getByText(/Entombed — Deftones — MacBook Pro/)).toBeInTheDocument()
 
-    // O Figma não traz título nem barra de progresso em tela cheia.
+    // O Figma não traz título nem barra de progresso no modo imersivo.
     expect(screen.queryByRole('heading', { name: 'Entombed' })).not.toBeInTheDocument()
     expect(screen.queryByRole('slider', { name: 'Posição da reprodução' })).not.toBeInTheDocument()
+  })
+
+  it('separates the app fullscreen button from the theme immersive toggle', async () => {
+    const user = userEvent.setup()
+    renderTheme(false)
+
+    // O da moldura expande a janela e vive no canto; o do Figma, na barra de
+    // transporte, só troca a apresentação do tema.
+    expect(screen.getByText('Tela cheia')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Entrar no modo imersivo' }))
+
+    expect(screen.getByText('Tela cheia')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sair do modo imersivo' })).toBeEnabled()
   })
 
   it('swaps the whole layout for the lyrics stage when the letter is toggled on', async () => {
@@ -175,9 +194,14 @@ describe('AmbientPlayerTheme', () => {
     expect(onExitFullScreen).toHaveBeenCalledOnce()
   })
 
-  it('keeps the track described for assistive technology in full screen', () => {
-    renderTheme(true)
+  it('drops the immersive mode when the lyrics take over the screen', async () => {
+    const user = userEvent.setup()
+    renderTheme(false, syncedLyrics)
 
-    expect(screen.getByText(/Entombed — Deftones — MacBook Pro/)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Entrar no modo imersivo' }))
+    await user.click(screen.getByRole('button', { name: 'Mostrar letra' }))
+
+    expect(screen.getByText('The way it breaks mine')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Entrar no modo imersivo' })).toBeEnabled()
   })
 })
