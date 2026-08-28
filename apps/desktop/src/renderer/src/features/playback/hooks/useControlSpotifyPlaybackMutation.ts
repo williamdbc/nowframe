@@ -6,33 +6,34 @@ import { spotifyPlaybackQueryKeys } from '@/features/playback/queries/spotify-pl
 import { SpotifyPlaybackService } from '@/features/playback/services/spotify-playback-service'
 import type { PlaybackCommand } from '@/features/playback/types/playback-command'
 import { calculatePlaybackProgress } from '@/features/playback/utils/calculate-playback-progress'
+import {
+  getPlaybackContentKey,
+  getPlaybackItemKey
+} from '@/features/playback/utils/get-playback-content-key'
+
+import type {
+  SpotifyPlaybackItem,
+  SpotifyPlaybackQueue
+} from '../../../../../contracts/nowframe-api'
 
 type SpotifyPlayback = Awaited<ReturnType<typeof SpotifyPlaybackService.getCurrentPlayback>>
 
 interface PlaybackMutationContext {
+  dispatchedAt: number
+  hasOptimisticItem: boolean
   previousPlayback: SpotifyPlayback | undefined
   reconciliationSequence: number
 }
 
-const playbackReconciliationOffsetsMs = [0, 250, 500, 1_000] as const
+/**
+ * Offsets medidos a partir do instante em que o comando foi disparado, não do fim da
+ * tentativa anterior. Cada consulta de reconciliação custa ~150–260 ms; somar os atrasos
+ * ao término de cada uma fazia o ladder derivar para ~0/500/1000/1750 ms.
+ */
+const playbackReconciliationOffsetsMs = [0, 150, 350, 600, 1_000, 1_500] as const
 
 function wait(delayMs: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, delayMs))
-}
-
-function getPlaybackContentKey(playback: SpotifyPlayback | undefined): string | null {
-  const item = playback?.item
-  if (!item) return null
-
-  return item.id
-    ? `${item.type}:${item.id}`
-    : [
-        item.type,
-        item.title,
-        item.collectionName,
-        item.creatorNames.join(','),
-        item.durationMs
-      ].join(':')
 }
 
 function hasPlaybackChanged(
@@ -52,16 +53,22 @@ async function reconcilePlaybackAfterSkip(
   queryKey: ReturnType<typeof spotifyPlaybackQueryKeys.current>,
   previousPlayback: SpotifyPlayback | undefined,
   reconciliationSequence: number,
-  getCurrentReconciliationSequence: () => number
+  getCurrentReconciliationSequence: () => number,
+  dispatchedAt: number,
+  hasOptimisticItem: boolean
 ): Promise<void> {
   for (const [index, offsetMs] of playbackReconciliationOffsetsMs.entries()) {
-    const previousOffsetMs = playbackReconciliationOffsetsMs[index - 1] ?? 0
-    const delayMs = offsetMs - previousOffsetMs
+    const delayMs = dispatchedAt + offsetMs - Date.now()
     if (delayMs > 0) await wait(delayMs)
     if (reconciliationSequence !== getCurrentReconciliationSequence()) return
 
-    const cachedPlayback = queryClient.getQueryData<SpotifyPlayback>(queryKey)
-    if (cachedPlayback && hasPlaybackChanged(previousPlayback, cachedPlayback)) return
+    // Sem palpite otimista, um cache já diferente significa que o polling adiantou o
+    // trabalho. Com palpite, o cache é a nossa própria suposição e não confirma nada —
+    // a reconciliação precisa ouvir o servidor para poder corrigir um palpite errado.
+    if (!hasOptimisticItem) {
+      const cachedPlayback = queryClient.getQueryData<SpotifyPlayback>(queryKey)
+      if (cachedPlayback && hasPlaybackChanged(previousPlayback, cachedPlayback)) return
+    }
 
     try {
       const currentPlayback = await SpotifyPlaybackService.getCurrentPlayback()
@@ -109,6 +116,44 @@ function optimisticallyUpdatePlayingState(
   }
 }
 
+/**
+ * Ao avançar, o próximo conteúdo já é conhecido pela fila em cache, então os metadados
+ * podem trocar na hora em vez de esperar o Spotify publicar o novo estado — o que custava
+ * o comando mais pelo menos uma consulta de reconciliação (~500 ms no melhor caso).
+ *
+ * Só se aplica a `next`: em `previous` o Spotify reinicia a faixa atual quando o progresso
+ * passou de alguns segundos, então adivinhar produziria um flicker de metadado errado.
+ */
+function getQueuedNextItem(
+  queryClient: QueryClient,
+  playback: SpotifyPlayback | undefined
+): SpotifyPlaybackItem | null {
+  const currentItemKey = getPlaybackContentKey(playback)
+  if (!currentItemKey) return null
+
+  const queue = queryClient.getQueryData<SpotifyPlaybackQueue>(
+    spotifyPlaybackQueryKeys.queue(currentItemKey)
+  )
+  const nextItem = queue?.items[0] ?? null
+
+  // Uma fila obsoleta pode listar o próprio conteúdo atual; nesse caso não há palpite útil.
+  return getPlaybackItemKey(nextItem) === currentItemKey ? null : nextItem
+}
+
+function optimisticallyAdvanceToItem(
+  playback: SpotifyPlayback | undefined,
+  nextItem: SpotifyPlaybackItem
+): SpotifyPlayback | undefined {
+  if (!playback) return playback
+
+  return {
+    ...playback,
+    item: nextItem,
+    progressMs: 0,
+    synchronizedAt: Date.now()
+  }
+}
+
 export function useControlSpotifyPlaybackMutation(): UseMutationResult<
   void,
   Error,
@@ -132,12 +177,18 @@ export function useControlSpotifyPlaybackMutation(): UseMutationResult<
       reconciliationSequenceRef.current += 1
       await queryClient.cancelQueries({ queryKey })
       const previousPlayback = queryClient.getQueryData<SpotifyPlayback>(queryKey)
+      const queuedNextItem =
+        command === 'next' ? getQueuedNextItem(queryClient, previousPlayback) : null
 
       queryClient.setQueryData<SpotifyPlayback>(queryKey, (playback) =>
-        optimisticallyUpdatePlayingState(playback, command)
+        queuedNextItem
+          ? optimisticallyAdvanceToItem(playback, queuedNextItem)
+          : optimisticallyUpdatePlayingState(playback, command)
       )
 
       return {
+        dispatchedAt: Date.now(),
+        hasOptimisticItem: queuedNextItem !== null,
         previousPlayback,
         reconciliationSequence: reconciliationSequenceRef.current
       }
@@ -154,7 +205,9 @@ export function useControlSpotifyPlaybackMutation(): UseMutationResult<
         queryKey,
         context.previousPlayback,
         context.reconciliationSequence,
-        () => reconciliationSequenceRef.current
+        () => reconciliationSequenceRef.current,
+        context.dispatchedAt,
+        context.hasOptimisticItem
       )
     }
   })

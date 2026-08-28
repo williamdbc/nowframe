@@ -14,6 +14,7 @@ const nowframeApi: NowframeApi = {
     getSession: () => ipcRenderer.invoke(ipcChannels.getSpotifySession),
     getProfile: () => ipcRenderer.invoke(ipcChannels.getSpotifyProfile),
     getPlayback: () => ipcRenderer.invoke(ipcChannels.getSpotifyPlayback),
+    getPlaybackQueue: () => ipcRenderer.invoke(ipcChannels.getSpotifyPlaybackQueue),
     getAlbumTracks: (albumId) => ipcRenderer.invoke(ipcChannels.getSpotifyAlbumTracks, albumId),
     getPlaylistTracks: (playlistId) =>
       ipcRenderer.invoke(ipcChannels.getSpotifyPlaylistTracks, playlistId),

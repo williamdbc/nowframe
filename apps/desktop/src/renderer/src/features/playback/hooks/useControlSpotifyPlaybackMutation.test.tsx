@@ -47,6 +47,18 @@ const playback: PlaybackState = {
   synchronizedAt: 1_000
 }
 
+const queuedItem: NonNullable<PlaybackState['item']> = {
+  album: { id: 'queued-album-id', uri: 'spotify:album:queued-album-id' },
+  collectionName: 'Queued Album',
+  creatorNames: ['Queued Artist'],
+  durationMs: 210_000,
+  id: 'queued-track-id',
+  imageUrl: null,
+  title: 'Queued Track',
+  type: 'track',
+  uri: 'spotify:track:queuedtrackid'
+}
+
 function createQueryClient(): QueryClient {
   return new QueryClient({
     defaultOptions: {
@@ -165,8 +177,89 @@ describe('useControlSpotifyPlaybackMutation', () => {
     })
 
     await act(() => result.current.mutateAsync('previous'))
-    await act(() => vi.advanceTimersByTimeAsync(1_000))
+    await act(() => vi.advanceTimersByTimeAsync(2_000))
 
-    expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(4)
+    const attemptsAfterLadder = getCurrentPlaybackSpy.mock.calls.length
+    expect(attemptsAfterLadder).toBeGreaterThan(1)
+
+    // O ladder é limitado: passado o último offset, nenhuma tentativa nova acontece.
+    await act(() => vi.advanceTimersByTimeAsync(10_000))
+    expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(attemptsAfterLadder)
+  })
+
+  it('advances the metadata immediately when the queued next content is known', async () => {
+    vi.useFakeTimers()
+    vi.spyOn(SpotifyPlaybackService, 'skipToNext').mockResolvedValue(undefined)
+    const getCurrentPlaybackSpy = vi
+      .spyOn(SpotifyPlaybackService, 'getCurrentPlayback')
+      .mockResolvedValue(playback)
+    const queryClient = createQueryClient()
+    queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
+    queryClient.setQueryData(spotifyPlaybackQueryKeys.queue('track:track-id'), {
+      items: [queuedItem]
+    })
+    const { result } = renderHook(() => useControlSpotifyPlaybackMutation(), {
+      wrapper: createWrapper(queryClient)
+    })
+
+    await act(() => result.current.mutateAsync('next'))
+
+    // A troca aconteceu sem depender de nenhuma consulta de reconciliação.
+    expect(
+      queryClient.getQueryData<PlaybackState>(spotifyPlaybackQueryKeys.current())
+    ).toMatchObject({
+      item: queuedItem,
+      progressMs: 0
+    })
+
+    await act(() => vi.advanceTimersByTimeAsync(2_000))
+    expect(getCurrentPlaybackSpy).toHaveBeenCalled()
+  })
+
+  it('corrects an optimistic guess when Spotify reports different content', async () => {
+    vi.useFakeTimers()
+    const actualNextPlayback: PlaybackState = {
+      ...playback,
+      item: { ...queuedItem, id: 'shuffled-track-id', title: 'Shuffled Track' },
+      progressMs: 500
+    }
+    vi.spyOn(SpotifyPlaybackService, 'skipToNext').mockResolvedValue(undefined)
+    vi.spyOn(SpotifyPlaybackService, 'getCurrentPlayback').mockResolvedValue(actualNextPlayback)
+    const queryClient = createQueryClient()
+    queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
+    queryClient.setQueryData(spotifyPlaybackQueryKeys.queue('track:track-id'), {
+      items: [queuedItem]
+    })
+    const { result } = renderHook(() => useControlSpotifyPlaybackMutation(), {
+      wrapper: createWrapper(queryClient)
+    })
+
+    await act(() => result.current.mutateAsync('next'))
+    await act(() => vi.advanceTimersByTimeAsync(2_000))
+
+    expect(queryClient.getQueryData(spotifyPlaybackQueryKeys.current())).toEqual(actualNextPlayback)
+  })
+
+  it('ignores a stale queue that still lists the current content', async () => {
+    vi.useFakeTimers()
+    vi.spyOn(SpotifyPlaybackService, 'skipToNext').mockResolvedValue(undefined)
+    vi.spyOn(SpotifyPlaybackService, 'getCurrentPlayback').mockResolvedValue(playback)
+    const queryClient = createQueryClient()
+    queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
+    queryClient.setQueryData(spotifyPlaybackQueryKeys.queue('track:track-id'), {
+      items: [playback.item!]
+    })
+    const { result } = renderHook(() => useControlSpotifyPlaybackMutation(), {
+      wrapper: createWrapper(queryClient)
+    })
+
+    await act(() => result.current.mutateAsync('next'))
+
+    // Nenhum palpite: os metadados seguem os do conteúdo atual até o servidor confirmar.
+    expect(
+      queryClient.getQueryData<PlaybackState>(spotifyPlaybackQueryKeys.current())?.item
+    ).toEqual(playback.item)
+
+    await act(() => vi.advanceTimersByTimeAsync(2_000))
   })
 })

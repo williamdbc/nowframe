@@ -1,10 +1,18 @@
-import type { SpotifyPlaybackState, SpotifyRepeatMode } from '../../../contracts/nowframe-api'
+import type {
+  SpotifyPlaybackQueue,
+  SpotifyPlaybackState,
+  SpotifyRepeatMode
+} from '../../../contracts/nowframe-api'
 import { SpotifyAuthService } from '../authentication/spotify-auth-service'
 import { SpotifyPlaybackClient } from './spotify-playback-client'
 
 export class SpotifyPlaybackService {
   static async getCurrentPlayback(): Promise<SpotifyPlaybackState | null> {
     return SpotifyPlaybackClient.getCurrentPlayback(await this.getAccessToken())
+  }
+
+  static async getQueue(): Promise<SpotifyPlaybackQueue> {
+    return SpotifyPlaybackClient.getQueue(await this.getAccessToken())
   }
 
   static async pause(): Promise<void> {

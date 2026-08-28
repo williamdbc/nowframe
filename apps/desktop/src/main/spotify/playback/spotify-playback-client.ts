@@ -3,11 +3,13 @@ import { z } from 'zod'
 import type {
   SpotifyPlaybackContext,
   SpotifyPlaybackItem,
+  SpotifyPlaybackQueue,
   SpotifyPlaybackState,
   SpotifyRepeatMode
 } from '../../../contracts/nowframe-api'
 
 const spotifyPlaybackUrl = 'https://api.spotify.com/v1/me/player'
+const maximumQueuedItems = 5
 let rateLimitedUntil = 0
 
 type SpotifyPlaybackCommandPath =
@@ -110,6 +112,10 @@ const spotifyApiErrorSchema = z.object({
   })
 })
 
+const spotifyQueueResponseSchema = z.object({
+  queue: z.array(z.unknown()).optional().default([])
+})
+
 function mapPlaybackItem(item: unknown): SpotifyPlaybackItem | null {
   const track = spotifyTrackSchema.safeParse(item)
 
@@ -154,6 +160,20 @@ function getRetryAfterMilliseconds(response: Response): number {
   return Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
     ? retryAfterSeconds * 1000
     : 30_000
+}
+
+/**
+ * O `progress_ms` devolvido pelo Spotify era verdade no servidor por volta da metade da
+ * viagem de ida e volta, não no momento em que a resposta chegou. Estampar `Date.now()`
+ * na chegada faz o relógio local nascer atrasado por ~RTT/2 (medido: 75–130 ms), viés que
+ * todo o cálculo de progresso e a sincronia da letra herdam.
+ */
+export function estimatePlaybackSynchronizedAt(
+  requestStartedAt: number,
+  respondedAt: number
+): number {
+  const roundTripMs = Math.max(0, respondedAt - requestStartedAt)
+  return requestStartedAt + Math.round(roundTripMs / 2)
 }
 
 function ensureSpotifyIsReadyForRequest(): void {
@@ -214,6 +234,7 @@ export class SpotifyPlaybackClient {
   static async getCurrentPlayback(accessToken: string): Promise<SpotifyPlaybackState | null> {
     ensureSpotifyIsReadyForRequest()
 
+    const requestStartedAt = Date.now()
     const response = await fetch(spotifyPlaybackUrl, {
       headers: {
         Authorization: `Bearer ${accessToken}`
@@ -262,7 +283,36 @@ export class SpotifyPlaybackClient {
       progressMs: playback.progress_ms ?? 0,
       repeatMode: playback.repeat_state,
       shuffleEnabled: playback.shuffle_state,
-      synchronizedAt: Date.now()
+      synchronizedAt: estimatePlaybackSynchronizedAt(requestStartedAt, Date.now())
+    }
+  }
+
+  static async getQueue(accessToken: string): Promise<SpotifyPlaybackQueue> {
+    ensureSpotifyIsReadyForRequest()
+
+    const response = await fetch(`${spotifyPlaybackUrl}/queue`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+
+    if (response.status === 204) return { items: [] }
+
+    if (!response.ok) {
+      throw await createSpotifyApiError(
+        response,
+        'Não foi possível consultar a fila de reprodução do Spotify.'
+      )
+    }
+
+    const payload: unknown = await response.json().catch(() => null)
+    const queue = spotifyQueueResponseSchema.parse(payload)
+
+    return {
+      items: queue.queue
+        .slice(0, maximumQueuedItems)
+        .map(mapPlaybackItem)
+        .filter((item): item is SpotifyPlaybackItem => item !== null)
     }
   }
 

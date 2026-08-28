@@ -9,6 +9,14 @@ export class SpotifyPlaybackService {
     }
   }
 
+  static async getQueue(): ReturnType<typeof window.nowframe.spotify.getPlaybackQueue> {
+    try {
+      return await window.nowframe.spotify.getPlaybackQueue()
+    } catch (error) {
+      throw normalizeIpcError(error, 'Não foi possível consultar a fila de reprodução.')
+    }
+  }
+
   static async pause(): ReturnType<typeof window.nowframe.spotify.pausePlayback> {
     try {
       return await window.nowframe.spotify.pausePlayback()

@@ -3,6 +3,7 @@ export const ipcChannels = {
   getSpotifySession: 'spotify:get-session',
   getSpotifyProfile: 'spotify:get-profile',
   getSpotifyPlayback: 'spotify:get-playback',
+  getSpotifyPlaybackQueue: 'spotify:get-playback-queue',
   getSpotifyAlbumTracks: 'spotify:get-album-tracks',
   getSpotifyPlaylistTracks: 'spotify:get-playlist-tracks',
   getLyrics: 'lyrics:get',
@@ -131,6 +132,14 @@ export interface SpotifyPlaybackState {
   synchronizedAt: number
 }
 
+/**
+ * Próximos conteúdos na fila do dispositivo ativo. Serve para trocar os metadados
+ * imediatamente ao avançar de faixa, em vez de esperar o Spotify publicar o novo estado.
+ */
+export interface SpotifyPlaybackQueue {
+  items: SpotifyPlaybackItem[]
+}
+
 export interface SpotifyLibraryItemState {
   isSaved: boolean
   uri: string
@@ -180,6 +189,7 @@ export interface NowframeApi {
     getSession: () => Promise<SpotifySessionState>
     getProfile: () => Promise<SpotifyProfile>
     getPlayback: () => Promise<SpotifyPlaybackState | null>
+    getPlaybackQueue: () => Promise<SpotifyPlaybackQueue>
     getAlbumTracks: (albumId: string) => Promise<SpotifyAlbumTracklist>
     getPlaylistTracks: (playlistId: string) => Promise<SpotifyPlaylistTracklist>
     getLibraryItemState: (uri: string) => Promise<SpotifyLibraryItemState>

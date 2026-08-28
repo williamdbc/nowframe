@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { SpotifyPlaybackClient } from './spotify-playback-client'
+import {
+  estimatePlaybackSynchronizedAt,
+  SpotifyPlaybackClient
+} from './spotify-playback-client'
 
 const device = {
   id: 'device-id',
@@ -285,5 +288,66 @@ describe('SpotifyPlaybackClient', () => {
       'O Spotify solicitou uma pausa antes da próxima solicitação.'
     )
     expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('anchors the synchronization clock at the middle of the round trip', async () => {
+    // O progresso relatado era verdade no servidor por volta da metade da viagem, não na
+    // chegada da resposta: 2_000_000 de saída, 2_000_240 de volta => 2_000_120.
+    // Os timestamps ficam além da janela de rate limit que o teste anterior deixou no
+    // `rateLimitedUntil`, que é estado de módulo e atravessa testes.
+    let hasResponded = false
+    vi.spyOn(Date, 'now').mockImplementation(() => (hasResponded ? 2_000_240 : 2_000_000))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(() => {
+        hasResponded = true
+
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              device,
+              is_playing: true,
+              repeat_state: 'off',
+              shuffle_state: false,
+              progress_ms: 42_000,
+              item: {
+                id: 'track-id',
+                type: 'track',
+                name: 'Midnight City',
+                duration_ms: 244_000,
+                artists: [{ name: 'M83' }],
+                album: {
+                  id: 'album-id',
+                  name: 'Hurry Up, We’re Dreaming',
+                  images: [{ url: 'https://i.scdn.co/image/album-cover' }],
+                  uri: 'spotify:album:album-id'
+                },
+                uri: 'spotify:track:trackid'
+              }
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } }
+          )
+        )
+      })
+    )
+
+    await expect(SpotifyPlaybackClient.getCurrentPlayback('access-token')).resolves.toMatchObject({
+      progressMs: 42_000,
+      synchronizedAt: 2_000_120
+    })
+  })
+})
+
+describe('estimatePlaybackSynchronizedAt', () => {
+  it('compensates half of the observed round trip', () => {
+    expect(estimatePlaybackSynchronizedAt(1_000, 1_260)).toBe(1_130)
+  })
+
+  it('collapses to the request instant when the response is immediate', () => {
+    expect(estimatePlaybackSynchronizedAt(1_000, 1_000)).toBe(1_000)
+  })
+
+  it('never travels backwards when the clock moves non-monotonically', () => {
+    expect(estimatePlaybackSynchronizedAt(1_000, 900)).toBe(1_000)
   })
 })

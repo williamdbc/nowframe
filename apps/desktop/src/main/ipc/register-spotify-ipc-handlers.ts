@@ -12,6 +12,7 @@ export function registerSpotifyIpcHandlers(): void {
   ipcMain.handle(ipcChannels.getSpotifySession, () => SpotifyAuthService.getSession())
   ipcMain.handle(ipcChannels.getSpotifyProfile, () => SpotifyProfileService.getCurrentProfile())
   ipcMain.handle(ipcChannels.getSpotifyPlayback, () => SpotifyPlaybackService.getCurrentPlayback())
+  ipcMain.handle(ipcChannels.getSpotifyPlaybackQueue, () => SpotifyPlaybackService.getQueue())
   ipcMain.handle(ipcChannels.getSpotifyAlbumTracks, (_event, albumId: unknown) =>
     SpotifyAlbumService.getTracks(albumId)
   )
