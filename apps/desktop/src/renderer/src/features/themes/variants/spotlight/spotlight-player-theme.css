@@ -1,0 +1,470 @@
+/* Escala responsiva: os valores do Figma são o teto, e a altura da janela é a
+   referência porque o tema é um display de tela cheia empilhado numa coluna —
+   é a altura, não a largura, que decide se a capa ainda cabe. */
+.spotlight-root {
+  --spotlight-column: clamp(180px, min(42vh, 66vw), 480px);
+  --spotlight-stack-gap: clamp(20px, 3.7vh, 40px);
+  --spotlight-block-gap: clamp(18px, 3vh, 32px);
+  --spotlight-group-gap: clamp(14px, 2.2vh, 24px);
+  --spotlight-text-gap: clamp(12px, 1.9vh, 20px);
+  --spotlight-line-gap: clamp(8px, 1.1vh, 12px);
+  --spotlight-meta-gap: clamp(6px, 0.93vh, 10px);
+  --spotlight-transport-gap: clamp(20px, 3.7vh, 40px);
+  --spotlight-transport-inner-gap: clamp(16px, 3vh, 32px);
+  --spotlight-icon-sm: clamp(14px, 1.7vh, 18px);
+  --spotlight-icon-md: clamp(18px, 2.3vh, 24px);
+  --spotlight-icon-lg: clamp(28px, 3.7vh, 40px);
+  --spotlight-title-size: clamp(14px, 1.5vh, 16px);
+  --spotlight-body-size: clamp(12px, 1.3vh, 14px);
+  --spotlight-label-size: clamp(10px, 1.12vh, 12px);
+  --spotlight-time-size: clamp(9px, 0.95vh, 10px);
+  background-color: #0b0b0d;
+}
+
+/* O fundo é a própria capa desfocada. O recorte é dele, não da tela: assim a
+   coluna pode rolar numa janela baixa sem que a sangria do blur vire barra de
+   rolagem. A ampliação cobre a borda transparente que o blur deixaria. */
+.spotlight-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.spotlight-backdrop-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.16);
+  filter: blur(40px);
+  animation: spotlight-backdrop-in 900ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* O véu claro do Figma, somado a um escurecimento discreto: sem ele uma capa
+   clara apagaria o texto branco, que é a única cor de texto do tema. */
+.spotlight-backdrop-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04)),
+    linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.28));
+}
+
+@keyframes spotlight-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.spotlight-chrome {
+  opacity: 0;
+  transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+.spotlight-root:hover .spotlight-chrome,
+.spotlight-chrome:focus-within {
+  opacity: 1;
+}
+
+.spotlight-icon {
+  display: block;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+/* Centrado por margem, não por align-items: com a coluna mais alta que a
+   janela o alinhamento central cortaria o topo em vez de deixar rolar. */
+.spotlight-stack {
+  position: relative;
+  z-index: 1;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spotlight-stack-gap);
+  width: var(--spotlight-column);
+  max-width: 92vw;
+}
+
+/* Capa: borda, sombra em quatro camadas e brilho diagonal, todos do Figma. */
+.spotlight-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 1px 1px 0 rgba(14, 14, 16, 0.04),
+    0 4px 6px 0 rgba(14, 14, 16, 0.04),
+    0 24px 68px 0 rgba(14, 14, 16, 0.04),
+    0 2px 3px 0 rgba(14, 14, 16, 0.04);
+}
+.spotlight-cover-sheen {
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
+}
+.spotlight-cover-image {
+  animation: spotlight-cover-in 600ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes spotlight-cover-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* O bloco abaixo da capa é uma lista só: o Figma usa um espaço diferente entre
+   cada par de blocos, e a entrada escalonada precisa deles como irmãos diretos
+   para contar a ordem. */
+.spotlight-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.spotlight-content > * {
+  animation: spotlight-rise-in 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.spotlight-content > :nth-child(1) {
+  animation-delay: 80ms;
+}
+.spotlight-content > :nth-child(2) {
+  margin-top: var(--spotlight-text-gap);
+  animation-delay: 160ms;
+}
+.spotlight-content > :nth-child(3) {
+  margin-top: var(--spotlight-group-gap);
+  animation-delay: 240ms;
+}
+.spotlight-content > :nth-child(4) {
+  margin-top: var(--spotlight-block-gap);
+  animation-delay: 320ms;
+}
+
+@keyframes spotlight-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Título longo para em duas linhas: passando disso o bloco de texto cresce e
+   empurra o transporte para fora da janela. O recorte do clamp ganha uma folga
+   vertical devolvida por margem negativa, senão o leading cortaria os
+   descendentes da última linha visível. */
+.spotlight-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  padding-block: 0.1em;
+  margin-block: -0.1em;
+}
+
+/* animate-text / per-word-crossfade */
+.spotlight-reveal-unit {
+  display: inline-block;
+  white-space: pre;
+  animation: spotlight-per-word-crossfade 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes spotlight-per-word-crossfade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* transitions-dev — troca do glifo de play/pause dentro do mesmo botão. */
+.spotlight-icon-swap {
+  position: relative;
+  display: inline-grid;
+}
+.spotlight-icon-swap > * {
+  grid-area: 1 / 1;
+  transition:
+    opacity 200ms ease-in-out,
+    filter 200ms ease-in-out,
+    transform 200ms ease-in-out;
+}
+.spotlight-icon-swap[data-state='playing'] > [data-icon='pause'],
+.spotlight-icon-swap[data-state='paused'] > [data-icon='play'] {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+.spotlight-icon-swap[data-state='playing'] > [data-icon='play'],
+.spotlight-icon-swap[data-state='paused'] > [data-icon='pause'] {
+  opacity: 0;
+  filter: blur(2px);
+  transform: scale(0.25);
+}
+
+.spotlight-nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  cursor: pointer;
+  transition:
+    color 160ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    scale 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.spotlight-nav-button:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+}
+.spotlight-nav-button:active {
+  scale: 0.96;
+}
+.spotlight-nav-button:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 2px;
+}
+
+/* Todos os botões de transporte partilham o mesmo estado, o play incluído: aqui
+   ele é só um glifo maior, não a pílula branca do tema Ambient. A área de toque
+   fica 16px maior que o glifo, o que reproduz a caixa de 56px do Figma sob o
+   ícone de 40px sem inflar o desenho. */
+.spotlight-control {
+  --spotlight-control-size: var(--spotlight-icon-md);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spotlight-control-size);
+  height: var(--spotlight-control-size);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  opacity: 0.4;
+  cursor: pointer;
+  transition:
+    color 160ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 160ms cubic-bezier(0.2, 0, 0, 1),
+    scale 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.spotlight-control::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--spotlight-control-size) + 16px);
+  height: calc(var(--spotlight-control-size) + 16px);
+  transform: translate(-50%, -50%);
+}
+.spotlight-control--sm {
+  --spotlight-control-size: var(--spotlight-icon-sm);
+}
+.spotlight-control--md {
+  --spotlight-control-size: var(--spotlight-icon-md);
+}
+.spotlight-control--lg {
+  --spotlight-control-size: var(--spotlight-icon-lg);
+}
+.spotlight-control:hover,
+.spotlight-control:focus-visible {
+  opacity: 1;
+}
+.spotlight-control:active {
+  scale: 0.96;
+}
+.spotlight-control[data-active='true'] {
+  color: #1ed760;
+  opacity: 1;
+}
+.spotlight-control:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 8px;
+}
+.spotlight-control:disabled {
+  cursor: not-allowed;
+  opacity: 0.15;
+}
+.spotlight-control:disabled:active {
+  scale: 1;
+}
+
+/* O ícone de salvo é bicolor e só existe no Figma no estado ativo; o estado
+   não salvo reusa o mesmo glifo dessaturado. */
+.spotlight-control--saved img {
+  transition:
+    filter 160ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.spotlight-control--saved[data-active='false'] img {
+  filter: grayscale(1) brightness(1.5);
+  opacity: 0.55;
+}
+.spotlight-control--saved[data-active='false']:hover img {
+  opacity: 0.85;
+}
+
+/* O SVG de repetir tem 24x32: o ponto abaixo do glifo marca o modo ligado e só
+   escapa do recorte quando a repetição está ativa. */
+.spotlight-repeat-clip {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+.spotlight-control--repeat[data-active='true'] .spotlight-repeat-clip {
+  overflow: visible;
+}
+.spotlight-repeat-glyph {
+  width: var(--spotlight-icon-sm);
+  height: calc(var(--spotlight-icon-sm) * 4 / 3);
+}
+
+/* A barra de progresso do Figma mostra o thumb o tempo todo, ao contrário do
+   range compartilhado, que só o revela no hover. */
+.spotlight-progress-range {
+  height: 6px;
+}
+.spotlight-progress-range::-webkit-slider-runnable-track {
+  height: 6px;
+}
+.spotlight-progress-range::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: -4px;
+  opacity: 1;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.16);
+}
+
+/* O range nativo fica transparente sobre a trilha pintada: preserva teclado e
+   leitor de tela e deixa o desenho do Figma por conta do CSS. */
+.spotlight-volume-range {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+.spotlight-volume-range:disabled {
+  cursor: not-allowed;
+}
+.spotlight-volume-thumb {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.16);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.spotlight-volume-fill,
+.spotlight-volume-thumb {
+  transition:
+    width 120ms linear,
+    left 120ms linear;
+}
+/* O anel é para navegação por teclado. Com :focus-within ele ficaria preso
+   depois de arrastar o volume com o mouse, até um clique fora. */
+.spotlight-volume-track:has(:focus-visible) {
+  outline: 2px solid #1ed760;
+  outline-offset: 4px;
+}
+
+.spotlight-mute {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.spotlight-mute::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%);
+}
+.spotlight-mute:hover,
+.spotlight-mute:focus-visible {
+  opacity: 1;
+}
+.spotlight-mute[data-muted='true'] {
+  opacity: 0.25;
+}
+.spotlight-mute:disabled {
+  opacity: 0.15;
+  cursor: not-allowed;
+}
+.spotlight-mute:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-chrome,
+  .spotlight-control,
+  .spotlight-nav-button,
+  .spotlight-mute,
+  .spotlight-volume-fill,
+  .spotlight-volume-thumb,
+  .spotlight-icon-swap > * {
+    transition: none !important;
+  }
+  .spotlight-backdrop-image,
+  .spotlight-cover-image,
+  .spotlight-content > *,
+  .spotlight-reveal-unit {
+    animation: none !important;
+  }
+}

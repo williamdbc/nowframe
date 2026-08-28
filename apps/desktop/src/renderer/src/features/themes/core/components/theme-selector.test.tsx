@@ -23,6 +23,7 @@ describe('ThemeSelector', () => {
     expect(screen.getByRole('menuitemradio', { name: 'Ambient' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Karaoke' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Lyrics' })).toBeVisible()
+    expect(screen.getByRole('menuitemradio', { name: 'Spotlight' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Tracklist' })).toBeVisible()
 
     await user.click(screen.getByRole('menuitemradio', { name: 'Drive' }))

@@ -53,7 +53,7 @@ export interface PlayerThemeProps {
 }
 
 export type PlayerThemeId =
-  'ambient' | 'default' | 'drive' | 'karaoke' | 'lyrics' | 'minimalist' | 'tracklist'
+  'ambient' | 'default' | 'drive' | 'karaoke' | 'lyrics' | 'minimalist' | 'spotlight' | 'tracklist'
 
 export interface PlayerTheme {
   id: PlayerThemeId
