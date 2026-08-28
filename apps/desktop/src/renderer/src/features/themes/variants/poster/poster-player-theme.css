@@ -300,20 +300,10 @@
   scale: 1;
 }
 
-/* O ícone de salvo é bicolor e só existe no Figma no estado ativo; o estado
-   não salvo reusa o mesmo glifo dessaturado. */
-.poster-control--saved img {
-  transition:
-    filter 160ms cubic-bezier(0.2, 0, 0, 1),
-    opacity 160ms cubic-bezier(0.2, 0, 0, 1);
-}
-.poster-control--saved[data-active='false'] img {
-  filter: grayscale(1) brightness(1.5);
-  opacity: 0.55;
-}
-.poster-control--saved[data-active='false']:hover img {
-  opacity: 0.85;
-}
+/* O salvo não tem tratamento próprio aqui: como os demais controles, ele é uma máscara
+   em `currentColor`, e o que separa salvo de não salvo é a opacidade herdada de
+   `.poster-control` — 0.4 inativo, 1 ativo. Nos temas Ambient e Spotlight o mesmo ícone
+   é um <img> dessaturado por filtro, porque lá o verde do Spotify é a cor do estado. */
 
 /* O SVG de repetir tem 24x32: o ponto abaixo do glifo marca o modo ligado e só
    escapa do recorte quando a repetição está ativa. */

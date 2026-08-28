@@ -177,6 +177,26 @@ describe('PosterPlayerTheme', () => {
     expect(root).toHaveAttribute('data-contrast', 'light-on-dark')
   })
 
+  /**
+   * O arquivo do Figma traz o verde do Spotify assado no `fill`. Como <img> ele ignorava
+   * a cor legível escolhida para a fileira e ficava verde sobre qualquer degradê, então
+   * aqui ele tem de ser máscara em `currentColor` como os outros.
+   */
+  it('renders the saved icon as a mask so it follows the readable colour', () => {
+    renderTheme()
+
+    const saved = screen.getByRole('button', { name: 'Adicionar à biblioteca' })
+
+    expect(saved.querySelector('img')).toBeNull()
+
+    const glyph = saved.querySelector('.poster-icon') as HTMLElement
+    expect(glyph).not.toBeNull()
+    // O verde segue dentro do arquivo — o que importa é que ele agora está numa máscara,
+    // que descarta a cor da fonte e pinta com o `currentColor` do botão.
+    expect(glyph.style.maskImage).toContain('%231ED760')
+    expect(glyph.style.maskImage).toContain('data:image/svg+xml')
+  })
+
   it('marks a pending option command as busy instead of dimming it', () => {
     renderTheme(false, { isPlaybackOptionPending: true })
 

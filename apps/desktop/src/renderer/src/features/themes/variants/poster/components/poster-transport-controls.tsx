@@ -46,7 +46,11 @@ export function PosterTransportControls({
         disabled={!playback?.item || !controls.canToggleSaved || controls.isLibraryPending}
         onClick={controls.onToggleSaved}
       >
-        <img alt="" aria-hidden="true" className="size-full" src={savedIcon} />
+        {/* Máscara, não <img>: o arquivo vem do Figma com o verde do Spotify assado no
+            fill, e como <img> ele ignorava a cor legível escolhida para o resto da
+            fileira. O check é um furo no próprio path, então o recorte sobrevive à
+            máscara e deixa o degradê aparecer por dentro do círculo. */}
+        <PosterIcon className="size-full" source={savedIcon} />
       </button>
 
       <div className="flex items-center gap-[var(--poster-transport-gap)]">
