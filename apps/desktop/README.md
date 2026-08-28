@@ -1,6 +1,6 @@
-# Music Display Desktop
+# Nowframe Desktop
 
-Aplicação Electron do Music Display, construída com React, Vite, TypeScript, TanStack Router e TanStack Query.
+Aplicação Electron do Nowframe, construída com React, Vite, TypeScript, TanStack Router e TanStack Query.
 
 ## Desenvolvimento
 

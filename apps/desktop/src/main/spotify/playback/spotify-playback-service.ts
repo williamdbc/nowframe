@@ -1,4 +1,4 @@
-import type { SpotifyPlaybackState, SpotifyRepeatMode } from '../../../contracts/music-display-api'
+import type { SpotifyPlaybackState, SpotifyRepeatMode } from '../../../contracts/nowframe-api'
 import { SpotifyAuthService } from '../authentication/spotify-auth-service'
 import { SpotifyPlaybackClient } from './spotify-playback-client'
 

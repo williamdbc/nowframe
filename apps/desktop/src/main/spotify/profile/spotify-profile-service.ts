@@ -1,4 +1,4 @@
-import type { SpotifyProfile } from '../../../contracts/music-display-api'
+import type { SpotifyProfile } from '../../../contracts/nowframe-api'
 import { SpotifyAuthService } from '../authentication/spotify-auth-service'
 import { SpotifyProfileClient } from './spotify-profile-client'
 

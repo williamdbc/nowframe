@@ -1,5 +1,5 @@
-appId: com.musicdisplay.desktop
-productName: Music Display
+appId: app.nowframe.desktop
+productName: Nowframe
 directories:
   buildResources: build
 files:
@@ -12,9 +12,9 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: music-display
+  executableName: nowframe
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: nowframe-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
@@ -22,7 +22,7 @@ mac:
   entitlementsInherit: build/entitlements.mac.plist
   notarize: false
 dmg:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: nowframe-${version}.${ext}
 linux:
   target:
     - AppImage
@@ -31,8 +31,8 @@ linux:
   maintainer: electronjs.org
   category: Utility
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: nowframe-${version}.${ext}
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.invalid/music-display/updates
+  url: https://example.invalid/nowframe/updates

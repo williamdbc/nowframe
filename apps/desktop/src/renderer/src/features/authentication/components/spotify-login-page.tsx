@@ -45,7 +45,7 @@ export function SpotifyLoginPage(): React.JSX.Element {
         </div>
 
         <p className="mt-8 text-sm font-semibold tracking-[0.25em] text-[#1ed760] uppercase">
-          Music Display
+          Nowframe
         </p>
         <h1 className="mt-3 text-[clamp(2.7rem,6vw,4rem)] leading-[0.98] font-semibold tracking-[-0.055em] text-balance">
           Seu Spotify, em outra tela.

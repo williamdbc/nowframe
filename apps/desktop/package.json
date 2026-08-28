@@ -1,5 +1,6 @@
 {
-  "name": "music-display-desktop",
+  "name": "nowframe-desktop",
+  "productName": "Nowframe",
   "version": "0.1.0",
   "description": "A customizable second screen for your music.",
   "main": "./out/main/index.js",
@@ -31,6 +32,7 @@
     "lucide-react": "^1.34.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
+    "yaml": "^2.9.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

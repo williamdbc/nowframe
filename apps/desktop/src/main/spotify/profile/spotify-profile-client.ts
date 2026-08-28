@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { SpotifyProfile } from '../../../contracts/music-display-api'
+import type { SpotifyProfile } from '../../../contracts/nowframe-api'
 
 const spotifyCurrentProfileUrl = 'https://api.spotify.com/v1/me'
 

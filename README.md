@@ -1,6 +1,6 @@
-# Music Display
+# Nowframe
 
-Aplicativo desktop que transforma uma segunda tela em uma interface landscape para acompanhar a reprodução do Spotify.
+Sua música, em outra tela. O Nowframe transforma um display secundário em uma experiência visual personalizável para acompanhar e controlar a reprodução do Spotify.
 
 ## Estrutura
 

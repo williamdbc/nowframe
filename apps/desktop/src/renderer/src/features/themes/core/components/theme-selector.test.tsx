@@ -19,7 +19,9 @@ describe('ThemeSelector', () => {
 
     await user.click(screen.getByRole('button', { name: 'Default' }))
     expect(screen.getByRole('menu', { name: 'Temas' })).toBeInTheDocument()
-    expect(screen.getAllByRole('menuitemradio')).toHaveLength(4)
+    expect(screen.getAllByRole('menuitemradio')).toHaveLength(6)
+    expect(screen.getByRole('menuitemradio', { name: 'Karaoke' })).toBeVisible()
+    expect(screen.getByRole('menuitemradio', { name: 'Lyrics' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Tracklist' })).toBeVisible()
 
     await user.click(screen.getByRole('menuitemradio', { name: 'Drive' }))

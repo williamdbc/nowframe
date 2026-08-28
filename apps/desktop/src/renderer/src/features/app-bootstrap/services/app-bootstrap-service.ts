@@ -1,5 +1,5 @@
 export class AppBootstrapService {
-  static getState(): ReturnType<typeof window.musicDisplay.app.getBootstrapState> {
-    return window.musicDisplay.app.getBootstrapState()
+  static getState(): ReturnType<typeof window.nowframe.app.getBootstrapState> {
+    return window.nowframe.app.getBootstrapState()
   }
 }

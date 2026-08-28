@@ -1,4 +1,4 @@
-import type { SpotifyRepeatMode } from '../../../../../contracts/music-display-api'
+import type { SpotifyRepeatMode } from '../../../../../contracts/nowframe-api'
 
 export type PlaybackOptionCommand =
   | {

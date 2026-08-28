@@ -1,4 +1,4 @@
-import type { SpotifyLibraryItemState } from '../../../contracts/music-display-api'
+import type { SpotifyLibraryItemState } from '../../../contracts/nowframe-api'
 import { SpotifyAuthService } from '../authentication/spotify-auth-service'
 import { SpotifyLibraryClient } from './spotify-library-client'
 

@@ -1,0 +1,124 @@
+.lyrics-layout {
+  height: 100vh;
+}
+
+.lyrics-panel-container {
+  height: calc(100vh - 8.5rem);
+}
+
+.lyrics-scroll {
+  scrollbar-width: none;
+  mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
+}
+
+.lyrics-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.lyrics-line {
+  transform-origin: left center;
+  transition:
+    color 260ms ease,
+    opacity 260ms ease,
+    transform 260ms ease;
+}
+
+.lyrics-line-active {
+  transform: scale(1.015);
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+}
+
+.lyrics-skeleton {
+  animation: lyrics-pulse 1.4s ease-in-out infinite alternate;
+}
+
+.lyrics-control {
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.56);
+  background: transparent;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.lyrics-control-primary {
+  width: 3.5rem;
+  height: 3.5rem;
+  color: #17100e;
+  background: #f6e6e0;
+}
+
+.lyrics-control[aria-pressed='true'] {
+  color: #f3b5a3;
+}
+
+.lyrics-control:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+.lyrics-control:not(:disabled) {
+  cursor: pointer;
+}
+
+.lyrics-control:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: white;
+  transform: scale(1.06);
+}
+
+.lyrics-control-primary:not(:disabled):hover {
+  color: #17100e;
+  background-color: white;
+}
+
+.lyrics-control:focus-visible {
+  outline: 2px solid #f3b5a3;
+  outline-offset: 3px;
+}
+
+@keyframes lyrics-pulse {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+
+@media (max-width: 920px) {
+  .lyrics-theme {
+    overflow-y: auto;
+  }
+
+  .lyrics-layout {
+    height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .lyrics-cover {
+    max-width: min(48vw, 18rem);
+  }
+
+  .lyrics-panel-container {
+    height: min(70vh, 42rem);
+  }
+}
+
+@media (max-height: 760px) and (min-width: 921px) {
+  .lyrics-cover {
+    max-width: 13rem;
+  }
+
+  .lyrics-player-panel > div:nth-child(2) {
+    margin-top: 1rem;
+  }
+}

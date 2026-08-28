@@ -3,7 +3,7 @@ import { z } from 'zod'
 import type {
   SpotifyPlaylistTracklist,
   SpotifyTracklistTrack
-} from '../../../contracts/music-display-api'
+} from '../../../contracts/nowframe-api'
 
 const spotifyPlaylistsUrl = 'https://api.spotify.com/v1/playlists'
 const playlistItemsPageSize = 50
@@ -29,8 +29,12 @@ const spotifyPlaylistTrackSchema = z.object({
   uri: z.string()
 })
 
+const spotifyPlaylistItemSchema = z
+  .union([z.object({ item: z.unknown().nullable() }), z.object({ track: z.unknown().nullable() })])
+  .transform((playlistItem) => ('item' in playlistItem ? playlistItem.item : playlistItem.track))
+
 const spotifyPlaylistItemsPageSchema = z.object({
-  items: z.array(z.object({ track: z.unknown().nullable() })),
+  items: z.array(spotifyPlaylistItemSchema),
   offset: z.number().int().nonnegative(),
   total: z.number().int().nonnegative()
 })
@@ -103,7 +107,7 @@ export class SpotifyPlaylistClient {
       const page = spotifyPlaylistItemsPageSchema.parse(pagePayload)
 
       for (const [index, item] of page.items.entries()) {
-        const track = mapPlaylistTrack(item.track, page.offset + index)
+        const track = mapPlaylistTrack(item, page.offset + index)
         if (track) tracks.push(track)
       }
 

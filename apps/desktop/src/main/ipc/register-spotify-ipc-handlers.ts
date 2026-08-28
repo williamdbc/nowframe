@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
 
-import { ipcChannels } from '../../contracts/music-display-api'
+import { ipcChannels } from '../../contracts/nowframe-api'
 import { SpotifyAlbumService } from '../spotify/albums/spotify-album-service'
 import { SpotifyAuthService } from '../spotify/authentication/spotify-auth-service'
 import { SpotifyLibraryService } from '../spotify/library/spotify-library-service'

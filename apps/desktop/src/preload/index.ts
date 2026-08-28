@@ -1,11 +1,14 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type { IpcRendererEvent } from 'electron'
 
-import { ipcChannels, type MusicDisplayApi, type WindowState } from '../contracts/music-display-api'
+import { ipcChannels, type NowframeApi, type WindowState } from '../contracts/nowframe-api'
 
-const musicDisplayApi: MusicDisplayApi = {
+const nowframeApi: NowframeApi = {
   app: {
     getBootstrapState: () => ipcRenderer.invoke(ipcChannels.getAppBootstrapState)
+  },
+  lyrics: {
+    get: (query) => ipcRenderer.invoke(ipcChannels.getLyrics, query)
   },
   spotify: {
     getSession: () => ipcRenderer.invoke(ipcChannels.getSpotifySession),
@@ -47,4 +50,4 @@ const musicDisplayApi: MusicDisplayApi = {
   }
 }
 
-contextBridge.exposeInMainWorld('musicDisplay', musicDisplayApi)
+contextBridge.exposeInMainWorld('nowframe', nowframeApi)

@@ -3,7 +3,7 @@ import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 
 import icon from '../../../resources/icon.png?asset'
-import { ipcChannels, type WindowState } from '../../contracts/music-display-api'
+import { ipcChannels, type WindowState } from '../../contracts/nowframe-api'
 
 export function createMainWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -12,7 +12,7 @@ export function createMainWindow(): BrowserWindow {
     minWidth: 900,
     minHeight: 540,
     show: false,
-    title: 'Music Display',
+    title: 'Nowframe',
     backgroundColor: '#08090a',
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),

@@ -1,9 +1,6 @@
 import { z } from 'zod'
 
-import type {
-  SpotifyAlbumTracklist,
-  SpotifyTracklistTrack
-} from '../../../contracts/music-display-api'
+import type { SpotifyAlbumTracklist, SpotifyTracklistTrack } from '../../../contracts/nowframe-api'
 
 const spotifyAlbumsUrl = 'https://api.spotify.com/v1/albums'
 const albumTracksPageSize = 50

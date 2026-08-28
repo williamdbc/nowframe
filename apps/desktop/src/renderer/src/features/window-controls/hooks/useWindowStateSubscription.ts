@@ -8,7 +8,7 @@ export function useWindowStateSubscription(): void {
 
   useEffect(
     () =>
-      window.musicDisplay.window.onStateChanged((state) => {
+      window.nowframe.window.onStateChanged((state) => {
         queryClient.setQueryData(windowQueryKeys.state(), state)
       }),
     [queryClient]

@@ -1,4 +1,4 @@
-import type { SpotifyTracklistTrack } from '../../../../../contracts/music-display-api'
+import type { SpotifyTracklistTrack } from '../../../../../contracts/nowframe-api'
 
 export interface PlayContextTrackMutationVariables {
   contextUri: string

@@ -1,7 +1,8 @@
 import type { ComponentType, ReactNode } from 'react'
 
 import type { PlaybackLoadStatus, PlaybackState } from '@/features/playback/types/playback-state'
-import type { SpotifyTracklistTrack } from '../../../../../../contracts/music-display-api'
+import type { LyricsDisplayState } from '@/features/lyrics/types/lyrics-display-state'
+import type { SpotifyTracklistTrack } from '../../../../../../contracts/nowframe-api'
 
 export interface PlaybackControls {
   canToggleSaved: boolean
@@ -43,12 +44,13 @@ export interface PlayerThemeTracklist {
 export interface PlayerThemeProps {
   chrome: PlayerThemeChrome
   controls: PlaybackControls
+  lyrics: LyricsDisplayState
   playback: PlaybackState | null
   playbackStatus: PlaybackLoadStatus
   tracklist: PlayerThemeTracklist
 }
 
-export type PlayerThemeId = 'default' | 'drive' | 'minimalist' | 'tracklist'
+export type PlayerThemeId = 'default' | 'drive' | 'karaoke' | 'lyrics' | 'minimalist' | 'tracklist'
 
 export interface PlayerTheme {
   id: PlayerThemeId

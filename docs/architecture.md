@@ -2,7 +2,7 @@
 
 ## Escopo atual
 
-O Music Display começa como uma aplicação desktop pessoal. O Spotify oficial continua responsável pelo áudio; o aplicativo exibe o estado da reprodução em um layout landscape.
+O Nowframe começa como uma aplicação desktop pessoal. O Spotify oficial continua responsável pelo áudio; o aplicativo exibe o estado da reprodução em um layout landscape.
 
 ```text
 apps/desktop
@@ -57,7 +57,7 @@ O access token é renovado antes de expirar. Um refresh token expirado, revogado
 
 O processo `main` consulta `GET /me/player` e entrega ao renderer um contrato reduzido com conteúdo atual, progresso, dispositivo e volume. O renderer não recebe o access token nem a resposta completa do Spotify.
 
-Enquanto há reprodução ativa, a query sincroniza a cada 3 segundos; pausada ou sem reprodução, a cada 10 segundos; após falhas, a cada 30 segundos. O polling para quando a janela fica em segundo plano e volta imediatamente ao foco. Entre respostas do Spotify, o progresso visual avança localmente a cada 250 ms e é corrigido na próxima sincronização. Respostas de rate limit respeitam o `Retry-After` antes de uma nova chamada externa.
+Enquanto há reprodução ativa, a query sincroniza a cada segundo; pausada ou sem reprodução, a cada 2 segundos; após falhas, a cada 30 segundos. Uma consulta adicional é programada para o final previsto da faixa, reduzindo o atraso em trocas naturais. O polling para quando a janela fica em segundo plano e volta imediatamente ao foco. Entre respostas do Spotify, o progresso visual avança localmente a cada 250 ms e é corrigido na próxima sincronização. Respostas de rate limit respeitam o `Retry-After` antes de uma nova chamada externa.
 
 Play, pause, faixa anterior e próxima são enviados pelo processo `main` ao dispositivo ativo. O renderer aplica uma atualização otimista apenas ao estado play/pause e restaura o cache se o comando falhar. Após avançar ou voltar uma faixa, uma sequência curta e limitada de consultas reconcilia os metadados assim que o Spotify publica o novo estado; o polling periódico permanece como fallback. Restrições de dispositivo e contexto retornadas pelo Spotify determinam quais botões ficam disponíveis.
 
@@ -79,7 +79,7 @@ Cada tema implementa um layout completo do player e possui seus próprios contro
 
 O contrato `PlayerThemeProps` entrega a todos os temas os mesmos dados e capacidades: conteúdo atual, progresso, volume, aleatório, faixa anterior, play/pause, próxima faixa, repetição, favorito e mensagens de erro. Progresso e volume reutilizam o comportamento compartilhado, mas aceitam aparência específica de cada tema. As ações de conta, conexão, tema e fullscreen são entregues como slots, permitindo que cada layout escolha suas posições.
 
-O registro central contém atualmente `default`, `drive` e `minimalist`. A preferência é persistida no `localStorage` do renderer e restaurada na próxima inicialização. Um teste de conformidade renderiza todos os temas registrados e garante que nenhum deles omita as capacidades obrigatórias do player.
+O registro central contém atualmente `default`, `drive`, `minimalist`, `tracklist`, `lyrics` e `karaoke`. A preferência é persistida no `localStorage` do renderer e restaurada na próxima inicialização. Um teste de conformidade renderiza todos os temas registrados e garante que nenhum deles omita as capacidades obrigatórias do player.
 
 ## Evolução
 

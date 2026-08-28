@@ -1,0 +1,162 @@
+.karaoke-layout {
+  height: 100vh;
+}
+
+.karaoke-stage {
+  --karaoke-line-step: clamp(5.5rem, 14vh, 9rem);
+  --karaoke-far-line-step: clamp(11rem, 28vh, 18rem);
+  text-shadow: 0 12px 42px rgba(0, 0, 0, 0.32);
+}
+
+.karaoke-line-rail {
+  contain: layout paint;
+}
+
+.karaoke-rail-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(100% - clamp(2rem, 10vw, 12rem));
+  max-width: 76rem;
+  margin: 0 auto;
+  overflow-wrap: anywhere;
+  font-size: clamp(2.35rem, 5vw, 6.5rem);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+  transform-origin: center;
+  transition:
+    opacity 500ms ease-in-out,
+    transform 500ms cubic-bezier(0.45, 0, 0.2, 1);
+  text-wrap: balance;
+  will-change: opacity, transform;
+}
+
+.karaoke-rail-line-active {
+  opacity: 1;
+  transform: translate3d(-50%, -50%, 0) scale(1);
+}
+
+.karaoke-rail-line-previous {
+  opacity: 0.2;
+  transform: translate3d(-50%, calc(-50% - var(--karaoke-line-step)), 0) scale(0.42);
+}
+
+.karaoke-rail-line-next {
+  opacity: 0.25;
+  transform: translate3d(-50%, calc(-50% + var(--karaoke-line-step)), 0) scale(0.42);
+}
+
+.karaoke-rail-line-far-previous {
+  opacity: 0;
+  transform: translate3d(-50%, calc(-50% - var(--karaoke-far-line-step)), 0) scale(0.3);
+}
+
+.karaoke-rail-line-far-next {
+  opacity: 0;
+  transform: translate3d(-50%, calc(-50% + var(--karaoke-far-line-step)), 0) scale(0.3);
+}
+
+.karaoke-word {
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.22));
+}
+
+.karaoke-control {
+  display: inline-flex;
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.58);
+  background: transparent;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.karaoke-control-primary {
+  width: 4rem;
+  height: 4rem;
+  color: #25180a;
+  background: #ffd77d;
+  box-shadow: 0 12px 34px rgba(255, 198, 82, 0.18);
+}
+
+.karaoke-control[aria-pressed='true'] {
+  color: #ffd77d;
+}
+
+.karaoke-control:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+.karaoke-control:not(:disabled) {
+  cursor: pointer;
+}
+
+.karaoke-control:not(:disabled):hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: scale(1.06);
+}
+
+.karaoke-control-primary:not(:disabled):hover {
+  color: #25180a;
+  background-color: #ffe6a9;
+}
+
+.karaoke-control:focus-visible {
+  outline: 2px solid #ffd77d;
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .karaoke-layout {
+    height: 100vh;
+    min-height: 0;
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .karaoke-stage {
+    min-height: 0;
+  }
+
+  .karaoke-rail-line {
+    font-size: clamp(2rem, 8vw, 4rem);
+  }
+
+  .karaoke-track-summary {
+    max-width: calc(100vw - 3rem);
+  }
+}
+
+@media (max-height: 760px) and (min-width: 761px) {
+  .karaoke-layout {
+    padding-top: 5rem;
+    padding-bottom: 1rem;
+  }
+
+  .karaoke-track-summary > div:first-child {
+    width: 4.5rem;
+  }
+
+  .karaoke-control {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .karaoke-control-primary {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+
+  .karaoke-rail-line {
+    font-size: clamp(2.1rem, 4.4vw, 4.5rem);
+  }
+}

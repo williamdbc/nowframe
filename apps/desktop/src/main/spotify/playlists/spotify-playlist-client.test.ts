@@ -26,7 +26,7 @@ describe('SpotifyPlaylistClient', () => {
           JSON.stringify({
             items: [
               {
-                track: {
+                item: {
                   album: { images: [{ url: 'https://i.scdn.co/image/album-cover' }] },
                   artists: [{ name: 'Scorpions' }],
                   disc_number: 1,
@@ -77,6 +77,57 @@ describe('SpotifyPlaylistClient', () => {
       'https://api.spotify.com/v1/playlists/playlist-id/items?limit=50&offset=0',
       { headers: { Authorization: 'Bearer access-token' } }
     )
+  })
+
+  it('supports the legacy track field while Spotify completes the items migration', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            id: 'playlist-id',
+            images: [],
+            name: 'Legacy Playlist'
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            items: [
+              {
+                track: {
+                  album: { images: [] },
+                  artists: [{ name: 'Scorpions' }],
+                  disc_number: 1,
+                  duration_ms: 312_000,
+                  id: 'legacy-track-id',
+                  name: 'Wind Of Change',
+                  track_number: 4,
+                  type: 'track',
+                  uri: 'spotify:track:legacy-track-id'
+                }
+              }
+            ],
+            offset: 0,
+            total: 1
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const tracklist = await SpotifyPlaylistClient.getTracks('access-token', 'playlist-id')
+
+    expect(tracklist.tracks).toEqual([
+      expect.objectContaining({
+        id: 'legacy-track-id',
+        imageUrl: null,
+        isPlayable: true,
+        title: 'Wind Of Change'
+      })
+    ])
   })
 
   it('explains the current playlist ownership restriction', async () => {

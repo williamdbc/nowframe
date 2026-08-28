@@ -1,4 +1,4 @@
-import type { SpotifyPlaylistTracklist } from '../../../contracts/music-display-api'
+import type { SpotifyPlaylistTracklist } from '../../../contracts/nowframe-api'
 import { SpotifyAuthService } from '../authentication/spotify-auth-service'
 import { SpotifyPlaylistClient } from './spotify-playlist-client'
 

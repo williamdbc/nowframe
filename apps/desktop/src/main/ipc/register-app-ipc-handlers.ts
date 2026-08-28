@@ -1,6 +1,6 @@
 import { app, ipcMain } from 'electron'
 
-import { ipcChannels, type AppBootstrapState } from '../../contracts/music-display-api'
+import { ipcChannels, type AppBootstrapState } from '../../contracts/nowframe-api'
 import { getSpotifyRedirectUri, isSpotifyConfigured } from '../config/spotify-environment'
 
 export function registerAppIpcHandlers(): void {

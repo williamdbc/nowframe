@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { UseMutationResult } from '@tanstack/react-query'
 
-import type { SpotifyLibraryItemState } from '../../../../../contracts/music-display-api'
+import type { SpotifyLibraryItemState } from '../../../../../contracts/nowframe-api'
 import { spotifyLibraryQueryKeys } from '../queries/spotify-library-query-keys'
 import { SpotifyLibraryService } from '../services/spotify-library-service'
 import type { ToggleLibraryItemMutationVariables } from '../types/toggle-library-item-mutation-variables'

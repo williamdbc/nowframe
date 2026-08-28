@@ -3,8 +3,8 @@ import { queryOptions } from '@tanstack/react-query'
 import { SpotifyPlaybackService } from '../services/spotify-playback-service'
 import { spotifyPlaybackQueryKeys } from './spotify-playback-query-keys'
 
-export const activePlaybackRefetchIntervalMs = 3_000
-export const idlePlaybackRefetchIntervalMs = 10_000
+export const activePlaybackRefetchIntervalMs = 1_000
+export const idlePlaybackRefetchIntervalMs = 2_000
 export const failedPlaybackRefetchIntervalMs = 30_000
 
 type SpotifyPlayback = Awaited<ReturnType<typeof SpotifyPlaybackService.getCurrentPlayback>>
