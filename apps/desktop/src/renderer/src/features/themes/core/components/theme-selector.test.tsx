@@ -23,6 +23,7 @@ describe('ThemeSelector', () => {
     expect(screen.getByRole('menuitemradio', { name: 'Ambient' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Karaoke' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Lyrics' })).toBeVisible()
+    expect(screen.getByRole('menuitemradio', { name: 'Poster' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Spotlight' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Tracklist' })).toBeVisible()
 

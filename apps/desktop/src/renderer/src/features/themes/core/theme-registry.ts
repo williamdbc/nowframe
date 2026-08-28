@@ -4,6 +4,7 @@ import { DrivePlayerTheme } from '@/features/themes/variants/drive/drive-player-
 import { KaraokePlayerTheme } from '@/features/themes/variants/karaoke/karaoke-player-theme'
 import { LyricsPlayerTheme } from '@/features/themes/variants/lyrics/lyrics-player-theme'
 import { MinimalistPlayerTheme } from '@/features/themes/variants/minimalist/minimalist-player-theme'
+import { PosterPlayerTheme } from '@/features/themes/variants/poster/poster-player-theme'
 import { SpotlightPlayerTheme } from '@/features/themes/variants/spotlight/spotlight-player-theme'
 import { TracklistPlayerTheme } from '@/features/themes/variants/tracklist/tracklist-player-theme'
 
@@ -41,6 +42,11 @@ export const themeRegistry = {
     id: 'minimalist',
     name: 'Minimalist',
     component: MinimalistPlayerTheme
+  },
+  poster: {
+    id: 'poster',
+    name: 'Poster',
+    component: PosterPlayerTheme
   },
   spotlight: {
     id: 'spotlight',

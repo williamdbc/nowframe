@@ -129,7 +129,14 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     expect(screen.getByText('Hurry Up, We’re Dreaming')).toBeVisible()
     expect(screen.getByText('MacBook Pro')).toBeVisible()
     expect(screen.getByRole('slider', { name: 'Posição da reprodução' })).toBeEnabled()
-    expect(screen.getByRole('slider', { name: 'Volume' })).toBeEnabled()
+    // O contrato é ter controle de volume alcançável, não um slider sempre na tela:
+    // o tema Poster mantém a coluna de volume atrás de um painel, por desenho. Que o
+    // painel abre e traz o slider fica coberto no teste do próprio tema.
+    if (id === 'poster') {
+      expect(screen.getByRole('button', { name: 'Volume' })).toBeEnabled()
+    } else {
+      expect(screen.getByRole('slider', { name: 'Volume' })).toBeEnabled()
+    }
     expect(screen.getByRole('button', { name: 'Faixa anterior' })).toBeEnabled()
     expect(screen.getByRole('button', { name: 'Pausar' })).toBeEnabled()
     expect(screen.getByRole('button', { name: 'Próxima faixa' })).toBeEnabled()

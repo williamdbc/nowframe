@@ -1,0 +1,524 @@
+/* Escala responsiva: os valores do Figma (frame de 1440x1080) são o teto. A
+   tipografia acompanha a largura porque o bloco de texto ocupa a fileira inteira;
+   os espaçamentos e os controles acompanham a altura, que é o que decide se o
+   conjunto ainda cabe acima da borda inferior. */
+.poster-root {
+  --poster-inset: clamp(16px, 2.8vw, 40px);
+  --poster-bottom: clamp(20px, 4.45vh, 48px);
+  --poster-fade-height: clamp(280px, 54vh, 583px);
+  --poster-block-gap: clamp(20px, 3.71vh, 40px);
+  --poster-details-gap: clamp(14px, 2.23vh, 24px);
+  --poster-text-gap: clamp(8px, 1.12vh, 12px);
+  --poster-progress-gap: clamp(10px, 1.05vw, 15px);
+  --poster-transport-gap: clamp(20px, 3.71vh, 40px);
+  --poster-transport-inner-gap: clamp(16px, 3vh, 32px);
+  --poster-icon-size: clamp(18px, 2.3vh, 24px);
+  --poster-icon-small: clamp(14px, 1.7vh, 18px);
+  --poster-play-size: clamp(40px, 5.2vh, 56px);
+  --poster-play-glyph-size: clamp(28px, 3.71vh, 40px);
+  --poster-title-size: clamp(28px, 3.34vw, 48px);
+  --poster-body-size: clamp(17px, 1.7vw, 24px);
+  --poster-label-size: clamp(12px, 1vw, 14px);
+  /* Preenchidos em runtime pelo tema: a media da capa e o preto ou branco que a WCAG
+     escolhe sobre ela. Os valores abaixo valem so antes da primeira amostragem. */
+  --poster-accent-rgb: 27 26 26;
+  --poster-on-accent-rgb: 255 255 255;
+  background-color: rgb(var(--poster-accent-rgb));
+}
+
+/* A capa preenche a tela e é recortada, não desfocada — é a arte que domina. */
+.poster-cover-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: poster-cover-in 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.poster-cover-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+@keyframes poster-cover-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* O degradê parte da cor da capa em alfa zero e chega a ela cheia em 70%, ficando
+   opaco daí para baixo. É o que faz o bloco de informação assentar na arte em vez de
+   sobre uma tarja preta. */
+.poster-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--poster-fade-height);
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--poster-accent-rgb) / 0) 0%,
+    rgb(var(--poster-accent-rgb)) 70%
+  );
+  pointer-events: none;
+}
+
+.poster-chrome {
+  opacity: 0;
+  transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+.poster-root:hover .poster-chrome,
+.poster-chrome:focus-within {
+  opacity: 1;
+}
+
+.poster-icon {
+  display: block;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+/* O conteúdo é ancorado pela borda inferior, não pelo topo: assim a coluna sobe
+   junto com a janela em vez de escapar por baixo. */
+.poster-stack {
+  position: absolute;
+  right: var(--poster-inset);
+  bottom: var(--poster-bottom);
+  left: var(--poster-inset);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--poster-block-gap);
+}
+.poster-stack > * {
+  animation: poster-rise-in 360ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.poster-stack > :nth-child(1) {
+  animation-delay: 30ms;
+}
+.poster-stack > :nth-child(2) {
+  animation-delay: 70ms;
+}
+.poster-stack > :nth-child(3) {
+  animation-delay: 110ms;
+}
+
+@keyframes poster-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.poster-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--poster-details-gap);
+}
+.poster-chip {
+  max-width: 100%;
+  overflow: hidden;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgb(var(--poster-on-accent-rgb) / 0.12);
+  font-size: var(--poster-label-size);
+  font-weight: 500;
+  line-height: 1.143;
+  letter-spacing: -0.01em;
+  color: rgb(var(--poster-on-accent-rgb));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.poster-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--poster-text-gap);
+  width: 100%;
+  color: rgb(var(--poster-on-accent-rgb));
+}
+
+/* Título longo para em duas linhas: passando disso o bloco de texto cresce e
+   empurra o transporte para fora da tela. O recorte do clamp ganha uma folga
+   vertical devolvida por margem negativa, senão o leading cortaria os
+   descendentes da última linha visível. */
+.poster-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  padding-block: 0.1em;
+  margin-block: -0.1em;
+  font-size: var(--poster-title-size);
+  font-weight: 600;
+  line-height: 1.084;
+  letter-spacing: -0.018em;
+}
+.poster-artist {
+  overflow: hidden;
+  font-size: var(--poster-body-size);
+  font-weight: 500;
+  line-height: 1.167;
+  letter-spacing: -0.01em;
+  opacity: 0.8;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* animate-text / per-word-crossfade */
+.poster-reveal-unit {
+  display: inline-block;
+  white-space: pre;
+  animation: poster-per-word-crossfade 400ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes poster-per-word-crossfade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* O controle compartilhado renderiza o range e, depois, os dois tempos num nó
+   próprio. Aqui o Figma quer os três na mesma fileira, então o nó dos tempos
+   deixa de gerar caixa (`display: contents`) e a ordem recoloca cada um. */
+.poster-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--poster-progress-gap);
+}
+.poster-progress-times {
+  display: contents;
+}
+.poster-progress-times > span {
+  font-size: var(--poster-label-size);
+  font-weight: 500;
+  line-height: 1.143;
+  letter-spacing: -0.01em;
+  color: rgb(var(--poster-on-accent-rgb));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.poster-progress-times > span:first-child {
+  order: -1;
+}
+.poster-progress-range {
+  order: 0;
+  flex: 1;
+  min-width: 0;
+  height: 8px;
+}
+.poster-progress-range::-webkit-slider-runnable-track {
+  height: 8px;
+}
+
+/* Os botões são os do tema Ambient. O apagado fica reservado para
+   indisponibilidade real do dispositivo: comando em voo é sinalizado por
+   `data-busy`, senão clicar em aleatório ou repetir derrubava a opacidade e a
+   devolvia, o que se via como uma piscada. */
+.poster-control {
+  --poster-control-size: var(--poster-icon-size);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--poster-control-size);
+  height: var(--poster-control-size);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(var(--poster-on-accent-rgb));
+  opacity: 0.4;
+  cursor: pointer;
+  transition:
+    color 160ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 160ms cubic-bezier(0.2, 0, 0, 1),
+    scale 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+/* Área de toque maior que o glifo, sem inflar o desenho. */
+.poster-control::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--poster-control-size) + 16px);
+  height: calc(var(--poster-control-size) + 16px);
+  transform: translate(-50%, -50%);
+}
+/* Aleatório e repetir são 18px no Figma; o resto da fileira é 24px. */
+.poster-control--sm {
+  --poster-control-size: var(--poster-icon-small);
+}
+.poster-control:hover,
+.poster-control:focus-visible {
+  opacity: 1;
+}
+.poster-control:active {
+  scale: 0.96;
+}
+/* O ativo era verde Spotify. Sobre um degradê que muda de cor a cada capa ele deixa de
+   ter contraste garantido, então o estado passa a usar a própria cor legível — o que
+   distingue ativo de inativo aqui é a opacidade cheia. */
+.poster-control[data-active='true'] {
+  color: rgb(var(--poster-on-accent-rgb));
+  opacity: 1;
+}
+.poster-control:focus-visible {
+  outline: 2px solid rgb(var(--poster-on-accent-rgb));
+  outline-offset: 8px;
+}
+.poster-control:disabled:not([data-busy='true']) {
+  opacity: 0.15;
+}
+.poster-control:disabled {
+  cursor: not-allowed;
+}
+.poster-control:disabled:active {
+  scale: 1;
+}
+
+/* O ícone de salvo é bicolor e só existe no Figma no estado ativo; o estado
+   não salvo reusa o mesmo glifo dessaturado. */
+.poster-control--saved img {
+  transition:
+    filter 160ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.poster-control--saved[data-active='false'] img {
+  filter: grayscale(1) brightness(1.5);
+  opacity: 0.55;
+}
+.poster-control--saved[data-active='false']:hover img {
+  opacity: 0.85;
+}
+
+/* O SVG de repetir tem 24x32: o ponto abaixo do glifo marca o modo ligado e só
+   escapa do recorte quando a repetição está ativa. */
+.poster-repeat-clip {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+.poster-control--repeat[data-active='true'] .poster-repeat-clip {
+  overflow: visible;
+}
+.poster-repeat-glyph {
+  width: var(--poster-control-size);
+  height: calc(var(--poster-control-size) * 4 / 3);
+}
+
+/* Sem a pílula branca do tema Ambient: aqui o play é só o glifo, maior que os demais
+   controles e na mesma cor legível. A caixa de 56px do Figma continua sendo a área de
+   toque em volta do glifo de 40px. */
+.poster-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--poster-play-size);
+  height: var(--poster-play-size);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(var(--poster-on-accent-rgb));
+  cursor: pointer;
+  transition:
+    scale 180ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.poster-play-glyph {
+  width: var(--poster-play-glyph-size);
+  height: var(--poster-play-glyph-size);
+}
+.poster-play:hover {
+  scale: 1.04;
+}
+.poster-play:active {
+  scale: 0.96;
+}
+.poster-play:focus-visible {
+  outline: 2px solid rgb(var(--poster-on-accent-rgb));
+  outline-offset: 4px;
+}
+.poster-play:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+  scale: 1;
+}
+
+/* O painel de volume: o ícone é a âncora, e a coluna abre acima dele. */
+.poster-volume {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.poster-volume-panel {
+  position: absolute;
+  right: 50%;
+  bottom: calc(100% + 12px);
+  transform: translateX(50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 5px;
+  background: #202020;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  animation: poster-volume-in 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes poster-volume-in {
+  from {
+    opacity: 0;
+    transform: translateX(50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(50%) translateY(0);
+  }
+}
+
+.poster-volume-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: clamp(160px, 31.5vh, 340px);
+}
+.poster-volume-track {
+  position: relative;
+  flex: 1;
+  width: 12px;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.poster-volume-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 12px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+/* O range nativo fica transparente sobre a trilha pintada: preserva teclado e
+   leitor de tela e deixa o desenho do Figma por conta do CSS. Girar -90° é mais
+   confiável que `writing-mode` vertical entre motores. */
+.poster-volume-range {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(160px, 31.5vh, 340px);
+  height: 12px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.poster-mute {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.poster-mute:hover,
+.poster-mute:focus-visible {
+  opacity: 1;
+}
+.poster-mute[data-muted='true'] {
+  opacity: 1;
+}
+
+.poster-nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  cursor: pointer;
+  transition:
+    color 160ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    scale 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.poster-nav-button:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+}
+.poster-nav-button:active {
+  scale: 0.96;
+}
+.poster-nav-button:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 2px;
+}
+
+/* Vermelho fixo só funciona num dos lados, então a variante segue o mesmo contraste
+   que a WCAG escolheu para o resto da informação. */
+.poster-error {
+  font-size: var(--poster-label-size);
+  font-weight: 500;
+  line-height: 1.143;
+}
+.poster-root[data-contrast='light-on-dark'] .poster-error {
+  color: #fecaca;
+}
+.poster-root[data-contrast='dark-on-light'] .poster-error {
+  color: #7f1d1d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster-cover-image,
+  .poster-stack > *,
+  .poster-reveal-unit,
+  .poster-volume-panel {
+    animation: none !important;
+  }
+}
