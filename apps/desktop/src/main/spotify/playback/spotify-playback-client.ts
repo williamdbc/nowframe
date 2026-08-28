@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { isRateLimited, noteRateLimited, noteRequestSucceeded } from '../spotify-rate-limit'
 import type {
   SpotifyPlaybackContext,
   SpotifyPlaybackItem,
@@ -10,7 +11,6 @@ import type {
 
 const spotifyPlaybackUrl = 'https://api.spotify.com/v1/me/player'
 const maximumQueuedItems = 5
-let rateLimitedUntil = 0
 
 type SpotifyPlaybackCommandPath =
   | '/next'
@@ -155,13 +155,6 @@ function mapPlaybackItem(item: unknown): SpotifyPlaybackItem | null {
   return null
 }
 
-function getRetryAfterMilliseconds(response: Response): number {
-  const retryAfterSeconds = Number(response.headers.get('Retry-After'))
-  return Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
-    ? retryAfterSeconds * 1000
-    : 30_000
-}
-
 /**
  * O `progress_ms` devolvido pelo Spotify era verdade no servidor por volta da metade da
  * viagem de ida e volta, não no momento em que a resposta chegou. Estampar `Date.now()`
@@ -176,8 +169,12 @@ export function estimatePlaybackSynchronizedAt(
   return requestStartedAt + Math.round(roundTripMs / 2)
 }
 
-function ensureSpotifyIsReadyForRequest(): void {
-  if (Date.now() < rateLimitedUntil) {
+/**
+ * Só as consultas periódicas esperam a janela de rate limit. Comandos da pessoa passam
+ * direto — ver `spotify-rate-limit.ts`.
+ */
+function ensurePollingIsAllowed(): void {
+  if (isRateLimited()) {
     throw new Error('O Spotify solicitou uma pausa antes da próxima solicitação.')
   }
 }
@@ -188,7 +185,7 @@ async function createSpotifyApiError(
   restrictionMessage?: string
 ): Promise<Error> {
   if (response.status === 429) {
-    rateLimitedUntil = Date.now() + getRetryAfterMilliseconds(response)
+    noteRateLimited(response.headers.get('Retry-After'))
   }
 
   const payload: unknown = await response.json().catch(() => null)
@@ -214,8 +211,6 @@ async function sendPlaybackCommand(
   restrictionMessage?: string,
   body?: unknown
 ): Promise<void> {
-  ensureSpotifyIsReadyForRequest()
-
   const response = await fetch(`${spotifyPlaybackUrl}${path}`, {
     method,
     headers: {
@@ -228,11 +223,13 @@ async function sendPlaybackCommand(
   if (!response.ok) {
     throw await createSpotifyApiError(response, fallbackMessage, restrictionMessage)
   }
+
+  noteRequestSucceeded()
 }
 
 export class SpotifyPlaybackClient {
   static async getCurrentPlayback(accessToken: string): Promise<SpotifyPlaybackState | null> {
-    ensureSpotifyIsReadyForRequest()
+    ensurePollingIsAllowed()
 
     const requestStartedAt = Date.now()
     const response = await fetch(spotifyPlaybackUrl, {
@@ -241,7 +238,10 @@ export class SpotifyPlaybackClient {
       }
     })
 
-    if (response.status === 204) return null
+    if (response.status === 204) {
+      noteRequestSucceeded()
+      return null
+    }
 
     if (!response.ok) {
       throw await createSpotifyApiError(
@@ -249,6 +249,8 @@ export class SpotifyPlaybackClient {
         'Não foi possível sincronizar a reprodução do Spotify.'
       )
     }
+
+    noteRequestSucceeded()
 
     const payload: unknown = await response.json().catch(() => null)
     const playback = spotifyPlaybackResponseSchema.parse(payload)
@@ -288,7 +290,7 @@ export class SpotifyPlaybackClient {
   }
 
   static async getQueue(accessToken: string): Promise<SpotifyPlaybackQueue> {
-    ensureSpotifyIsReadyForRequest()
+    ensurePollingIsAllowed()
 
     const response = await fetch(`${spotifyPlaybackUrl}/queue`, {
       headers: {
@@ -296,7 +298,10 @@ export class SpotifyPlaybackClient {
       }
     })
 
-    if (response.status === 204) return { items: [] }
+    if (response.status === 204) {
+      noteRequestSucceeded()
+      return { items: [] }
+    }
 
     if (!response.ok) {
       throw await createSpotifyApiError(
@@ -304,6 +309,8 @@ export class SpotifyPlaybackClient {
         'Não foi possível consultar a fila de reprodução do Spotify.'
       )
     }
+
+    noteRequestSucceeded()
 
     const payload: unknown = await response.json().catch(() => null)
     const queue = spotifyQueueResponseSchema.parse(payload)

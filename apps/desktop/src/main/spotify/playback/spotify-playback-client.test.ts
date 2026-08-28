@@ -1,9 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  estimatePlaybackSynchronizedAt,
-  SpotifyPlaybackClient
-} from './spotify-playback-client'
+import { isRateLimited, resetRateLimitState } from '../spotify-rate-limit'
+import { estimatePlaybackSynchronizedAt, SpotifyPlaybackClient } from './spotify-playback-client'
 
 const device = {
   id: 'device-id',
@@ -17,6 +15,7 @@ const device = {
 afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
+  resetRateLimitState()
 })
 
 describe('SpotifyPlaybackClient', () => {
@@ -288,6 +287,63 @@ describe('SpotifyPlaybackClient', () => {
       'O Spotify solicitou uma pausa antes da próxima solicitação.'
     )
     expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  /**
+   * A regressão que motivou separar o gate: um 429 no polling deixava play, pause e skip
+   * mortos por no mínimo 30 s, o que lê como app travado.
+   */
+  it('still lets a person-initiated command through during the rate limit window', async () => {
+    vi.spyOn(Date, 'now').mockReturnValue(3_000_000)
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ error: { status: 429, message: 'Too many requests' } }), {
+          status: 429,
+          headers: { 'Content-Type': 'application/json', 'Retry-After': '30' }
+        })
+      )
+      .mockResolvedValue(new Response(null, { status: 204 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(SpotifyPlaybackClient.getCurrentPlayback('access-token')).rejects.toThrow(
+      'Too many requests'
+    )
+
+    // O polling espera...
+    await expect(SpotifyPlaybackClient.getCurrentPlayback('access-token')).rejects.toThrow(
+      'O Spotify solicitou uma pausa antes da próxima solicitação.'
+    )
+
+    // ...mas o comando vai.
+    await expect(SpotifyPlaybackClient.pause('access-token')).resolves.toBeUndefined()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('reopens polling once a request succeeds', async () => {
+    vi.spyOn(Date, 'now').mockReturnValue(4_000_000)
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ error: { status: 429, message: 'Too many requests' } }), {
+            status: 429,
+            headers: { 'Content-Type': 'application/json', 'Retry-After': '30' }
+          })
+        )
+        .mockResolvedValue(new Response(null, { status: 204 }))
+    )
+
+    await expect(SpotifyPlaybackClient.getCurrentPlayback('access-token')).rejects.toThrow(
+      'Too many requests'
+    )
+    expect(isRateLimited()).toBe(true)
+
+    await SpotifyPlaybackClient.pause('access-token')
+
+    expect(isRateLimited()).toBe(false)
+    await expect(SpotifyPlaybackClient.getCurrentPlayback('access-token')).resolves.toBeNull()
   })
 
   it('anchors the synchronization clock at the middle of the round trip', async () => {
