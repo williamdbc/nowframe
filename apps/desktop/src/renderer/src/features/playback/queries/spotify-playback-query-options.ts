@@ -4,8 +4,9 @@ import { SpotifyPlaybackService } from '../services/spotify-playback-service'
 import { shouldDiscardPlayback } from '../utils/playback-expectation'
 import { spotifyPlaybackQueryKeys } from './spotify-playback-query-keys'
 
-export const activePlaybackRefetchIntervalMs = 1_000
-export const idlePlaybackRefetchIntervalMs = 2_000
+export const activePlaybackRefetchIntervalMs = 2_000
+export const idlePlaybackRefetchIntervalMs = 5_000
+export const playbackWindowFocusFreshnessMs = 2_000
 
 /**
  * Perto do fim da faixa o polling adensa. Com a posição interpolada por relógio local, um
@@ -51,6 +52,10 @@ export function getSpotifyPlaybackRefetchInterval(
     : activePlaybackRefetchIntervalMs
 }
 
+export function shouldRefetchPlaybackOnWindowFocus(dataUpdatedAt: number, now: number): boolean {
+  return now - dataUpdatedAt >= playbackWindowFocusFreshnessMs
+}
+
 /**
  * Todo resultado de polling passa por aqui antes de virar cache, então é o ponto onde a
  * resposta velha do Spotify é descartada em favor do que já está na tela. Atualização
@@ -77,7 +82,8 @@ export function spotifyPlaybackQueryOptions(): SpotifyPlaybackQueryOptions {
         Date.now()
       ),
     refetchIntervalInBackground: false,
-    refetchOnWindowFocus: 'always',
+    refetchOnWindowFocus: (query) =>
+      shouldRefetchPlaybackOnWindowFocus(query.state.dataUpdatedAt, Date.now()),
     retry: false,
     structuralSharing: keepPlaybackWhenResponseIsStale
   })

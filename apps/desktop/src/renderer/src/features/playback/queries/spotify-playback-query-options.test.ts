@@ -6,7 +6,9 @@ import {
   boundaryPlaybackRefetchIntervalMs,
   failedPlaybackRefetchIntervalsMs,
   getSpotifyPlaybackRefetchInterval,
-  idlePlaybackRefetchIntervalMs
+  idlePlaybackRefetchIntervalMs,
+  playbackWindowFocusFreshnessMs,
+  shouldRefetchPlaybackOnWindowFocus
 } from './spotify-playback-query-options'
 
 const playback: PlaybackState = {
@@ -97,5 +99,14 @@ describe('getSpotifyPlaybackRefetchInterval', () => {
     expect(getSpotifyPlaybackRefetchInterval(playback, 99, 1_000)).toBe(
       failedPlaybackRefetchIntervalsMs[failedPlaybackRefetchIntervalsMs.length - 1]
     )
+  })
+})
+
+describe('shouldRefetchPlaybackOnWindowFocus', () => {
+  it('skips a duplicate request while the cached playback is still fresh', () => {
+    expect(shouldRefetchPlaybackOnWindowFocus(10_000, 11_999)).toBe(false)
+    expect(
+      shouldRefetchPlaybackOnWindowFocus(10_000, 10_000 + playbackWindowFocusFreshnessMs)
+    ).toBe(true)
   })
 })

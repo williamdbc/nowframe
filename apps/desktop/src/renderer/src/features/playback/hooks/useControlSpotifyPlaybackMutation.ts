@@ -34,7 +34,7 @@ interface PlaybackMutationContext {
  * tentativa anterior. Cada consulta de reconciliação custa ~150–260 ms; somar os atrasos
  * ao término de cada uma fazia o ladder derivar para ~0/500/1000/1750 ms.
  */
-const playbackReconciliationOffsetsMs = [0, 150, 350, 600, 1_000, 1_500] as const
+const playbackReconciliationOffsetsMs = [0, 250, 750, 1_500] as const
 
 function wait(delayMs: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, delayMs))

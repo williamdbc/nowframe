@@ -14,6 +14,12 @@ const progressiveRetryDelaysMs = [2_000, 5_000, 15_000, 30_000] as const
 let rateLimitedUntil = 0
 let consecutiveRateLimits = 0
 
+export interface SpotifyRateLimitWindow {
+  delayMs: number
+  retryAt: number
+  source: 'fallback' | 'header'
+}
+
 function parseRetryAfterMs(retryAfterHeader: string | null): number | null {
   const retryAfterSeconds = Number(retryAfterHeader)
   return Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
@@ -29,19 +35,30 @@ export function getRateLimitDelayMs(retryAfterHeader: string | null, attempt: nu
   return progressiveRetryDelaysMs[index]
 }
 
-export function noteRateLimited(retryAfterHeader: string | null): void {
+export function noteRateLimited(retryAfterHeader: string | null): SpotifyRateLimitWindow {
+  const source = parseRetryAfterMs(retryAfterHeader) === null ? 'fallback' : 'header'
   const delayMs = getRateLimitDelayMs(retryAfterHeader, consecutiveRateLimits)
+  const now = Date.now()
   consecutiveRateLimits += 1
-  rateLimitedUntil = Date.now() + delayMs
+  rateLimitedUntil = Math.max(rateLimitedUntil, now + delayMs)
+
+  return { delayMs: rateLimitedUntil - now, retryAt: rateLimitedUntil, source }
 }
 
 export function noteRequestSucceeded(): void {
   consecutiveRateLimits = 0
-  rateLimitedUntil = 0
+
+  // Um comando pode ter sucesso enquanto o endpoint de polling continua limitado.
+  // Nesse caso o Retry-After permanece autoritativo até vencer por tempo.
+  if (Date.now() >= rateLimitedUntil) rateLimitedUntil = 0
 }
 
 export function isRateLimited(): boolean {
   return Date.now() < rateLimitedUntil
+}
+
+export function getRateLimitRemainingMs(): number {
+  return Math.max(0, rateLimitedUntil - Date.now())
 }
 
 /** Apenas para testes: o estado é de módulo e de outra forma atravessa casos. */

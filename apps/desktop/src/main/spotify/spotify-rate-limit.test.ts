@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   getRateLimitDelayMs,
+  getRateLimitRemainingMs,
   isRateLimited,
   noteRateLimited,
   noteRequestSucceeded,
@@ -41,23 +42,40 @@ describe('rate limit window', () => {
     noteRateLimited('10')
 
     expect(isRateLimited()).toBe(true)
+    expect(getRateLimitRemainingMs()).toBe(10_000)
 
     vi.spyOn(Date, 'now').mockReturnValue(1_010_001)
     expect(isRateLimited()).toBe(false)
+    expect(getRateLimitRemainingMs()).toBe(0)
   })
 
-  it('clears the window and the attempt count on the first success', () => {
+  it('keeps the Retry-After window even when another request succeeds', () => {
     vi.spyOn(Date, 'now').mockReturnValue(1_000_000)
     noteRateLimited(null)
     noteRateLimited(null)
     expect(isRateLimited()).toBe(true)
 
     noteRequestSucceeded()
+    expect(isRateLimited()).toBe(true)
+
+    vi.spyOn(Date, 'now').mockReturnValue(1_005_001)
+    noteRequestSucceeded()
     expect(isRateLimited()).toBe(false)
 
     // O contador voltou ao início, então a próxima espera é a menor de novo.
     noteRateLimited(null)
-    vi.spyOn(Date, 'now').mockReturnValue(1_002_001)
+    vi.spyOn(Date, 'now').mockReturnValue(1_007_002)
     expect(isRateLimited()).toBe(false)
+  })
+
+  it('never shortens an active Retry-After window', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(2_000_000)
+    noteRateLimited('30')
+
+    vi.spyOn(Date, 'now').mockReturnValue(2_001_000)
+    const window = noteRateLimited('5')
+
+    expect(window.retryAt).toBe(2_030_000)
+    expect(window.delayMs).toBe(29_000)
   })
 })

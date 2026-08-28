@@ -298,11 +298,17 @@ describe('SpotifyPlaybackClient', () => {
 
   it('respects the retry window returned by Spotify after rate limiting', async () => {
     vi.spyOn(Date, 'now').mockReturnValue(1_000_000)
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ error: { status: 429, message: 'Too many requests' } }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json', 'Retry-After': '15' }
-      })
+      new Response(
+        JSON.stringify({
+          error: { status: 429, message: 'Too many requests', reason: 'QUOTA_EXCEEDED' }
+        }),
+        {
+          status: 429,
+          headers: { 'Content-Type': 'application/json', 'Retry-After': '15' }
+        }
+      )
     )
     vi.stubGlobal('fetch', fetchMock)
 
@@ -310,9 +316,12 @@ describe('SpotifyPlaybackClient', () => {
       'Too many requests'
     )
     await expect(SpotifyPlaybackClient.getCurrentPlayback('access-token')).rejects.toThrow(
-      'O Spotify solicitou uma pausa antes da próxima solicitação.'
+      'O Spotify solicitou uma pausa antes da próxima solicitação. Tente novamente em 15 s.'
     )
     expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      '[Spotify] HTTP 429 | reason=QUOTA_EXCEEDED | retryAfter=15s | retryAt=1970-01-01T00:16:55.000Z | source=header'
+    )
   })
 
   /**
@@ -338,7 +347,7 @@ describe('SpotifyPlaybackClient', () => {
 
     // O polling espera...
     await expect(SpotifyPlaybackClient.getCurrentPlayback('access-token')).rejects.toThrow(
-      'O Spotify solicitou uma pausa antes da próxima solicitação.'
+      'O Spotify solicitou uma pausa antes da próxima solicitação. Tente novamente em 30 s.'
     )
 
     // ...mas o comando vai.
@@ -346,7 +355,7 @@ describe('SpotifyPlaybackClient', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
-  it('reopens polling once a request succeeds', async () => {
+  it('keeps polling blocked until Retry-After expires even when a command succeeds', async () => {
     vi.spyOn(Date, 'now').mockReturnValue(4_000_000)
     vi.stubGlobal(
       'fetch',
@@ -368,7 +377,12 @@ describe('SpotifyPlaybackClient', () => {
 
     await SpotifyPlaybackClient.pause('access-token')
 
-    expect(isRateLimited()).toBe(false)
+    expect(isRateLimited()).toBe(true)
+    await expect(SpotifyPlaybackClient.getCurrentPlayback('access-token')).rejects.toThrow(
+      'O Spotify solicitou uma pausa antes da próxima solicitação. Tente novamente em 30 s.'
+    )
+
+    vi.spyOn(Date, 'now').mockReturnValue(4_030_001)
     await expect(SpotifyPlaybackClient.getCurrentPlayback('access-token')).resolves.toBeNull()
   })
 

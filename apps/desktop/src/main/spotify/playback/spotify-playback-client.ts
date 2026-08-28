@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
-import { isRateLimited, noteRateLimited, noteRequestSucceeded } from '../spotify-rate-limit'
+import {
+  getRateLimitRemainingMs,
+  noteRateLimited,
+  noteRequestSucceeded
+} from '../spotify-rate-limit'
 import type {
   SpotifyPlaybackContext,
   SpotifyPlaybackItem,
@@ -109,7 +113,8 @@ function mapPlaybackContext(
 const spotifyApiErrorSchema = z.object({
   error: z.object({
     status: z.number().int(),
-    message: z.string()
+    message: z.string(),
+    reason: z.string().optional()
   })
 })
 
@@ -175,9 +180,13 @@ export function estimatePlaybackSynchronizedAt(
  * direto — ver `spotify-rate-limit.ts`.
  */
 function ensurePollingIsAllowed(): void {
-  if (isRateLimited()) {
-    throw new Error('O Spotify solicitou uma pausa antes da próxima solicitação.')
-  }
+  const remainingMs = getRateLimitRemainingMs()
+  if (remainingMs <= 0) return
+
+  const remainingSeconds = Math.ceil(remainingMs / 1000)
+  throw new Error(
+    `O Spotify solicitou uma pausa antes da próxima solicitação. Tente novamente em ${remainingSeconds} s.`
+  )
 }
 
 async function createSpotifyApiError(
@@ -185,13 +194,21 @@ async function createSpotifyApiError(
   fallbackMessage: string,
   restrictionMessage?: string
 ): Promise<Error> {
-  if (response.status === 429) {
-    noteRateLimited(response.headers.get('Retry-After'))
-  }
-
   const payload: unknown = await response.json().catch(() => null)
   const apiError = spotifyApiErrorSchema.safeParse(payload)
   const apiMessage = apiError.success ? apiError.data.error.message : null
+
+  if (response.status === 429) {
+    const retryAfterHeader = response.headers.get('Retry-After')
+    const rateLimitWindow = noteRateLimited(retryAfterHeader)
+    const reason = apiError.success
+      ? (apiError.data.error.reason ?? 'RATE_LIMIT_OR_QUOTA_UNKNOWN')
+      : 'RATE_LIMIT_OR_QUOTA_UNKNOWN'
+
+    console.warn(
+      `[Spotify] HTTP 429 | reason=${reason} | retryAfter=${Math.ceil(rateLimitWindow.delayMs / 1000)}s | retryAt=${new Date(rateLimitWindow.retryAt).toISOString()} | source=${rateLimitWindow.source}`
+    )
+  }
 
   if (
     response.status === 403 &&

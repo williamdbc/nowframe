@@ -156,7 +156,7 @@ describe('useControlSpotifyPlaybackMutation', () => {
     await act(() => vi.advanceTimersByTimeAsync(250))
     expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(2)
 
-    await act(() => vi.advanceTimersByTimeAsync(250))
+    await act(() => vi.advanceTimersByTimeAsync(500))
     expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(3)
     expect(queryClient.getQueryData(spotifyPlaybackQueryKeys.current())).toEqual(nextPlayback)
 
@@ -180,7 +180,7 @@ describe('useControlSpotifyPlaybackMutation', () => {
     await act(() => vi.advanceTimersByTimeAsync(2_000))
 
     const attemptsAfterLadder = getCurrentPlaybackSpy.mock.calls.length
-    expect(attemptsAfterLadder).toBeGreaterThan(1)
+    expect(attemptsAfterLadder).toBe(4)
 
     // O ladder é limitado: passado o último offset, nenhuma tentativa nova acontece.
     await act(() => vi.advanceTimersByTimeAsync(10_000))
