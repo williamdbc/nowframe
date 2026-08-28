@@ -1,0 +1,133 @@
+# Desenvolvimento local
+
+## Pré-requisitos
+
+- Git, Node.js e npm.
+- Uma conta Spotify e acesso ao [Spotify Developer Dashboard](https://developer.spotify.com/dashboard).
+- Um aplicativo Spotify em Development Mode ou outro modo compatível.
+- Um dispositivo Spotify capaz de iniciar uma reprodução para testar o controle remoto.
+
+No Development Mode, o proprietário do aplicativo precisa atender aos requisitos atuais do Spotify e cada usuário de teste deve estar na allowlist. Consulte [Quota modes](https://developer.spotify.com/documentation/web-api/concepts/quota-modes) porque limites e critérios podem mudar.
+
+## Configurar o Spotify Dashboard
+
+1. Crie ou abra um aplicativo no Developer Dashboard.
+2. Em Redirect URIs, adicione exatamente:
+
+   ```text
+   http://127.0.0.1:8888/callback
+   ```
+
+3. Se outra pessoa usar o mesmo aplicativo em Development Mode, adicione a conta em Users Management.
+4. Copie o Client ID. Não copie nem compartilhe o Client Secret com o Nowframe.
+
+O redirect usa loopback HTTP porque o callback acontece na máquina local. `localhost`, outra porta, barra final diferente ou caminho diferente não correspondem à configuração padrão.
+
+Quotas de Development Mode são contabilizadas por conta de desenvolvedor. Para trabalho simultâneo sem compartilhar a mesma quota, cada colaborador pode criar seu aplicativo Spotify em sua própria conta e configurar o Client ID localmente.
+
+## Instalar e executar
+
+Na raiz do repositório:
+
+```bash
+npm --prefix apps/desktop install
+cp apps/desktop/.env.example apps/desktop/.env.local
+```
+
+Edite `apps/desktop/.env.local`:
+
+```dotenv
+MAIN_VITE_SPOTIFY_CLIENT_ID=seu_client_id
+MAIN_VITE_SPOTIFY_REDIRECT_URI=http://127.0.0.1:8888/callback
+```
+
+Inicie:
+
+```bash
+npm --prefix apps/desktop run dev
+```
+
+O arquivo `.env.local` é ignorado pelo Git. Reinicie o processo de desenvolvimento sempre que alterar variáveis carregadas pelo Electron Vite.
+
+## Primeiro login
+
+1. Abra o Nowframe e selecione a conexão com Spotify.
+2. O navegador padrão abrirá a autorização.
+3. Aceite os scopes solicitados.
+4. O navegador retorna ao callback local e o aplicativo segue para o display.
+5. Inicie uma faixa em um cliente Spotify caso ainda não exista dispositivo ativo.
+
+A sessão é renovada automaticamente. Logout remove o arquivo cifrado local; revogação, refresh token inválido ou scopes antigos também exigem novo login.
+
+## Scripts
+
+Execute dentro de `apps/desktop` ou use `npm --prefix apps/desktop` a partir da raiz.
+
+| Comando                | Uso                                                       |
+| ---------------------- | --------------------------------------------------------- |
+| `npm run dev`          | Inicia main, preload e renderer em desenvolvimento.       |
+| `npm run format`       | Aplica Prettier.                                          |
+| `npm run format:check` | Verifica formatação sem alterar arquivos.                 |
+| `npm run typecheck`    | Gera a árvore de rotas e valida TypeScript dos processos. |
+| `npm run lint`         | Executa ESLint.                                           |
+| `npm test`             | Executa a suíte Vitest uma vez.                           |
+| `npm run test:watch`   | Mantém Vitest em observação.                              |
+| `npm run build`        | Valida tipos e produz `out/` sem empacotar instalador.    |
+| `npm run build:unpack` | Gera uma aplicação descompactada para inspeção local.     |
+| `npm run build:mac`    | Gera os artefatos configurados para macOS.                |
+| `npm run build:win`    | Gera o instalador NSIS do Windows.                        |
+| `npm run build:linux`  | Gera AppImage, Snap e DEB.                                |
+
+Antes de enviar mudanças, execute:
+
+```bash
+npm run format:check
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
+
+## Onde depurar
+
+- **UI, rotas e cache:** `src/renderer/src`.
+- **API exposta ao renderer:** `src/preload` e `src/contracts`.
+- **OAuth, Spotify, letras e janela:** `src/main`.
+- **Estado remoto:** React Query DevTools não está instalado; use testes, logs do main e inspeção do cache nos hooks.
+- **HTTP 429:** o terminal informa `reason`, `retryAfter`, `retryAt` e a origem da janela.
+
+## Problemas comuns
+
+### Spotify não configurado
+
+Confirme que `.env.local` está dentro de `apps/desktop`, que o Client ID não está vazio e que o processo foi reiniciado.
+
+### Callback inválido ou login não conclui
+
+Compare a URI do Dashboard e a variável caractere por caractere. Verifique também se a porta 8888 está livre durante o login.
+
+### Login funciona, mas chamadas retornam 403
+
+Em Development Mode, confirme a allowlist do aplicativo e os requisitos atuais da conta. Se os scopes mudaram desde o último login, faça logout e autorize novamente.
+
+### Nada tocando ou comando restrito
+
+Inicie uma faixa em um cliente Spotify e confirme que há um dispositivo ativo. Alguns contextos, dispositivos ou a primeira posição de uma lista podem restringir ações como voltar.
+
+### HTTP 429 ou `QUOTA_EXCEEDED`
+
+Pare de reiniciar ou repetir comandos e aguarde o `retryAt` informado. Reiniciar o Nowframe não reduz uma janela controlada pelo Spotify. Se vários desenvolvedores compartilham a mesma conta de desenvolvedor, considere aplicativos próprios.
+
+### Tracklist vazia em uma playlist visível no Spotify
+
+Playlists personalizadas, rádios e recomendações podem não ser expostas como uma playlist legível pela Web API. Playlists privadas de outra conta também podem retornar 403.
+
+### Letra encontrada, mas sem sincronização
+
+LRCLIB pode oferecer apenas texto simples. Lyrics esconde esse conteúdo por padrão e Karaoke informa que não há letra sincronizada. Sincronização por palavra é ainda mais rara e volta automaticamente para linha quando possível.
+
+## Documentos relacionados
+
+- [Referência de configuração](../reference/configuration.md)
+- [Visão geral da arquitetura](../architecture/overview.md)
+- [Gerar builds desktop](../guides/build-desktop.md)
