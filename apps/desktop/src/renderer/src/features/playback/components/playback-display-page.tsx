@@ -46,7 +46,9 @@ export function PlaybackDisplayPage(): React.JSX.Element {
   const playback = useLivePlaybackState(playbackQuery.data ?? null)
   const isTracklistTheme = selectedTheme.activeThemeId === 'tracklist'
   const shouldLoadLyrics =
-    selectedTheme.activeThemeId === 'lyrics' || selectedTheme.activeThemeId === 'karaoke'
+    selectedTheme.activeThemeId === 'lyrics' ||
+    selectedTheme.activeThemeId === 'karaoke' ||
+    selectedTheme.activeThemeId === 'ambient'
   const lyricsQueryInput =
     playback?.item?.type === 'track' && playback.item.creatorNames[0]
       ? {
@@ -140,6 +142,8 @@ export function PlaybackDisplayPage(): React.JSX.Element {
       <FullscreenHint isFullScreen={presentationMode.isFullScreen} />
       <ActiveTheme
         chrome={chrome}
+        isFullScreen={presentationMode.isFullScreen}
+        onExitFullScreen={presentationMode.exitFullScreen}
         controls={{
           canToggleSaved: Boolean(libraryItemUri && libraryItemQuery.data),
           errorMessage:

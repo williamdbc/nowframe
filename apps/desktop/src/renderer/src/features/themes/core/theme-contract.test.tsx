@@ -108,6 +108,8 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     render(
       <Theme
         chrome={chrome}
+        isFullScreen={false}
+        onExitFullScreen={vi.fn()}
         controls={createControls()}
         lyrics={lyrics}
         playback={playback}
@@ -148,6 +150,8 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     render(
       <Theme
         chrome={chrome}
+        isFullScreen={false}
+        onExitFullScreen={vi.fn()}
         controls={controls}
         lyrics={lyrics}
         playback={playback}
@@ -175,6 +179,8 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     render(
       <Theme
         chrome={chrome}
+        isFullScreen={false}
+        onExitFullScreen={vi.fn()}
         controls={createControls()}
         lyrics={{ status: 'idle', plainLines: [], syncedLines: [] }}
         playback={null}

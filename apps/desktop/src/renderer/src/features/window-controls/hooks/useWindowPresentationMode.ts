@@ -8,6 +8,7 @@ interface WindowPresentationMode {
   isFullScreen: boolean
   isTransitioning: boolean
   enterFullScreen: () => void
+  exitFullScreen: () => void
 }
 
 export function useWindowPresentationMode(): WindowPresentationMode {
@@ -31,6 +32,7 @@ export function useWindowPresentationMode(): WindowPresentationMode {
   return {
     isFullScreen,
     isTransitioning: windowStateQuery.isPending || setFullScreenMutation.isPending,
-    enterFullScreen: () => setFullScreenMutation.mutate(true)
+    enterFullScreen: () => setFullScreenMutation.mutate(true),
+    exitFullScreen: () => setFullScreenMutation.mutate(false)
   }
 }

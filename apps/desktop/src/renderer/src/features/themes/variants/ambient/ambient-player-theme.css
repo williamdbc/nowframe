@@ -1,0 +1,613 @@
+/* transitions-dev — variáveis do icon swap usadas pelo botão de play/pause. */
+:root {
+  --icon-swap-dur: 200ms;
+  --icon-swap-blur: 2px;
+  --icon-swap-start-scale: 0.25;
+  --icon-swap-ease: ease-in-out;
+}
+
+.t-icon-swap {
+  position: relative;
+  display: inline-grid;
+}
+.t-icon-swap .t-icon {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--icon-swap-dur) var(--icon-swap-ease),
+    filter var(--icon-swap-dur) var(--icon-swap-ease),
+    transform var(--icon-swap-dur) var(--icon-swap-ease);
+  will-change: opacity, filter, transform;
+}
+.t-icon-swap[data-state='a'] .t-icon[data-icon='a'],
+.t-icon-swap[data-state='b'] .t-icon[data-icon='b'] {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+.t-icon-swap[data-state='a'] .t-icon[data-icon='b'],
+.t-icon-swap[data-state='b'] .t-icon[data-icon='a'] {
+  opacity: 0;
+  filter: blur(var(--icon-swap-blur));
+  transform: scale(var(--icon-swap-start-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-icon-swap .t-icon {
+    transition: none !important;
+  }
+}
+
+/* O fundo acompanha a cor predominante da capa e leva o tempo de uma faixa
+   trocar para chegar lá, evitando o corte seco entre duas artes. */
+/* Escala responsiva: os valores do Figma são o teto, e a altura da janela é a
+   referência porque o tema é um display de tela inteira. */
+.ambient-root {
+  --ambient-cover-size: clamp(200px, 42vh, 340px);
+  --ambient-column-gap: clamp(20px, 4.4vw, 64px);
+  --ambient-block-gap: clamp(20px, 3.7vh, 40px);
+  --ambient-title-size: clamp(28px, 3.3vw, 48px);
+  --ambient-body-size: clamp(17px, 1.7vw, 24px);
+  --ambient-label-size: clamp(12px, 1vw, 14px);
+  transition: background-color 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ambient-root--fullscreen {
+  --ambient-cover-size: clamp(280px, 60vh, 600px);
+}
+
+.ambient-chrome {
+  opacity: 0;
+  transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+.ambient-root:hover .ambient-chrome,
+.ambient-chrome:focus-within {
+  opacity: 1;
+}
+
+.ambient-icon {
+  display: block;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+/* Capa: borda, sombra em quatro camadas e brilho diagonal, todos do Figma. */
+.ambient-cover {
+  width: var(--ambient-cover-size);
+  height: var(--ambient-cover-size);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  box-shadow:
+    0 1px 1px 0 rgba(14, 14, 16, 0.04),
+    0 4px 6px 0 rgba(14, 14, 16, 0.04),
+    0 24px 68px 0 rgba(14, 14, 16, 0.04),
+    0 2px 3px 0 rgba(14, 14, 16, 0.04);
+}
+.ambient-cover--compact {
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
+}
+.ambient-cover-sheen {
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
+}
+.ambient-cover-image {
+  animation: ambient-cover-in 600ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes ambient-cover-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Entrada escalonada: cada bloco semântico entra 100ms depois do anterior. */
+.ambient-stagger {
+  animation: ambient-rise-in 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.ambient-stagger:nth-child(1) {
+  animation-delay: 0ms;
+}
+.ambient-stagger:nth-child(2) {
+  animation-delay: 100ms;
+}
+.ambient-stagger:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+@keyframes ambient-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* animate-text / per-word-crossfade */
+.ambient-reveal-unit {
+  display: inline-block;
+  white-space: pre;
+  animation: ambient-per-word-crossfade 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes ambient-per-word-crossfade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modo letra: o Figma troca a tela inteira por uma coluna de 692px com a letra
+   grande em cima e uma barra compacta de capa, transporte e volume embaixo. */
+.ambient-root--lyrics {
+  --ambient-lyrics-column: clamp(320px, 48vw, 692px);
+  --ambient-lyrics-size: clamp(22px, 2.78vw, 40px);
+  --ambient-lyrics-line-gap: clamp(12px, 1.4vw, 20px);
+  --ambient-lyrics-stage-height: clamp(200px, 37vh, 401px);
+  --ambient-lyrics-stage-gap: clamp(32px, 7.5vh, 81px);
+  --ambient-lyrics-bar-gap: clamp(24px, 3.7vh, 40px);
+}
+
+/* O palco tem altura fixa e recorta: a linha atual é levada ao topo e o que já
+   passou sai por cima da borda. */
+.ambient-lyrics-stage {
+  position: relative;
+  width: 100%;
+  height: var(--ambient-lyrics-stage-height);
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000000 0%, #000000 76%, transparent 100%);
+}
+.ambient-lyrics-stage--scroll {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.ambient-lyrics-stage--scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.ambient-lyrics-track {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ambient-lyrics-line-gap);
+  transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.ambient-lyrics-line {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--ambient-lyrics-size);
+  font-weight: 700;
+  line-height: 1.075;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  overflow-wrap: break-word;
+  transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ambient-lyrics-line[data-state='active'] {
+  opacity: 1;
+}
+.ambient-lyrics-line[data-state='next'] {
+  opacity: 0.4;
+}
+.ambient-lyrics-line[data-state='rest'] {
+  opacity: 0.1;
+}
+
+/* animate-text / mask-reveal-up: a linha sobe de trás de um recorte. O recorte
+   ganha uma folga vertical devolvida por margem negativa, senão o leading de
+   43px do Figma cortaria os descendentes. */
+.ambient-lyrics-mask {
+  display: block;
+  overflow: hidden;
+  padding-block: 0.14em;
+  margin-block: -0.14em;
+}
+
+/* A opacidade do estado mora no <p> e a da entrada no <span>: multiplicadas,
+   uma linha distante não pisca em branco enquanto anima. */
+.ambient-lyrics-reveal {
+  display: block;
+  animation: ambient-mask-reveal-up 760ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes ambient-mask-reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.ambient-lyrics-message {
+  max-width: 28ch;
+  font-size: clamp(16px, 1.7vw, 24px);
+  font-weight: 500;
+  line-height: 1.167;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ambient-lyrics-skeleton {
+  animation: ambient-lyrics-pulse 1400ms ease-in-out infinite;
+}
+
+@keyframes ambient-lyrics-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.ambient-lyrics-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  cursor: pointer;
+  transition:
+    color 160ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    scale 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.ambient-lyrics-toggle:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+}
+.ambient-lyrics-toggle[aria-pressed='true'] {
+  color: #1ed760;
+}
+.ambient-lyrics-toggle:active {
+  scale: 0.96;
+}
+.ambient-lyrics-toggle:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 2px;
+}
+
+/* Botões de transporte: 24px visíveis, 40px de área de toque via pseudo-elemento.
+   Os SVGs vêm do Figma com fill-opacity 0.4; a opacidade foi retirada do arquivo
+   para o CSS poder levá-la a 100% no hover, que é o estado de destaque. */
+.ambient-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  opacity: 0.4;
+  cursor: pointer;
+  transition:
+    color 160ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 160ms cubic-bezier(0.2, 0, 0, 1),
+    scale 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.ambient-control::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%);
+}
+.ambient-control:hover,
+.ambient-control:focus-visible {
+  opacity: 1;
+}
+.ambient-control:active {
+  scale: 0.96;
+}
+.ambient-control[data-active='true'] {
+  color: #1ed760;
+  opacity: 1;
+}
+.ambient-control:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 8px;
+}
+.ambient-control:disabled {
+  cursor: not-allowed;
+  opacity: 0.15;
+}
+.ambient-control:disabled:active {
+  scale: 1;
+}
+
+/* O ícone de salvo é bicolor e só existe no Figma no estado ativo; o estado
+   não salvo reusa o mesmo glifo dessaturado. */
+.ambient-control--saved img {
+  transition:
+    filter 160ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.ambient-control--saved[data-active='false'] img {
+  filter: grayscale(1) brightness(1.5);
+  opacity: 0.55;
+}
+.ambient-control--saved[data-active='false']:hover img {
+  opacity: 0.85;
+}
+
+/* O SVG de repetir tem 24x32: o ponto abaixo do glifo marca o modo ligado. */
+.ambient-repeat-clip {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+.ambient-control--repeat[data-active='true'] .ambient-repeat-clip {
+  overflow: visible;
+}
+.ambient-repeat-glyph {
+  width: 24px;
+  height: 32px;
+}
+
+.ambient-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  padding: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #000000;
+  cursor: pointer;
+  transition:
+    scale 180ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 180ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.ambient-play:hover {
+  scale: 1.04;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+}
+.ambient-play:active {
+  scale: 0.96;
+}
+.ambient-play:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 4px;
+}
+.ambient-play:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+  scale: 1;
+  box-shadow: none;
+}
+
+/* O controle de tela cheia é da moldura do app: aqui ele veste o slot do Figma. */
+.ambient-fullscreen-slot > button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  color: #ffffff;
+  opacity: 0.4;
+  cursor: pointer;
+  transition:
+    opacity 160ms cubic-bezier(0.2, 0, 0, 1),
+    scale 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.ambient-fullscreen-slot > button:disabled {
+  cursor: not-allowed;
+}
+.ambient-fullscreen-slot > button:hover,
+.ambient-fullscreen-slot > button:focus-visible {
+  opacity: 1;
+}
+.ambient-fullscreen-slot > button > svg {
+  display: none;
+}
+.ambient-fullscreen-slot > button::after {
+  content: '';
+  width: 24px;
+  height: 24px;
+  background-color: currentColor;
+  mask-image: var(--ambient-fullscreen-icon);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: var(--ambient-fullscreen-icon);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+.ambient-fullscreen-slot > button:active {
+  scale: 0.96;
+}
+
+.ambient-volume-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 16px;
+  height: var(--ambient-cover-size);
+}
+
+/* O range nativo é girado sobre a trilha pintada: o comprimento é a altura da
+   coluna menos o espaço e o ícone. */
+.ambient-volume-range {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--ambient-cover-size) - 40px);
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+.ambient-volume-range-horizontal {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+.ambient-volume-range:disabled,
+.ambient-volume-range-horizontal:disabled {
+  cursor: not-allowed;
+}
+.ambient-volume-thumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.16);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.ambient-volume-fill,
+.ambient-volume-thumb {
+  transition:
+    height 120ms linear,
+    width 120ms linear,
+    left 120ms linear;
+}
+/* O anel é para navegação por teclado. Com :focus-within ele ficava preso
+   depois de arrastar o volume com o mouse, até um clique fora. */
+.ambient-volume-track:has(:focus-visible) {
+  outline: 2px solid #1ed760;
+  outline-offset: 4px;
+}
+
+.ambient-mute {
+  position: relative;
+  opacity: 0.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  transition: opacity 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.ambient-mute::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%);
+}
+.ambient-mute:hover,
+.ambient-mute:focus-visible {
+  opacity: 1;
+}
+.ambient-mute[data-muted='true'] {
+  opacity: 0.25;
+}
+.ambient-mute:disabled {
+  opacity: 0.15;
+  cursor: not-allowed;
+}
+.ambient-mute:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 8px;
+}
+
+.ambient-progress-range {
+  height: 8px;
+}
+.ambient-progress-range::-webkit-slider-runnable-track {
+  height: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-root,
+  .ambient-chrome,
+  .ambient-control,
+  .ambient-control::before,
+  .ambient-play,
+  .ambient-volume-fill {
+    transition: none !important;
+  }
+  .ambient-lyrics-line,
+  .ambient-lyrics-track,
+  .ambient-lyrics-toggle {
+    transition: none !important;
+  }
+  .ambient-cover-image,
+  .ambient-stagger,
+  .ambient-reveal-unit,
+  .ambient-lyrics-reveal,
+  .ambient-lyrics-skeleton {
+    animation: none !important;
+  }
+}

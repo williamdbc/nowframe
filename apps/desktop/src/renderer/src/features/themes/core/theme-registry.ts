@@ -1,3 +1,4 @@
+import { AmbientPlayerTheme } from '@/features/themes/variants/ambient/ambient-player-theme'
 import { DefaultPlayerTheme } from '@/features/themes/variants/default/default-player-theme'
 import { DrivePlayerTheme } from '@/features/themes/variants/drive/drive-player-theme'
 import { KaraokePlayerTheme } from '@/features/themes/variants/karaoke/karaoke-player-theme'
@@ -10,6 +11,11 @@ import type { PlayerTheme, PlayerThemeId } from './types/player-theme'
 export const defaultThemeId = 'default'
 
 export const themeRegistry = {
+  ambient: {
+    id: 'ambient',
+    name: 'Ambient',
+    component: AmbientPlayerTheme
+  },
   default: {
     id: defaultThemeId,
     name: 'Default',

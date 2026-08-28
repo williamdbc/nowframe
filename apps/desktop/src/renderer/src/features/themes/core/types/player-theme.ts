@@ -44,13 +44,16 @@ export interface PlayerThemeTracklist {
 export interface PlayerThemeProps {
   chrome: PlayerThemeChrome
   controls: PlaybackControls
+  isFullScreen: boolean
+  onExitFullScreen: () => void
   lyrics: LyricsDisplayState
   playback: PlaybackState | null
   playbackStatus: PlaybackLoadStatus
   tracklist: PlayerThemeTracklist
 }
 
-export type PlayerThemeId = 'default' | 'drive' | 'karaoke' | 'lyrics' | 'minimalist' | 'tracklist'
+export type PlayerThemeId =
+  'ambient' | 'default' | 'drive' | 'karaoke' | 'lyrics' | 'minimalist' | 'tracklist'
 
 export interface PlayerTheme {
   id: PlayerThemeId
