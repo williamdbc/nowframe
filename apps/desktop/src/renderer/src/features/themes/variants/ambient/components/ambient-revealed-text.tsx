@@ -2,7 +2,7 @@
  * Spec per-word-crossfade do catálogo animate-text: as palavras entram uma após
  * a outra com um deslocamento vertical curto, em cadência calma e legível.
  */
-const staggerMs = 70
+const staggerMs = 30
 
 interface AmbientRevealedTextProps {
   className?: string

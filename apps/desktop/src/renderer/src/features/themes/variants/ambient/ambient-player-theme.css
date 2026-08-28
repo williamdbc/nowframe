@@ -100,13 +100,13 @@
   pointer-events: none;
 }
 .ambient-cover-image {
-  animation: ambient-cover-in 600ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: ambient-cover-in 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 @keyframes ambient-cover-in {
   from {
     opacity: 0;
-    filter: blur(8px);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
@@ -114,30 +114,30 @@
   }
 }
 
-/* Entrada escalonada: cada bloco semântico entra 100ms depois do anterior. */
+/* Entrada escalonada: cada bloco semântico entra 55ms depois do anterior. O
+   intervalo é curto de propósito — escalonar demais faz a troca de faixa ler como
+   uma sequência de blocos em vez de um movimento único. */
 .ambient-stagger {
-  animation: ambient-rise-in 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: ambient-rise-in 360ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 .ambient-stagger:nth-child(1) {
   animation-delay: 0ms;
 }
 .ambient-stagger:nth-child(2) {
-  animation-delay: 100ms;
+  animation-delay: 55ms;
 }
 .ambient-stagger:nth-child(3) {
-  animation-delay: 200ms;
+  animation-delay: 110ms;
 }
 
 @keyframes ambient-rise-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
-    filter: blur(4px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-    filter: blur(0);
   }
 }
 
@@ -158,13 +158,13 @@
 .ambient-reveal-unit {
   display: inline-block;
   white-space: pre;
-  animation: ambient-per-word-crossfade 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation: ambient-per-word-crossfade 400ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 @keyframes ambient-per-word-crossfade {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -362,9 +362,16 @@
   outline: 2px solid #1ed760;
   outline-offset: 8px;
 }
+/* Enquanto um comando está em voo o botão continua bloqueado para não disparar
+   duas vezes, mas não apaga: o estado otimista já mostrou o resultado, e cair
+   para 0.15 e voltar no meio disso é o piscada que se via ao clicar em aleatório
+   ou repetir. O apagado fica reservado para indisponibilidade real do
+   dispositivo. */
+.ambient-control:disabled:not([data-busy='true']) {
+  opacity: 0.15;
+}
 .ambient-control:disabled {
   cursor: not-allowed;
-  opacity: 0.15;
 }
 .ambient-control:disabled:active {
   scale: 1;

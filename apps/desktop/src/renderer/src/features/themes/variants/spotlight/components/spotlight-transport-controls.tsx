@@ -37,6 +37,7 @@ export function SpotlightTransportControls({
         aria-label={playback?.shuffleEnabled ? 'Desativar modo aleatório' : 'Ativar modo aleatório'}
         aria-pressed={playback?.shuffleEnabled ?? false}
         data-active={playback?.shuffleEnabled ?? false}
+        data-busy={controls.isPlaybackOptionPending}
         disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleShuffle}
         onClick={controls.onToggleShuffle}
       >
@@ -96,6 +97,7 @@ export function SpotlightTransportControls({
         aria-label={getRepeatControlLabel(playback?.repeatMode ?? 'off')}
         aria-pressed={isRepeatEnabled}
         data-active={isRepeatEnabled}
+        data-busy={controls.isPlaybackOptionPending}
         disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleRepeat}
         onClick={controls.onCycleRepeat}
       >

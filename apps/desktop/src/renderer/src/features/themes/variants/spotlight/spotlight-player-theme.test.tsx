@@ -68,7 +68,10 @@ function createControls(): PlaybackControls {
   }
 }
 
-function renderTheme(isFullScreen = false): { onExitFullScreen: () => void } {
+function renderTheme(
+  isFullScreen = false,
+  controlOverrides: Partial<PlaybackControls> = {}
+): { onExitFullScreen: () => void } {
   const onExitFullScreen = vi.fn()
   const props: PlayerThemeProps = {
     chrome: {
@@ -77,7 +80,7 @@ function renderTheme(isFullScreen = false): { onExitFullScreen: () => void } {
       fullscreenControl: isFullScreen ? null : <span>Tela cheia</span>,
       themeSelector: isFullScreen ? null : <span>Temas</span>
     },
-    controls: createControls(),
+    controls: { ...createControls(), ...controlOverrides },
     isFullScreen,
     onExitFullScreen,
     lyrics: { status: 'idle', plainLines: [], syncedLines: [] },
@@ -172,5 +175,30 @@ describe('SpotlightPlayerTheme', () => {
     await user.click(screen.getByRole('button', { name: 'Sair da tela cheia' }))
 
     expect(onExitFullScreen).toHaveBeenCalledOnce()
+  })
+
+  /**
+   * O CSS reserva o apagado (opacidade 0.15) para indisponibilidade real do dispositivo.
+   * Comando em voo é sinalizado por `data-busy`, senão clicar em aleatório ou repetir
+   * derrubava a opacidade e a devolvia, o que se via como uma piscada.
+   */
+  it('marks a pending option command as busy instead of dimming it', () => {
+    renderTheme(false, { isPlaybackOptionPending: true })
+
+    const shuffle = screen.getByRole('button', { name: 'Ativar modo aleatório' })
+    const repeat = screen.getByRole('button', { name: /repeti/i })
+
+    expect(shuffle).toHaveAttribute('data-busy', 'true')
+    expect(shuffle).toBeDisabled()
+    expect(repeat).toHaveAttribute('data-busy', 'true')
+  })
+
+  it('does not mark the option controls as busy while idle', () => {
+    renderTheme()
+
+    expect(screen.getByRole('button', { name: 'Ativar modo aleatório' })).toHaveAttribute(
+      'data-busy',
+      'false'
+    )
   })
 })

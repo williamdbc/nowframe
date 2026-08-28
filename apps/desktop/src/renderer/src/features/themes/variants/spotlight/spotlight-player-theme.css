@@ -114,13 +114,13 @@
   pointer-events: none;
 }
 .spotlight-cover-image {
-  animation: spotlight-cover-in 600ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: spotlight-cover-in 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 @keyframes spotlight-cover-in {
   from {
     opacity: 0;
-    filter: blur(8px);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
@@ -137,34 +137,32 @@
   width: 100%;
 }
 .spotlight-content > * {
-  animation: spotlight-rise-in 520ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation: spotlight-rise-in 360ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 .spotlight-content > :nth-child(1) {
-  animation-delay: 80ms;
+  animation-delay: 30ms;
 }
 .spotlight-content > :nth-child(2) {
   margin-top: var(--spotlight-text-gap);
-  animation-delay: 160ms;
+  animation-delay: 70ms;
 }
 .spotlight-content > :nth-child(3) {
   margin-top: var(--spotlight-group-gap);
-  animation-delay: 240ms;
+  animation-delay: 110ms;
 }
 .spotlight-content > :nth-child(4) {
   margin-top: var(--spotlight-block-gap);
-  animation-delay: 320ms;
+  animation-delay: 150ms;
 }
 
 @keyframes spotlight-rise-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
-    filter: blur(4px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-    filter: blur(0);
   }
 }
 
@@ -185,13 +183,13 @@
 .spotlight-reveal-unit {
   display: inline-block;
   white-space: pre;
-  animation: spotlight-per-word-crossfade 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation: spotlight-per-word-crossfade 400ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 @keyframes spotlight-per-word-crossfade {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -296,6 +294,9 @@
 }
 .spotlight-control--lg {
   --spotlight-control-size: var(--spotlight-icon-lg);
+  /* O play/pause é o foco do transporte: fica sempre em opacidade cheia, sem
+     depender de hover como os controles secundários. */
+  opacity: 1;
 }
 .spotlight-control:hover,
 .spotlight-control:focus-visible {
@@ -312,9 +313,16 @@
   outline: 2px solid #1ed760;
   outline-offset: 8px;
 }
+/* Enquanto um comando está em voo o botão continua bloqueado para não disparar
+   duas vezes, mas não apaga: o estado otimista já mostrou o resultado, e cair
+   para 0.15 e voltar no meio disso é o piscada que se via ao clicar em aleatório
+   ou repetir. O apagado fica reservado para indisponibilidade real do
+   dispositivo. */
+.spotlight-control:disabled:not([data-busy='true']) {
+  opacity: 0.15;
+}
 .spotlight-control:disabled {
   cursor: not-allowed;
-  opacity: 0.15;
 }
 .spotlight-control:disabled:active {
   scale: 1;
