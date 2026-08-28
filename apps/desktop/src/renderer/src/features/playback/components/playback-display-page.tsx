@@ -23,7 +23,7 @@ import { useWindowPresentationMode } from '@/features/window-controls/hooks/useW
 import { useControlSpotifyPlaybackMutation } from '../hooks/useControlSpotifyPlaybackMutation'
 import { useGetSpotifyPlaybackQuery } from '../hooks/useGetSpotifyPlaybackQuery'
 import { useGetSpotifyPlaybackQueueQuery } from '../hooks/useGetSpotifyPlaybackQueueQuery'
-import { useLivePlaybackState } from '../hooks/useLivePlaybackState'
+import { useSyncPlaybackClock } from '../hooks/useSyncPlaybackClock'
 import { getPlaybackContentKey } from '../utils/get-playback-content-key'
 import { usePlaybackVolumeControl } from '../hooks/usePlaybackVolumeControl'
 import { usePlaySpotifyContextTrackMutation } from '../hooks/usePlaySpotifyContextTrackMutation'
@@ -45,7 +45,10 @@ export function PlaybackDisplayPage(): React.JSX.Element {
   const selectedTheme = useSelectedTheme()
   const ActiveTheme = selectedTheme.activeTheme.component
   const presentationMode = useWindowPresentationMode()
-  const playback = useLivePlaybackState(playbackQuery.data ?? null)
+  const playback = playbackQuery.data ?? null
+
+  // A posição viva sai do relógio compartilhado, não de um tick que re-renderiza a página.
+  useSyncPlaybackClock(playback)
 
   // Mantém a fila em cache por faixa. É o que permite ao `next` trocar os metadados na
   // hora, em vez de esperar o Spotify publicar o novo estado.
