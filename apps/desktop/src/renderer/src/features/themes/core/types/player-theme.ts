@@ -63,6 +63,7 @@ export type PlayerThemeId =
   | 'poster'
   | 'spotlight'
   | 'tracklist'
+  | 'vinyl'
 
 export interface PlayerTheme {
   id: PlayerThemeId

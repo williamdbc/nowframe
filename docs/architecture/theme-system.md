@@ -18,6 +18,7 @@ features/themes/
 │   └── theme-registry.ts
 └── variants/
     ├── ambient/
+    ├── cd-cover/
     ├── default/
     ├── drive/
     ├── karaoke/
@@ -25,10 +26,13 @@ features/themes/
     ├── minimalist/
     ├── poster/
     ├── spotlight/
-    └── tracklist/
+    ├── tracklist/
+    └── vinyl/
 ```
 
 `core` define o contrato e o seletor. `variants` contém tudo que pertence ao desenho de um tema. Componentes de playback realmente compartilhados, como o range de progresso, continuam na feature `playback` e aceitam classes e cores específicas.
+
+A derivação de cor a partir da capa é a exceção útil: a amostragem dos pixels vive em `core`, porque quatro temas leem os mesmos pixels, e cada cálculo continua ao lado do tema que o inventou. O CD Cover reusa a média do Poster e o Vinyl reusa o agrupamento por matiz do Ambient, em vez de reescrever. O que varia é o cálculo, não a amostragem.
 
 ## Contrato do tema
 
@@ -46,17 +50,19 @@ Temas não chamam `window.nowframe`, services nem TanStack Query. A página `Pla
 
 ## Temas atuais
 
-| Tema       | Característica principal                                       | Dados condicionais |
-| ---------- | -------------------------------------------------------------- | ------------------ |
-| Ambient    | Cor extraída da capa, modo imersivo e letra opcional           | Letras             |
-| Default    | Capa e informações em duas colunas                             | Nenhum             |
-| Drive      | Controles amplos para leitura à distância                      | Nenhum             |
-| Karaoke    | Trilho de frases e preenchimento por palavra quando disponível | Letras             |
-| Lyrics     | Letra sincronizada em destaque                                 | Letras             |
-| Minimalist | Informação e transporte com baixa densidade visual             | Nenhum             |
-| Poster     | Capa em tela inteira, degradê derivado e contraste automático  | Nenhum             |
-| Spotlight  | Capa central sobre arte desfocada                              | Nenhum             |
-| Tracklist  | Carrossel arrastável de faixas do álbum ou playlist            | Álbum ou playlist  |
+| Tema       | Característica principal                                                  | Dados condicionais |
+| ---------- | ------------------------------------------------------------------------- | ------------------ |
+| Ambient    | Cor extraída da capa, modo imersivo e letra opcional                      | Letras             |
+| CD Cover   | Capa clara com o disco girando atrás dela, tingido pela arte             | Nenhum             |
+| Default    | Capa e informações em duas colunas                                        | Nenhum             |
+| Drive      | Controles amplos para leitura à distância                                 | Nenhum             |
+| Karaoke    | Trilho de frases e preenchimento por palavra quando disponível            | Letras             |
+| Lyrics     | Letra sincronizada em destaque                                            | Letras             |
+| Minimalist | Informação e transporte com baixa densidade visual                        | Nenhum             |
+| Poster     | Capa em tela inteira, degradê derivado e contraste automático             | Nenhum             |
+| Spotlight  | Capa central sobre arte desfocada                                         | Nenhum             |
+| Tracklist  | Carrossel arrastável de faixas do álbum ou playlist                       | Álbum ou playlist  |
+| Vinyl      | Vinil do tamanho da tela girando com a música, na matiz da capa           | Nenhum             |
 
 Dados condicionais são carregados apenas para os temas que os usam. Trocar de tema não duplica playback, perfil, biblioteca ou estado da janela.
 

@@ -117,8 +117,16 @@ function createControls(): PlaybackControls {
  */
 const themesWithoutSavedControl = new Set<string>(['cd-cover'])
 
+/**
+ * O contrato é ter controle de volume alcançável, não um slider sempre na tela. Poster e
+ * Vinyl mantêm a coluna de volume atrás de um painel, por desenho; que o painel abre e
+ * traz o slider fica coberto no teste de cada um.
+ */
+const themesWithVolumePanel = new Set<string>(['poster', 'vinyl'])
+
 describe.each(availableThemes)('$name player theme contract', ({ component: Theme, id }) => {
   const hasSavedControl = !themesWithoutSavedControl.has(id)
+  const hasVolumePanel = themesWithVolumePanel.has(id)
 
   it('renders the required playback content and chrome slots', () => {
     render(
@@ -145,10 +153,7 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     expect(screen.getByText('Hurry Up, We’re Dreaming')).toBeVisible()
     expect(screen.getByText('MacBook Pro')).toBeVisible()
     expect(screen.getByRole('slider', { name: 'Posição da reprodução' })).toBeEnabled()
-    // O contrato é ter controle de volume alcançável, não um slider sempre na tela:
-    // o tema Poster mantém a coluna de volume atrás de um painel, por desenho. Que o
-    // painel abre e traz o slider fica coberto no teste do próprio tema.
-    if (id === 'poster') {
+    if (hasVolumePanel) {
       expect(screen.getByRole('button', { name: 'Volume' })).toBeEnabled()
     } else {
       expect(screen.getByRole('slider', { name: 'Volume' })).toBeEnabled()

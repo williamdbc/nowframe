@@ -32,6 +32,16 @@ interface HslColor {
   lightness: number
 }
 
+/**
+ * Matiz e saturação predominantes da capa, sem luminosidade: quem consome decide em que
+ * claridade pintar. O Ambient usa uma só, escura e fixa; o Vinyl usa duas, o corpo do
+ * disco e o sulco.
+ */
+export interface DominantCoverHue {
+  hue: number
+  saturation: number
+}
+
 function toHsl(red: number, green: number, blue: number): HslColor {
   const normalizedRed = red / 255
   const normalizedGreen = green / 255
@@ -57,7 +67,7 @@ function toHsl(red: number, green: number, blue: number): HslColor {
   return { hue: (hue + 360) % 360, saturation, lightness }
 }
 
-function toHex(hue: number, saturation: number, lightness: number): string {
+export function toHslHex(hue: number, saturation: number, lightness: number): string {
   const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation
   const secondary = chroma * (1 - Math.abs(((hue / 60) % 2) - 1))
   const offset = lightness - chroma / 2
@@ -86,8 +96,11 @@ function toHex(hue: number, saturation: number, lightness: number): string {
  *
  * As matizes são somadas como vetores no círculo cromático para que o vermelho,
  * que fica nas duas pontas da escala, não seja partido em dois grupos opostos.
+ *
+ * Devolve `null` quando nenhum pixel carrega croma suficiente: uma arte preto e branco
+ * não tem matiz para emprestar, e cada tema decide o que fazer com essa ausência.
  */
-export function getDominantCoverColor(pixels: Uint8ClampedArray): string {
+export function getDominantCoverHue(pixels: Uint8ClampedArray): DominantCoverHue | null {
   const buckets = new Map<number, HueBucket>()
 
   for (let index = 0; index < pixels.length; index += 4) {
@@ -118,13 +131,25 @@ export function getDominantCoverColor(pixels: Uint8ClampedArray): string {
     if (!dominant || bucket.weight > dominant.weight) dominant = bucket
   }
 
-  if (!dominant || dominant.weight === 0) return ambientFallbackBackdrop
+  if (!dominant || dominant.weight === 0) return null
 
-  const hue = ((Math.atan2(dominant.hueY, dominant.hueX) * 180) / Math.PI + 360) % 360
-  const saturation = Math.min(
-    maximumBackdropSaturation,
-    Math.max(minimumBackdropSaturation, dominant.saturationSum / dominant.weight)
-  )
+  return {
+    hue: ((Math.atan2(dominant.hueY, dominant.hueX) * 180) / Math.PI + 360) % 360,
+    saturation: dominant.saturationSum / dominant.weight
+  }
+}
 
-  return toHex(hue, saturation, backdropLightness)
+/**
+ * A saturação da capa entra numa janela estreita: abaixo do mínimo a arte perde
+ * identidade no fundo, acima do máximo ela vira uma cor de aviso atrás do texto.
+ */
+export function clampBackdropSaturation(saturation: number): number {
+  return Math.min(maximumBackdropSaturation, Math.max(minimumBackdropSaturation, saturation))
+}
+
+export function getDominantCoverColor(pixels: Uint8ClampedArray): string {
+  const dominant = getDominantCoverHue(pixels)
+  if (!dominant) return ambientFallbackBackdrop
+
+  return toHslHex(dominant.hue, clampBackdropSaturation(dominant.saturation), backdropLightness)
 }

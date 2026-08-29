@@ -8,6 +8,7 @@ import { MinimalistPlayerTheme } from '@/features/themes/variants/minimalist/min
 import { PosterPlayerTheme } from '@/features/themes/variants/poster/poster-player-theme'
 import { SpotlightPlayerTheme } from '@/features/themes/variants/spotlight/spotlight-player-theme'
 import { TracklistPlayerTheme } from '@/features/themes/variants/tracklist/tracklist-player-theme'
+import { VinylPlayerTheme } from '@/features/themes/variants/vinyl/vinyl-player-theme'
 
 import type { PlayerTheme, PlayerThemeId } from './types/player-theme'
 
@@ -63,6 +64,11 @@ export const themeRegistry = {
     id: 'tracklist',
     name: 'Tracklist',
     component: TracklistPlayerTheme
+  },
+  vinyl: {
+    id: 'vinyl',
+    name: 'Vinyl',
+    component: VinylPlayerTheme
   }
 } as const satisfies Record<PlayerThemeId, PlayerTheme>
 
