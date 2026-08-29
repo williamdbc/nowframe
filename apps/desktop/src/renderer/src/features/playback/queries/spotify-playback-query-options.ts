@@ -4,8 +4,8 @@ import { SpotifyPlaybackService } from '../services/spotify-playback-service'
 import { shouldDiscardPlayback } from '../utils/playback-expectation'
 import { spotifyPlaybackQueryKeys } from './spotify-playback-query-keys'
 
-export const activePlaybackRefetchIntervalMs = 2_000
-export const idlePlaybackRefetchIntervalMs = 5_000
+export const activePlaybackRefetchIntervalMs = 1_500
+export const idlePlaybackRefetchIntervalMs = 2_500
 export const playbackWindowFocusFreshnessMs = 2_000
 
 /**

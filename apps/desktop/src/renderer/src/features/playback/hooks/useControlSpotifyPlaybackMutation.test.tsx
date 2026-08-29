@@ -47,16 +47,16 @@ const playback: PlaybackState = {
   synchronizedAt: 1_000
 }
 
-const queuedItem: NonNullable<PlaybackState['item']> = {
-  album: { id: 'queued-album-id', uri: 'spotify:album:queued-album-id' },
-  collectionName: 'Queued Album',
-  creatorNames: ['Queued Artist'],
+const staleQueuedItem: NonNullable<PlaybackState['item']> = {
+  album: { id: 'stale-album-id', uri: 'spotify:album:stale-album-id' },
+  collectionName: 'Stale Album',
+  creatorNames: ['Stale Artist'],
   durationMs: 210_000,
-  id: 'queued-track-id',
+  id: 'stale-track-id',
   imageUrl: null,
-  title: 'Queued Track',
+  title: 'Stale Track',
   type: 'track',
-  uri: 'spotify:track:queuedtrackid'
+  uri: 'spotify:track:staletrackid'
 }
 
 function createQueryClient(): QueryClient {
@@ -153,10 +153,10 @@ describe('useControlSpotifyPlaybackMutation', () => {
     await act(() => result.current.mutateAsync('next'))
     expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(1)
 
-    await act(() => vi.advanceTimersByTimeAsync(250))
+    await act(() => vi.advanceTimersByTimeAsync(200))
     expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(2)
 
-    await act(() => vi.advanceTimersByTimeAsync(500))
+    await act(() => vi.advanceTimersByTimeAsync(300))
     expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(3)
     expect(queryClient.getQueryData(spotifyPlaybackQueryKeys.current())).toEqual(nextPlayback)
 
@@ -187,7 +187,7 @@ describe('useControlSpotifyPlaybackMutation', () => {
     expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(attemptsAfterLadder)
   })
 
-  it('advances the metadata immediately when the queued next content is known', async () => {
+  it('ignores a stale queue and keeps current metadata until Spotify confirms the next content', async () => {
     vi.useFakeTimers()
     vi.spyOn(SpotifyPlaybackService, 'skipToNext').mockResolvedValue(undefined)
     const getCurrentPlaybackSpy = vi
@@ -196,7 +196,7 @@ describe('useControlSpotifyPlaybackMutation', () => {
     const queryClient = createQueryClient()
     queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
     queryClient.setQueryData(spotifyPlaybackQueryKeys.queue('track:track-id'), {
-      items: [queuedItem]
+      items: [staleQueuedItem]
     })
     const { result } = renderHook(() => useControlSpotifyPlaybackMutation(), {
       wrapper: createWrapper(queryClient)
@@ -204,40 +204,12 @@ describe('useControlSpotifyPlaybackMutation', () => {
 
     await act(() => result.current.mutateAsync('next'))
 
-    // A troca aconteceu sem depender de nenhuma consulta de reconciliação.
-    expect(
-      queryClient.getQueryData<PlaybackState>(spotifyPlaybackQueryKeys.current())
-    ).toMatchObject({
-      item: queuedItem,
-      progressMs: 0
-    })
+    expect(queryClient.getQueryData<PlaybackState>(spotifyPlaybackQueryKeys.current())).toEqual(
+      playback
+    )
 
     await act(() => vi.advanceTimersByTimeAsync(2_000))
     expect(getCurrentPlaybackSpy).toHaveBeenCalled()
-  })
-
-  it('corrects an optimistic guess when Spotify reports different content', async () => {
-    vi.useFakeTimers()
-    const actualNextPlayback: PlaybackState = {
-      ...playback,
-      item: { ...queuedItem, id: 'shuffled-track-id', title: 'Shuffled Track' },
-      progressMs: 500
-    }
-    vi.spyOn(SpotifyPlaybackService, 'skipToNext').mockResolvedValue(undefined)
-    vi.spyOn(SpotifyPlaybackService, 'getCurrentPlayback').mockResolvedValue(actualNextPlayback)
-    const queryClient = createQueryClient()
-    queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
-    queryClient.setQueryData(spotifyPlaybackQueryKeys.queue('track:track-id'), {
-      items: [queuedItem]
-    })
-    const { result } = renderHook(() => useControlSpotifyPlaybackMutation(), {
-      wrapper: createWrapper(queryClient)
-    })
-
-    await act(() => result.current.mutateAsync('next'))
-    await act(() => vi.advanceTimersByTimeAsync(2_000))
-
-    expect(queryClient.getQueryData(spotifyPlaybackQueryKeys.current())).toEqual(actualNextPlayback)
   })
 
   /**
@@ -265,28 +237,5 @@ describe('useControlSpotifyPlaybackMutation', () => {
     expect(queryClient.getQueryData(spotifyPlaybackQueryKeys.current())).toEqual(restartedPlayback)
     // Saiu na primeira tentativa, sem precisar percorrer o ladder inteiro.
     expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(1)
-  })
-
-  it('ignores a stale queue that still lists the current content', async () => {
-    vi.useFakeTimers()
-    vi.spyOn(SpotifyPlaybackService, 'skipToNext').mockResolvedValue(undefined)
-    vi.spyOn(SpotifyPlaybackService, 'getCurrentPlayback').mockResolvedValue(playback)
-    const queryClient = createQueryClient()
-    queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
-    queryClient.setQueryData(spotifyPlaybackQueryKeys.queue('track:track-id'), {
-      items: [playback.item!]
-    })
-    const { result } = renderHook(() => useControlSpotifyPlaybackMutation(), {
-      wrapper: createWrapper(queryClient)
-    })
-
-    await act(() => result.current.mutateAsync('next'))
-
-    // Nenhum palpite: os metadados seguem os do conteúdo atual até o servidor confirmar.
-    expect(
-      queryClient.getQueryData<PlaybackState>(spotifyPlaybackQueryKeys.current())?.item
-    ).toEqual(playback.item)
-
-    await act(() => vi.advanceTimersByTimeAsync(2_000))
   })
 })
