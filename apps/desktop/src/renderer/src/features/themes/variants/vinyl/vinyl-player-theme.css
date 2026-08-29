@@ -1,0 +1,738 @@
+/* Escala responsiva: os valores do Figma (frame de 1440x1080) são o teto. A barra segue a
+   altura da janela, como nos outros temas, porque é ela que decide se texto e controles
+   ainda cabem numa fileira só; os espaços horizontais seguem a largura. */
+.vinyl-root {
+  --vinyl-inset: clamp(16px, 2.78vw, 40px);
+  --vinyl-bar-gap: clamp(16px, 2.78vw, 40px);
+  --vinyl-center-column: clamp(240px, 32vw, 400px);
+  --vinyl-controls-gap: clamp(12px, 1.85vh, 20px);
+  --vinyl-progress-gap: clamp(12px, 1.94vw, 28px);
+  --vinyl-meta-gap: clamp(10px, 1.11vw, 16px);
+  --vinyl-actions-gap: clamp(20px, 3.7vh, 40px);
+  --vinyl-transport-gap: clamp(20px, 3.7vh, 40px);
+  --vinyl-transport-inner-gap: clamp(16px, 2.96vh, 32px);
+  --vinyl-cover-size: clamp(44px, 5.93vh, 64px);
+  --vinyl-icon-size: clamp(18px, 2.22vh, 24px);
+  --vinyl-icon-small: clamp(14px, 1.67vh, 18px);
+  --vinyl-play-size: clamp(40px, 5.19vh, 56px);
+  --vinyl-play-glyph-size: clamp(28px, 3.7vh, 40px);
+  --vinyl-title-size: clamp(15px, 1.67vh, 18px);
+  --vinyl-body-size: clamp(12px, 1.3vh, 14px);
+  --vinyl-time-size: clamp(11px, 1.3vh, 14px);
+
+  /* O disco é 1280 num frame de 1440x1080. Os dois limites entram porque cada um governa
+     uma janela diferente: numa tela larga e baixa a altura é que segura o disco, numa
+     estreita e alta é a largura. */
+  --vinyl-size: min(118.5vh, 88.9vw);
+  /* Todas as medidas internas do disco foram lidas no Figma em cima de 1280px. */
+  --vinyl-unit: calc(var(--vinyl-size) / 1280);
+  --vinyl-hairline: calc(var(--vinyl-unit) * 1.72);
+
+  /* Preenchidas em runtime pelo tema: a matiz da capa em duas claridades. Os valores
+     abaixo valem só antes da primeira amostragem — um vinil preto de sulco cinza. */
+  --vinyl-record-color: #1b1a19;
+  --vinyl-groove: #5f5f5f;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  /* O fundo do Figma é a cor do disco sob um véu preto de 48%: a mesma matiz da capa, mais
+     escura que o disco, para o vinil se destacar sem uma segunda cor entrar em cena. */
+  background-color: var(--vinyl-record-color);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.48));
+  transition: background-color 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.vinyl-icon {
+  display: block;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+/* ---------------------------------------------------------------- o disco -- */
+
+/* O centro do disco fica na borda de cima da janela, então só a metade de baixo aparece.
+   O recorte circular do próprio disco é o que contém a luz e a sombra, que transbordam a
+   caixa de propósito. */
+.vinyl-record {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 0;
+  width: var(--vinyl-size);
+  height: var(--vinyl-size);
+  translate: -50% -50%;
+  border: calc(var(--vinyl-unit) * 2) solid rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+  overflow: hidden;
+  /* Base sob a camada que gira: sem ela uma borda antisserrilhada deixaria um fio do fundo
+     do tema aparecer na volta do recorte. */
+  background-color: var(--vinyl-record-color);
+  /* Contém o `mix-blend-mode` da varredura de luz: sem isto ela alcançaria o fundo do
+     tema em vez de parar no disco. */
+  isolation: isolate;
+  box-shadow:
+    0 calc(var(--vinyl-unit) * 2.133) calc(var(--vinyl-unit) * 2.133) rgba(14, 14, 16, 0.04),
+    0 calc(var(--vinyl-unit) * 4.267) calc(var(--vinyl-unit) * 6.4) rgba(14, 14, 16, 0.04),
+    0 calc(var(--vinyl-unit) * 8.533) calc(var(--vinyl-unit) * 12.8) rgba(14, 14, 16, 0.04),
+    0 calc(var(--vinyl-unit) * 51.2) calc(var(--vinyl-unit) * 145.067) rgba(14, 14, 16, 0.04);
+  transition: background-color 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* O disco inteiro numa camada só: corpo, brilho, varreduras, sulcos e rótulo giram juntos.
+   O quadrado gira dentro do recorte redondo sem abrir buraco porque o círculo do recorte é
+   o inscrito neste quadrado, e um círculo inscrito é invariante à rotação.
+
+   `will-change` promove a camada para o compositor: o gradiente, as duas varreduras com
+   filtro e os quatro anéis são rasterizados uma vez e a rotação vira só composição. */
+.vinyl-record-turn {
+  position: absolute;
+  inset: 0;
+  rotate: var(--vinyl-rotation, 0deg);
+  will-change: rotate;
+  background-color: var(--vinyl-record-color);
+  /* A luz difusa de cima e o brilho em losango, os dois do Figma. */
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 100%),
+    url("data:image/svg+xml;utf8,<svg viewBox='0 0 1280 1280' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><g transform='matrix(128 128 -64 64 0 0)' opacity='0.25'><rect height='100' width='100' fill='url(%23grad)' id='quad' shape-rendering='crispEdges'/><use href='%23quad' transform='scale(1 -1)'/><use href='%23quad' transform='scale(-1 1)'/><use href='%23quad' transform='scale(-1 -1)'/></g><defs><linearGradient id='grad' gradientUnits='userSpaceOnUse' x2='5' y2='5'><stop stop-color='rgba(255,255,255,0.4)' offset='0'/><stop stop-color='rgba(255,255,255,0)' offset='1'/></linearGradient></defs></svg>");
+  background-size: cover;
+  transition: background-color 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.vinyl-record-environment {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Cada varredura é uma caixa do tamanho do disco, girada, com a imagem transbordando nas
+   proporções que o Figma exportou — é a folga do desfoque, que morreria cortada rente. */
+.vinyl-record-sweep {
+  position: absolute;
+  inset: 0;
+}
+.vinyl-record-sweep img {
+  position: absolute;
+  top: -8.5%;
+  left: -3.71%;
+  width: 110.57%;
+  height: 116.83%;
+  /* O preflight do Tailwind aplica `max-width: 100%` a toda <img>; sem desarmar aqui a
+     largura fica presa e a varredura sai distorcida. */
+  max-width: none;
+}
+/* A varredura clara entra em `overlay`: sobre o disco escuro o modo multiplica em vez de
+   apenas somar, então o realce puxa a própria cor da capa para cima em vez de lavá-la de
+   branco. É por isso que ela aguenta 20% de preenchimento sem virar um véu cinza. */
+.vinyl-record-sweep--light {
+  rotate: 13.32deg;
+  mix-blend-mode: overlay;
+}
+.vinyl-record-sweep--shade {
+  rotate: 45deg;
+}
+
+.vinyl-groove {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  border: var(--vinyl-hairline) solid var(--vinyl-groove);
+  border-radius: 50%;
+  transition: border-color 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* O anel interno é preenchido com a própria cor do disco a 25%: abafa de leve o reflexo do
+   ambiente na faixa em volta do rótulo. */
+.vinyl-groove[data-filled='true'] {
+  background-color: color-mix(in srgb, var(--vinyl-record-color) 25%, transparent);
+}
+
+/* O rótulo é a capa recortada em círculo, com a borda na cor do disco. */
+.vinyl-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 33.74%;
+  height: 33.74%;
+  translate: -50% -50%;
+  border: var(--vinyl-hairline) solid var(--vinyl-record-color);
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.04);
+  transition: border-color 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.vinyl-label-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: vinyl-label-in 600ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.vinyl-label-placeholder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes vinyl-label-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* O furo: três anéis metálicos concêntricos, medidos em fração do rótulo. */
+.vinyl-spindle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  width: 7.968%;
+  height: 7.968%;
+  align-items: center;
+  justify-content: center;
+  translate: -50% -50%;
+  border: var(--vinyl-hairline) solid #171717;
+  border-radius: 50%;
+  background-image: linear-gradient(to left, #bdbdbd, #414546);
+}
+.vinyl-spindle-ring {
+  display: flex;
+  width: 50%;
+  height: 50%;
+  align-items: center;
+  justify-content: center;
+  border: calc(var(--vinyl-hairline) * 0.4) solid #5b5b5b;
+  border-radius: 50%;
+  background-image: linear-gradient(to left, #a0aaac, #777777);
+  box-shadow: 0 calc(var(--vinyl-unit) * 6.882) calc(var(--vinyl-unit) * 20.301) rgba(0, 0, 0, 0.13);
+}
+.vinyl-spindle-core {
+  width: 40%;
+  height: 40%;
+  border: calc(var(--vinyl-hairline) * 0.25) solid #7a7a7a;
+  border-radius: 50%;
+  background-image: linear-gradient(to left, #bfbfbf, #e1e1e1);
+}
+
+/* --------------------------------------------------------------- a barra -- */
+
+/* Três colunas: identificação à esquerda, transporte e progresso no centro, favorito e
+   volume à direita. A do meio tem largura própria para o transporte ficar centrado na
+   janela, e não no espaço que sobrar das outras duas. */
+.vinyl-bar {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  margin-top: auto;
+  padding: var(--vinyl-inset);
+  align-items: center;
+  gap: var(--vinyl-bar-gap);
+  grid-template-areas: 'meta controls actions';
+  grid-template-columns: minmax(0, 1fr) var(--vinyl-center-column) minmax(0, 1fr);
+}
+
+/* Abaixo da janela mínima suportada (900x540) as três colunas deixam de caber sem
+   espremer o título. Aí a barra vira duas fileiras e o transporte ocupa a de baixo. */
+@media (max-width: 860px) {
+  .vinyl-bar {
+    grid-template-areas:
+      'meta actions'
+      'controls controls';
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: clamp(14px, 2.5vh, 20px);
+  }
+}
+
+.vinyl-meta {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--vinyl-meta-gap);
+  grid-area: meta;
+}
+.vinyl-meta > * {
+  animation: vinyl-rise-in 360ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.vinyl-meta > :nth-child(1) {
+  animation-delay: 30ms;
+}
+.vinyl-meta > :nth-child(2) {
+  animation-delay: 70ms;
+}
+
+@keyframes vinyl-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* A capa pequena: borda, sombra em quatro camadas e brilho diagonal, todos do Figma. */
+.vinyl-sleeve {
+  position: relative;
+  width: var(--vinyl-cover-size);
+  height: var(--vinyl-cover-size);
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 6px;
+  box-shadow:
+    0 1px 1px rgba(14, 14, 16, 0.04),
+    0 2px 3px rgba(14, 14, 16, 0.04),
+    0 4px 6px rgba(14, 14, 16, 0.04),
+    0 24px 68px rgba(14, 14, 16, 0.04);
+}
+.vinyl-sleeve-image,
+.vinyl-sleeve-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+.vinyl-sleeve-placeholder {
+  background: rgba(255, 255, 255, 0.06);
+}
+.vinyl-sleeve-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
+}
+
+.vinyl-details {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  color: #ffffff;
+}
+.vinyl-artist {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--vinyl-body-size);
+  font-weight: 500;
+  line-height: 1.286;
+  letter-spacing: -0.01em;
+  opacity: 0.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Título longo para numa linha só: a barra tem altura fixa e uma segunda linha empurraria
+   o transporte para fora do alinhamento com as outras colunas. */
+.vinyl-title {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--vinyl-title-size);
+  font-weight: 600;
+  line-height: 1.222;
+  letter-spacing: -0.018em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* animate-text / per-word-crossfade */
+.vinyl-reveal-unit {
+  display: inline-block;
+  white-space: pre;
+  animation: vinyl-per-word-crossfade 400ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes vinyl-per-word-crossfade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vinyl-controls {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--vinyl-controls-gap);
+  grid-area: controls;
+}
+
+.vinyl-transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vinyl-transport-gap);
+}
+.vinyl-transport-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--vinyl-transport-inner-gap);
+}
+
+/* Os tempos ficam nas pontas da barra, não abaixo dela. `display: contents` desmonta o
+   invólucro que o controle compartilhado desenha e devolve os dois <span> à mesma fileira
+   do input, sem duplicar a lógica do controle. */
+.vinyl-progress {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--vinyl-progress-gap);
+}
+.vinyl-progress-times {
+  display: contents;
+}
+.vinyl-progress-times > span {
+  font-size: var(--vinyl-time-size);
+  font-weight: 500;
+  line-height: 1.143;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.vinyl-progress-times > span:first-child {
+  order: -1;
+}
+.vinyl-progress-range {
+  order: 0;
+  min-width: 0;
+  flex: 1;
+  height: 8px;
+}
+.vinyl-progress-range::-webkit-slider-runnable-track {
+  height: 8px;
+}
+
+.vinyl-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--vinyl-actions-gap);
+  grid-area: actions;
+}
+
+/* ------------------------------------------------------------- controles -- */
+
+/* O Figma deixa os controles secundários a 80% de branco, não aos 40% dos temas escuros:
+   o disco por trás é uma superfície de cor, e 40% ali some. O apagado fica reservado para
+   indisponibilidade real do dispositivo — comando em voo é sinalizado por `data-busy`,
+   senão clicar em aleatório ou repetir derrubava a opacidade e a devolvia, o que se via
+   como uma piscada. */
+.vinyl-control {
+  --vinyl-control-size: var(--vinyl-icon-size);
+  position: relative;
+  display: flex;
+  width: var(--vinyl-control-size);
+  height: var(--vinyl-control-size);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  opacity: 0.8;
+  cursor: pointer;
+  transition:
+    opacity 160ms cubic-bezier(0.2, 0, 0, 1),
+    scale 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+/* Área de toque maior que o glifo, sem inflar o desenho. */
+.vinyl-control::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--vinyl-control-size) + 16px);
+  height: calc(var(--vinyl-control-size) + 16px);
+  transform: translate(-50%, -50%);
+}
+.vinyl-control--sm {
+  --vinyl-control-size: var(--vinyl-icon-small);
+}
+/* O play é só o glifo maior, sem pílula. A caixa de 56px do Figma vira área de toque. */
+.vinyl-control--play {
+  --vinyl-control-size: var(--vinyl-play-glyph-size);
+  opacity: 1;
+}
+.vinyl-control--play::before {
+  width: var(--vinyl-play-size);
+  height: var(--vinyl-play-size);
+}
+.vinyl-control:hover,
+.vinyl-control:focus-visible,
+.vinyl-control[data-active='true'] {
+  opacity: 1;
+}
+.vinyl-control:active {
+  scale: 0.96;
+}
+.vinyl-control--play:hover {
+  scale: 1.04;
+}
+.vinyl-control:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 8px;
+}
+.vinyl-control:disabled:not([data-busy='true']) {
+  opacity: 0.25;
+}
+.vinyl-control:disabled {
+  cursor: not-allowed;
+}
+.vinyl-control:disabled:active {
+  scale: 1;
+}
+
+/* O SVG de repetir tem 18x24: o ponto abaixo do glifo marca o modo ligado e só escapa do
+   recorte quando a repetição está ativa. */
+.vinyl-repeat-clip {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+.vinyl-control--repeat[data-active='true'] .vinyl-repeat-clip {
+  overflow: visible;
+}
+.vinyl-repeat-glyph {
+  width: var(--vinyl-control-size);
+  height: calc(var(--vinyl-control-size) * 4 / 3);
+}
+
+/* transitions-dev — troca do glifo de play/pause dentro do mesmo botão. */
+.vinyl-icon-swap {
+  position: relative;
+  display: inline-grid;
+}
+.vinyl-icon-swap > * {
+  grid-area: 1 / 1;
+  transition:
+    opacity 200ms ease-in-out,
+    filter 200ms ease-in-out,
+    transform 200ms ease-in-out;
+}
+.vinyl-icon-swap[data-state='playing'] > [data-icon='pause'],
+.vinyl-icon-swap[data-state='paused'] > [data-icon='play'] {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+.vinyl-icon-swap[data-state='playing'] > [data-icon='play'],
+.vinyl-icon-swap[data-state='paused'] > [data-icon='pause'] {
+  opacity: 0;
+  filter: blur(2px);
+  transform: scale(0.25);
+}
+
+/* ---------------------------------------------------------------- volume -- */
+
+.vinyl-volume {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.vinyl-volume-panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 12px);
+  z-index: 30;
+  display: flex;
+  width: 200px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: #202020;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  animation: vinyl-volume-in 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes vinyl-volume-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vinyl-mute {
+  position: relative;
+  display: flex;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.vinyl-mute:hover,
+.vinyl-mute:focus-visible {
+  opacity: 1;
+}
+.vinyl-mute[data-muted='true'] {
+  opacity: 0.25;
+}
+.vinyl-mute:disabled {
+  opacity: 0.15;
+  cursor: not-allowed;
+}
+.vinyl-mute:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 6px;
+}
+
+.vinyl-volume-track {
+  position: relative;
+  height: 4px;
+  min-width: 0;
+  flex: 1;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+.vinyl-volume-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+.vinyl-volume-thumb {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.16);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.vinyl-volume-fill,
+.vinyl-volume-thumb {
+  transition:
+    width 120ms linear,
+    left 120ms linear;
+}
+/* O range nativo fica transparente sobre a trilha pintada: preserva teclado e leitor de
+   tela e deixa o desenho do Figma por conta do CSS. */
+.vinyl-volume-range {
+  position: absolute;
+  inset: -10px 0;
+  width: 100%;
+  height: calc(100% + 20px);
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+}
+.vinyl-volume-range:disabled {
+  cursor: not-allowed;
+}
+/* O anel é para navegação por teclado. Com `:focus-within` ele ficaria preso depois de
+   arrastar o volume com o mouse, até um clique fora. */
+.vinyl-volume-track:has(:focus-visible) {
+  outline: 2px solid #1ed760;
+  outline-offset: 4px;
+}
+
+/* ----------------------------------------------------------------- resto -- */
+
+.vinyl-nav-button {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  cursor: pointer;
+  transition:
+    color 160ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    scale 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.vinyl-nav-button:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+}
+.vinyl-nav-button:active {
+  scale: 0.96;
+}
+.vinyl-nav-button:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 2px;
+}
+
+.vinyl-error {
+  position: absolute;
+  right: var(--vinyl-inset);
+  bottom: calc(var(--vinyl-inset) / 2);
+  z-index: 3;
+  font-size: var(--vinyl-body-size);
+  font-weight: 500;
+  line-height: 1.4;
+  color: #fecaca;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vinyl-root,
+  .vinyl-record,
+  .vinyl-groove,
+  .vinyl-label,
+  .vinyl-control,
+  .vinyl-mute,
+  .vinyl-nav-button,
+  .vinyl-volume-fill,
+  .vinyl-volume-thumb,
+  .vinyl-icon-swap > * {
+    transition: none !important;
+  }
+  .vinyl-label-image,
+  .vinyl-meta > *,
+  .vinyl-reveal-unit,
+  .vinyl-volume-panel {
+    animation: none !important;
+  }
+}

@@ -67,6 +67,7 @@ export type PlayerThemeId =
   | 'setlist'
   | 'spotlight'
   | 'tracklist'
+  | 'vinyl'
 
 export type PlayerThemeCategory = 'main' | 'conceptual'
 

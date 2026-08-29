@@ -12,6 +12,7 @@ import { RocketLeaguePlayerTheme } from '@/features/themes/variants/rocket-leagu
 import { SetlistPlayerTheme } from '@/features/themes/variants/setlist/setlist-player-theme'
 import { SpotlightPlayerTheme } from '@/features/themes/variants/spotlight/spotlight-player-theme'
 import { TracklistPlayerTheme } from '@/features/themes/variants/tracklist/tracklist-player-theme'
+import { VinylPlayerTheme } from '@/features/themes/variants/vinyl/vinyl-player-theme'
 
 import type { PlayerTheme, PlayerThemeId } from './types/player-theme'
 
@@ -104,6 +105,12 @@ export const themeRegistry = {
     category: 'main',
     component: TracklistPlayerTheme,
     usesTracklist: true
+  },
+  vinyl: {
+    id: 'vinyl',
+    name: 'Vinyl',
+    category: 'main',
+    component: VinylPlayerTheme
   }
 } as const satisfies Record<PlayerThemeId, PlayerTheme>
 
