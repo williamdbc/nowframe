@@ -43,6 +43,9 @@
   inset: calc(var(--poster-cover-blur) * -2);
   width: calc(100% + var(--poster-cover-blur) * 4);
   height: calc(100% + var(--poster-cover-blur) * 4);
+  /* O preflight do Tailwind aplica `max-width: 100%` a toda <img>, o que prenderia a
+     largura no tamanho da janela e deixaria a margem do desfoque só de um lado. */
+  max-width: none;
   object-fit: cover;
   filter: blur(var(--poster-cover-blur));
   animation: poster-cover-in 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
