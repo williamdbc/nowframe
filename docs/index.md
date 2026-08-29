@@ -19,8 +19,9 @@ Este índice separa o estado atual do sistema, as decisões que o formaram e os 
 
 - [ADR 0001 — Desktop primeiro e extração sob demanda](decisions/0001-desktop-first-and-extract-on-demand.md)
 - [ADR 0002 — PKCE e fronteira entre processos](decisions/0002-pkce-and-electron-process-boundary.md)
-- [ADR 0003 — Controle remoto com polling adaptativo](decisions/0003-remote-control-with-adaptive-polling.md)
+- [ADR 0003 — Controle remoto com polling adaptativo](decisions/0003-remote-control-with-adaptive-polling.md) — substituída pela ADR 0005.
 - [ADR 0004 — Contrato comum para temas independentes](decisions/0004-shared-theme-contract.md)
+- [ADR 0005 — Sincronização responsiva sem antecipar metadados](decisions/0005-responsive-sync-without-metadata-prediction.md)
 
 ## Releases
 

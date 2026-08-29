@@ -1,0 +1,209 @@
+.concept-hud {
+  position: relative;
+  width: 100%;
+}
+
+.concept-time-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.45rem;
+  color: var(--concept-muted, rgb(255 255 255 / 52%));
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.concept-hud-row {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) auto minmax(150px, 1fr);
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.35rem;
+}
+
+.concept-device {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.5rem;
+  overflow: hidden;
+  color: var(--concept-muted, rgb(255 255 255 / 52%));
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.concept-device svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: 0 0 auto;
+  color: var(--concept-accent, #fff);
+}
+
+.concept-transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.concept-control {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 1px solid var(--concept-border, rgb(255 255 255 / 16%));
+  border-radius: var(--concept-control-radius, 50%);
+  color: var(--concept-control-color, rgb(255 255 255 / 76%));
+  background: var(--concept-control-bg, rgb(255 255 255 / 7%));
+  box-shadow: var(--concept-control-shadow, none);
+  transition: 150ms ease;
+}
+
+.concept-control svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.concept-control--play {
+  width: 2.9rem;
+  height: 2.9rem;
+  color: var(--concept-play-color, #111);
+  background: var(--concept-accent, #fff);
+}
+
+.concept-play-glyph {
+  transform: translateX(1px);
+}
+
+.concept-control:hover:not(:disabled),
+.concept-control:focus-visible:not(:disabled) {
+  color: var(--concept-hover-color, #fff);
+  border-color: var(--concept-accent, #fff);
+  transform: translateY(-2px);
+}
+
+.concept-control:focus-visible {
+  outline: 2px solid var(--concept-accent, #fff);
+  outline-offset: 3px;
+}
+
+.concept-control[data-active='true'] {
+  color: var(--concept-accent, #fff);
+  border-color: var(--concept-accent, #fff);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--concept-accent, #fff) 35%, transparent);
+}
+
+.concept-control:disabled {
+  cursor: not-allowed;
+  opacity: 0.28;
+}
+
+.concept-volume-wrap,
+.concept-volume {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.concept-volume-wrap {
+  gap: 0.6rem;
+}
+
+.concept-volume-label {
+  color: var(--concept-accent, #fff);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.concept-volume-button {
+  color: var(--concept-accent, #fff);
+}
+
+.concept-volume-range {
+  width: clamp(4.5rem, 7vw, 7rem);
+}
+
+.concept-volume-percentage {
+  width: 2.3rem;
+  color: var(--concept-muted, rgb(255 255 255 / 52%));
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.concept-error {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.5rem);
+  color: #ffd1d1;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.concept-track-rail {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  cursor: grab;
+  scrollbar-width: none;
+}
+
+.concept-track-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.concept-track-rail--dragging,
+.concept-track-rail--dragging .concept-track-item {
+  cursor: grabbing;
+}
+
+.concept-track-rail--dragging .concept-track-item {
+  pointer-events: none;
+}
+
+.concept-track-item {
+  flex: 0 0 auto;
+}
+
+.concept-track-state {
+  display: flex;
+  min-height: 8rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--concept-muted, rgb(255 255 255 / 45%));
+  font-size: 0.78rem;
+}
+
+.concept-track-state svg {
+  width: 1rem;
+  height: 1rem;
+  animation: concept-spin 1s linear infinite;
+}
+
+@keyframes concept-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 820px) {
+  .concept-hud-row {
+    grid-template-columns: 1fr;
+  }
+
+  .concept-device,
+  .concept-volume-wrap {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .concept-control {
+    transition: none;
+  }
+}

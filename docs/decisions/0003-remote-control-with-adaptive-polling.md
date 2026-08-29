@@ -1,6 +1,6 @@
 # ADR 0003: Controle remoto com polling adaptativo
 
-- **Status:** Aceita
+- **Status:** Substituída pela [ADR 0005](0005-responsive-sync-without-metadata-prediction.md)
 - **Data:** 2026-08-28
 
 ## Contexto
@@ -47,5 +47,6 @@ Adiado. Acrescentaria operação de servidor, credenciais e uma solução geralm
 ## Referências
 
 - [Sincronização e integrações](../architecture/playback-and-integrations.md)
+- [ADR 0005 — Sincronização responsiva sem antecipar metadados](0005-responsive-sync-without-metadata-prediction.md)
 - [Rate limits — Spotify](https://developer.spotify.com/documentation/web-api/concepts/rate-limits)
 - [Quota modes — Spotify](https://developer.spotify.com/documentation/web-api/concepts/quota-modes)
