@@ -7,6 +7,11 @@ import { spotifyPlaybackQueryKeys } from '@/features/playback/queries/spotify-pl
 import { SpotifyPlaybackService } from '@/features/playback/services/spotify-playback-service'
 import type { PlaybackState } from '@/features/playback/types/playback-state'
 
+import {
+  clearPlaybackExpectation,
+  shouldDiscardPlayback
+} from '@/features/playback/utils/playback-expectation'
+
 import { useSetSpotifyPlaybackVolumeMutation } from './useSetSpotifyPlaybackVolumeMutation'
 
 const playback: PlaybackState = {
@@ -75,5 +80,48 @@ describe('useSetSpotifyPlaybackVolumeMutation', () => {
         .volumePercent
     ).toBe(42)
     expect(invalidateQueriesSpy).not.toHaveBeenCalled()
+  })
+
+  /**
+   * Enquanto o Spotify nao publica o novo volume, o polling ainda relata o anterior. Sem a
+   * guarda ele sobrescrevia o valor otimista e o controle pulava de volta entre um arraste
+   * e outro — o que se sentia como um seletor travado.
+   */
+  it('discards a polling response that still reports the previous volume', async () => {
+    clearPlaybackExpectation()
+    vi.spyOn(SpotifyPlaybackService, 'setVolume').mockResolvedValue(undefined)
+    const queryClient = new QueryClient({
+      defaultOptions: { mutations: { retry: false }, queries: { retry: false } }
+    })
+    queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
+    const { result } = renderHook(() => useSetSpotifyPlaybackVolumeMutation(), {
+      wrapper: createWrapper(queryClient)
+    })
+
+    await act(() => result.current.mutateAsync(20))
+
+    const desatualizado = { ...playback, device: { ...playback.device, volumePercent: 64 } }
+    const confirmado = { ...playback, device: { ...playback.device, volumePercent: 20 } }
+
+    expect(shouldDiscardPlayback(desatualizado)).toBe(true)
+    expect(shouldDiscardPlayback(confirmado)).toBe(false)
+  })
+
+  it('drops the expectation when the command fails', async () => {
+    clearPlaybackExpectation()
+    vi.spyOn(SpotifyPlaybackService, 'setVolume').mockRejectedValue(new Error('falhou'))
+    const queryClient = new QueryClient({
+      defaultOptions: { mutations: { retry: false }, queries: { retry: false } }
+    })
+    queryClient.setQueryData(spotifyPlaybackQueryKeys.current(), playback)
+    const { result } = renderHook(() => useSetSpotifyPlaybackVolumeMutation(), {
+      wrapper: createWrapper(queryClient)
+    })
+
+    await expect(act(() => result.current.mutateAsync(20))).rejects.toThrow('falhou')
+
+    expect(
+      shouldDiscardPlayback({ ...playback, device: { ...playback.device, volumePercent: 64 } })
+    ).toBe(false)
   })
 })

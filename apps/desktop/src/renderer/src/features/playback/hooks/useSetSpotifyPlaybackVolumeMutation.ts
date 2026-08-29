@@ -3,6 +3,10 @@ import type { UseMutationResult } from '@tanstack/react-query'
 
 import { spotifyPlaybackQueryKeys } from '@/features/playback/queries/spotify-playback-query-keys'
 import { SpotifyPlaybackService } from '@/features/playback/services/spotify-playback-service'
+import {
+  clearPlaybackExpectation,
+  expectPlayback
+} from '@/features/playback/utils/playback-expectation'
 
 type SpotifyPlayback = Awaited<ReturnType<typeof SpotifyPlaybackService.getCurrentPlayback>>
 
@@ -37,9 +41,16 @@ export function useSetSpotifyPlaybackVolumeMutation(): UseMutationResult<
         }
       })
 
+      // Até o Spotify publicar o novo volume, o polling ainda relata o anterior. Sem esta
+      // expectativa o valor pulava de volta entre um arraste e outro, o que se sentia como
+      // um controle travado brigando com o cursor.
+      const committedVolumePercent = Math.min(100, Math.max(0, volumePercent))
+      expectPlayback((playback) => playback.device.volumePercent === committedVolumePercent)
+
       return { previousPlayback }
     },
     onError: (_error, _volumePercent, context) => {
+      clearPlaybackExpectation()
       queryClient.setQueryData(queryKey, context?.previousPlayback)
     }
   })
