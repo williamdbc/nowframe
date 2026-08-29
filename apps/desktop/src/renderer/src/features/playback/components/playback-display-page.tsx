@@ -54,7 +54,7 @@ export function PlaybackDisplayPage(): React.JSX.Element {
   // hora, em vez de esperar o Spotify publicar o novo estado.
   useGetSpotifyPlaybackQueueQuery(getPlaybackContentKey(playback))
 
-  const isTracklistTheme = selectedTheme.activeThemeId === 'tracklist'
+  const shouldLoadTracklist = selectedTheme.activeTheme.usesTracklist === true
   const shouldLoadLyrics =
     selectedTheme.activeThemeId === 'lyrics' ||
     selectedTheme.activeThemeId === 'karaoke' ||
@@ -81,11 +81,11 @@ export function PlaybackDisplayPage(): React.JSX.Element {
       : null)
   const albumTracksQuery = useGetSpotifyAlbumTracksQuery(
     playbackContext?.type === 'album' ? playbackContext.id : null,
-    isTracklistTheme && playbackContext?.type === 'album'
+    shouldLoadTracklist && playbackContext?.type === 'album'
   )
   const playlistTracksQuery = useGetSpotifyPlaylistTracksQuery(
     playbackContext?.type === 'playlist' ? playbackContext.id : null,
-    isTracklistTheme && playbackContext?.type === 'playlist'
+    shouldLoadTracklist && playbackContext?.type === 'playlist'
   )
   const activeTracklistQuery =
     playbackContext?.type === 'playlist' ? playlistTracksQuery : albumTracksQuery
@@ -158,7 +158,7 @@ export function PlaybackDisplayPage(): React.JSX.Element {
           canToggleSaved: Boolean(libraryItemUri && libraryItemQuery.data),
           errorMessage:
             playContextTrackMutation.error?.message ??
-            (isTracklistTheme ? activeTracklistQuery.error?.message : null) ??
+            (shouldLoadTracklist ? activeTracklistQuery.error?.message : null) ??
             playbackControlMutation.error?.message ??
             playbackOptionMutation.error?.message ??
             seekMutation.error?.message ??

@@ -54,18 +54,31 @@ export interface PlayerThemeProps {
 
 export type PlayerThemeId =
   | 'ambient'
+  | 'arcade-select'
+  | 'cassette'
   | 'cd-cover'
   | 'default'
   | 'drive'
+  | 'film-strip'
+  | 'hi-fi-rack'
   | 'karaoke'
+  | 'jukebox'
   | 'lyrics'
+  | 'metro-line'
+  | 'minidisc-deck'
   | 'minimalist'
+  | 'orbit'
   | 'poster'
+  | 'record-crate'
+  | 'rocket-league'
+  | 'setlist'
   | 'spotlight'
   | 'tracklist'
+  | 'timeline'
 
 export interface PlayerTheme {
   id: PlayerThemeId
   name: string
   component: ComponentType<PlayerThemeProps>
+  usesTracklist?: boolean
 }
