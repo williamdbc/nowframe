@@ -110,7 +110,16 @@ function createControls(): PlaybackControls {
   }
 }
 
+/**
+ * O tema CD Cover não desenha o favorito: o Figma põe só aleatório, anterior, play,
+ * próxima e repetir na fileira, e o desenho depende dessa simetria. É a única capacidade
+ * que um tema deixa de expor, e fica registrada aqui em vez de silenciosamente ausente.
+ */
+const themesWithoutSavedControl = new Set<string>(['cd-cover'])
+
 describe.each(availableThemes)('$name player theme contract', ({ component: Theme, id }) => {
+  const hasSavedControl = !themesWithoutSavedControl.has(id)
+
   it('renders the required playback content and chrome slots', () => {
     render(
       <Theme
@@ -149,7 +158,9 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     expect(screen.getByRole('button', { name: 'Próxima faixa' })).toBeEnabled()
     expect(screen.getByRole('button', { name: 'Ativar modo aleatório' })).toBeEnabled()
     expect(screen.getByRole('button', { name: 'Ativar repetição' })).toBeEnabled()
-    expect(screen.getByRole('button', { name: 'Adicionar à biblioteca' })).toBeEnabled()
+    if (hasSavedControl) {
+      expect(screen.getByRole('button', { name: 'Adicionar à biblioteca' })).toBeEnabled()
+    }
     expect(screen.queryByText('Nowframe')).not.toBeInTheDocument()
     expect(screen.queryByText('Modo direção')).not.toBeInTheDocument()
     expect(screen.getByText('Conta')).toBeInTheDocument()
@@ -179,14 +190,16 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     await user.click(screen.getByRole('button', { name: 'Próxima faixa' }))
     await user.click(screen.getByRole('button', { name: 'Ativar modo aleatório' }))
     await user.click(screen.getByRole('button', { name: 'Ativar repetição' }))
-    await user.click(screen.getByRole('button', { name: 'Adicionar à biblioteca' }))
+    if (hasSavedControl) {
+      await user.click(screen.getByRole('button', { name: 'Adicionar à biblioteca' }))
+    }
 
     expect(controls.onPrevious).toHaveBeenCalledOnce()
     expect(controls.onPauseOrResume).toHaveBeenCalledOnce()
     expect(controls.onNext).toHaveBeenCalledOnce()
     expect(controls.onToggleShuffle).toHaveBeenCalledOnce()
     expect(controls.onCycleRepeat).toHaveBeenCalledOnce()
-    expect(controls.onToggleSaved).toHaveBeenCalledOnce()
+    if (hasSavedControl) expect(controls.onToggleSaved).toHaveBeenCalledOnce()
   })
 
   it('uses the shared chrome behavior and keeps a fullscreen exit action', async () => {
@@ -237,6 +250,8 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
     expect(screen.getByRole('button', { name: 'Reproduzir' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Ativar modo aleatório' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Ativar repetição' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Adicionar à biblioteca' })).toBeDisabled()
+    if (hasSavedControl) {
+      expect(screen.getByRole('button', { name: 'Adicionar à biblioteca' })).toBeDisabled()
+    }
   })
 })

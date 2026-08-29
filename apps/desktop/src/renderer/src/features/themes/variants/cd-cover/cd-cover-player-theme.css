@@ -1,0 +1,538 @@
+/* Escala responsiva: os valores do Figma (frame de 1440x1080) são o teto. Tudo acompanha
+   a altura da janela, porque é ela que decide se a capa, o texto e os controles ainda
+   cabem empilhados numa coluna centrada. */
+.cd-cover-root {
+  --cd-column: clamp(280px, 55.6vh, 600px);
+  --cd-stack-gap: clamp(28px, 5.65vh, 61px);
+  --cd-block-gap: clamp(16px, 3vh, 32px);
+  --cd-group-gap: clamp(14px, 2.23vh, 24px);
+  --cd-text-progress-gap: clamp(20px, 3.71vh, 40px);
+  --cd-text-gap: clamp(6px, 0.75vh, 8px);
+  --cd-meta-gap: clamp(6px, 0.93vh, 10px);
+  --cd-transport-gap: clamp(20px, 3.71vh, 40px);
+  --cd-transport-inner-gap: clamp(16px, 3vh, 32px);
+  --cd-icon-size: clamp(18px, 2.3vh, 24px);
+  --cd-icon-small: clamp(14px, 1.7vh, 18px);
+  --cd-play-size: clamp(40px, 5.2vh, 56px);
+  --cd-play-glyph-size: clamp(28px, 3.71vh, 40px);
+  --cd-title-size: clamp(18px, 2.23vh, 24px);
+  --cd-body-size: clamp(12px, 1.3vh, 14px);
+  --cd-time-size: clamp(9px, 0.95vh, 10px);
+  --cd-volume-icon-size: clamp(14px, 1.5vh, 16px);
+  --cd-cover-size: clamp(160px, 31.5vh, 340px);
+  /* Derivado da capa, nao um clamp proprio: a proporcao 300/340 do Figma e o que mantem o
+     disco concentrico com a capa em qualquer tamanho de janela. */
+  --cd-disc-size: calc(var(--cd-cover-size) * 300 / 340);
+  background-color: #f6f6f6;
+}
+
+/* O fundo é a capa ampliada muito além da tela e desfocada. O véu branco de 92% deixa
+   passar só um rastro de cor: sem ele a arte competiria com o texto preto, que é a única
+   cor de texto do tema. */
+.cd-cover-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.cd-cover-backdrop-image {
+  position: absolute;
+  inset: -20%;
+  width: 140%;
+  height: 140%;
+  object-fit: cover;
+  filter: blur(30px);
+  animation: cd-cover-backdrop-in 900ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.cd-cover-backdrop-veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+@keyframes cd-cover-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.cd-cover-icon {
+  display: block;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+/* Coluna centrada por margem, não por align-items: numa janela baixa o alinhamento
+   central cortaria o topo em vez de deixar rolar. */
+.cd-cover-stack {
+  position: relative;
+  z-index: 1;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cd-stack-gap);
+  width: var(--cd-column);
+  max-width: 92vw;
+}
+
+/* A capa na frente e o disco saindo por trás dela, à direita. A caixa tem a largura do
+   conjunto: o deslocamento do disco somado ao próprio disco. */
+.cd-cover-media {
+  position: relative;
+  width: calc(var(--cd-cover-size) * 190 / 340 + var(--cd-disc-size));
+  height: var(--cd-cover-size);
+}
+
+.cd-cover-disc {
+  position: absolute;
+  top: calc(var(--cd-cover-size) * 20 / 340);
+  left: calc(var(--cd-cover-size) * 190 / 340);
+  z-index: 0;
+  width: var(--cd-disc-size);
+  height: var(--cd-disc-size);
+  rotate: var(--cd-disc-rotation, 0deg);
+  animation: cd-cover-disc-in 600ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+/* O PNG exportado traz 5% de folga em volta do disco — o grupo do Figma mede 330px para
+   um disco de 300px. A imagem transborda a caixa nessa mesma proporção para que a caixa
+   corresponda ao disco visível, que é o que o posicionamento usa. */
+.cd-cover-disc-image {
+  position: absolute;
+  inset: -5%;
+  width: 110%;
+  height: 110%;
+  /* O preflight do Tailwind aplica `max-width: 100%` a toda <img>. Sem desarmar aqui, a
+     largura fica presa em 100% enquanto a altura vai a 110% e o disco sai oval.
+     `contain` e a segunda trava: com a fonte quadrada, o disco continua redondo mesmo
+     que a caixa deixe de ser. */
+  max-width: none;
+  object-fit: contain;
+}
+
+@keyframes cd-cover-disc-in {
+  from {
+    opacity: 0;
+    translate: calc(var(--cd-disc-size) * -0.06) 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* Capa: borda, sombras e brilho diagonal, todos do Figma. */
+.cd-cover-sleeve {
+  position: relative;
+  z-index: 1;
+  width: var(--cd-cover-size);
+  height: var(--cd-cover-size);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  box-shadow:
+    0 2px 2px 0 rgba(0, 0, 0, 0.05),
+    0 2px 15px 0 rgba(0, 0, 0, 0.08),
+    0 1px 1px 0 rgba(14, 14, 16, 0.04),
+    0 4px 6px 0 rgba(14, 14, 16, 0.04),
+    0 24px 68px 0 rgba(14, 14, 16, 0.04),
+    0 2px 3px 0 rgba(14, 14, 16, 0.04);
+}
+.cd-cover-sleeve-image {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  animation: cd-cover-sleeve-in 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.cd-cover-sleeve-placeholder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.04);
+}
+.cd-cover-sleeve-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
+}
+
+@keyframes cd-cover-sleeve-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* O painel abaixo da capa é uma lista só: o Figma usa espaços diferentes entre cada par
+   de blocos, e a entrada escalonada precisa deles como irmãos diretos. */
+.cd-cover-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.cd-cover-panel > * {
+  animation: cd-cover-rise-in 360ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.cd-cover-panel > :nth-child(1) {
+  animation-delay: 30ms;
+}
+.cd-cover-panel > :nth-child(2) {
+  margin-top: var(--cd-text-progress-gap);
+  animation-delay: 70ms;
+}
+.cd-cover-panel > :nth-child(3) {
+  margin-top: var(--cd-group-gap);
+  animation-delay: 110ms;
+}
+.cd-cover-panel > :nth-child(4) {
+  margin-top: var(--cd-block-gap);
+  animation-delay: 150ms;
+}
+
+@keyframes cd-cover-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cd-cover-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cd-text-gap);
+  width: 100%;
+  color: #000000;
+  text-align: center;
+}
+.cd-cover-artist {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--cd-body-size);
+  font-weight: 500;
+  line-height: 1.286;
+  letter-spacing: -0.01em;
+  opacity: 0.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Título longo para em duas linhas: passando disso o painel cresce e empurra o volume
+   para fora da janela. O recorte do clamp ganha uma folga vertical devolvida por margem
+   negativa, senão o leading cortaria os descendentes da última linha visível. */
+.cd-cover-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  padding-block: 0.1em;
+  margin-block: -0.1em;
+  font-size: var(--cd-title-size);
+  font-weight: 600;
+  line-height: 1.167;
+  letter-spacing: -0.018em;
+}
+
+/* animate-text / per-word-crossfade */
+.cd-cover-reveal-unit {
+  display: inline-block;
+  white-space: pre;
+  animation: cd-cover-per-word-crossfade 400ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes cd-cover-per-word-crossfade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cd-cover-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cd-meta-gap);
+}
+.cd-cover-progress-range {
+  height: 6px;
+}
+.cd-cover-progress-range::-webkit-slider-runnable-track {
+  height: 6px;
+}
+.cd-cover-progress-range::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: -4px;
+  background: #000000;
+  opacity: 1;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.16);
+}
+.cd-cover-progress-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--cd-time-size);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: #000000;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Os botões seguem o mesmo estado dos outros temas, só que em preto. O apagado fica
+   reservado para indisponibilidade real do dispositivo: comando em voo é sinalizado por
+   `data-busy`, senão clicar em aleatório ou repetir derrubava a opacidade e a devolvia,
+   o que se via como uma piscada. */
+.cd-cover-control {
+  --cd-control-size: var(--cd-icon-size);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cd-control-size);
+  height: var(--cd-control-size);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #000000;
+  opacity: 0.4;
+  cursor: pointer;
+  transition:
+    opacity 160ms cubic-bezier(0.2, 0, 0, 1),
+    scale 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+/* Área de toque maior que o glifo, sem inflar o desenho. */
+.cd-cover-control::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--cd-control-size) + 16px);
+  height: calc(var(--cd-control-size) + 16px);
+  transform: translate(-50%, -50%);
+}
+.cd-cover-control--sm {
+  --cd-control-size: var(--cd-icon-small);
+}
+.cd-cover-control:hover,
+.cd-cover-control:focus-visible {
+  opacity: 1;
+}
+.cd-cover-control:active {
+  scale: 0.96;
+}
+.cd-cover-control[data-active='true'] {
+  opacity: 1;
+}
+.cd-cover-control:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 8px;
+}
+.cd-cover-control:disabled:not([data-busy='true']) {
+  opacity: 0.15;
+}
+.cd-cover-control:disabled {
+  cursor: not-allowed;
+}
+.cd-cover-control:disabled:active {
+  scale: 1;
+}
+
+/* O SVG de repetir tem 24x32: o ponto abaixo do glifo marca o modo ligado e só escapa do
+   recorte quando a repetição está ativa. */
+.cd-cover-repeat-clip {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+.cd-cover-control--repeat[data-active='true'] .cd-cover-repeat-clip {
+  overflow: visible;
+}
+.cd-cover-repeat-glyph {
+  width: var(--cd-control-size);
+  height: calc(var(--cd-control-size) * 4 / 3);
+}
+
+/* O play é só o glifo maior, sem pílula. A caixa de 56px do Figma vira área de toque. */
+.cd-cover-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cd-play-size);
+  height: var(--cd-play-size);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #000000;
+  cursor: pointer;
+  transition:
+    scale 180ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.cd-cover-play-glyph {
+  width: var(--cd-play-glyph-size);
+  height: var(--cd-play-glyph-size);
+}
+.cd-cover-play:hover {
+  scale: 1.04;
+}
+.cd-cover-play:active {
+  scale: 0.96;
+}
+.cd-cover-play:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 4px;
+}
+.cd-cover-play:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+  scale: 1;
+}
+
+.cd-cover-volume {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 16px;
+}
+.cd-cover-mute {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cd-volume-icon-size);
+  height: var(--cd-volume-icon-size);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #000000;
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 160ms cubic-bezier(0.2, 0, 0, 1);
+  flex-shrink: 0;
+}
+.cd-cover-mute:hover,
+.cd-cover-mute:focus-visible,
+.cd-cover-mute[data-muted='true'] {
+  opacity: 1;
+}
+.cd-cover-volume-track {
+  position: relative;
+  height: 4px;
+  min-width: 0;
+  flex: 1;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.12);
+}
+.cd-cover-volume-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  border-radius: 999px;
+  background: #000000;
+  opacity: 0.9;
+}
+.cd-cover-volume-thumb {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #000000;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.16);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+/* O range nativo fica transparente sobre a trilha pintada: preserva teclado e leitor de
+   tela e deixa o desenho do Figma por conta do CSS. */
+.cd-cover-volume-range {
+  position: absolute;
+  inset: -8px 0;
+  width: 100%;
+  height: calc(100% + 16px);
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.cd-cover-nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(16px);
+  cursor: pointer;
+  transition:
+    color 160ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    scale 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.cd-cover-nav-button:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+  color: #000000;
+}
+.cd-cover-nav-button:active {
+  scale: 0.96;
+}
+.cd-cover-nav-button:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+.cd-cover-error {
+  font-size: var(--cd-time-size);
+  font-weight: 500;
+  line-height: 1.4;
+  color: #b91c1c;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cd-cover-backdrop-image,
+  .cd-cover-sleeve-image,
+  .cd-cover-disc,
+  .cd-cover-panel > *,
+  .cd-cover-reveal-unit {
+    animation: none !important;
+  }
+}

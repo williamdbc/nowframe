@@ -1,4 +1,5 @@
 import { AmbientPlayerTheme } from '@/features/themes/variants/ambient/ambient-player-theme'
+import { CdCoverPlayerTheme } from '@/features/themes/variants/cd-cover/cd-cover-player-theme'
 import { DefaultPlayerTheme } from '@/features/themes/variants/default/default-player-theme'
 import { DrivePlayerTheme } from '@/features/themes/variants/drive/drive-player-theme'
 import { KaraokePlayerTheme } from '@/features/themes/variants/karaoke/karaoke-player-theme'
@@ -17,6 +18,11 @@ export const themeRegistry = {
     id: 'ambient',
     name: 'Ambient',
     component: AmbientPlayerTheme
+  },
+  'cd-cover': {
+    id: 'cd-cover',
+    name: 'CD Cover',
+    component: CdCoverPlayerTheme
   },
   default: {
     id: defaultThemeId,

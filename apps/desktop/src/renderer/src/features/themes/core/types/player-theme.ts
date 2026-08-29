@@ -54,6 +54,7 @@ export interface PlayerThemeProps {
 
 export type PlayerThemeId =
   | 'ambient'
+  | 'cd-cover'
   | 'default'
   | 'drive'
   | 'karaoke'
