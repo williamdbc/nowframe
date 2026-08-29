@@ -12,8 +12,8 @@ O estado base vem de `GET /me/player` e é reduzido no processo main para conte�
 
 | Situação                         |             Intervalo |
 | -------------------------------- | --------------------: |
-| Reprodução ativa                 |            2 segundos |
-| Pausado, inativo ou sem playback |            5 segundos |
+| Reprodução ativa                 |          1,5 segundos |
+| Pausado, inativo ou sem playback |          2,5 segundos |
 | Últimos 2,5 segundos da faixa    |                300 ms |
 | Falhas consecutivas              | 2 s, 5 s, 15 s e 30 s |
 
@@ -24,7 +24,7 @@ Além do intervalo adaptativo:
 - ao recuperar foco, só há nova consulta se o cache tiver pelo menos dois segundos;
 - o campo `timestamp` do Spotify serve como sinal de mudança, nunca como base para calcular progresso.
 
-Mudanças feitas diretamente no Spotify são percebidas na próxima consulta. Em reprodução normal isso significa até aproximadamente dois segundos; enquanto o player está inativo, até cinco segundos.
+Mudanças feitas diretamente no Spotify são percebidas na próxima consulta. Em reprodução normal isso significa até aproximadamente 1,5 segundo; enquanto o player está inativo, até 2,5 segundos. Esses intervalos equilibram resposta visual e consumo da quota de Development Mode.
 
 ## Relógio local
 
@@ -40,8 +40,7 @@ O relógio compartilhado:
 ## Comandos e estado otimista
 
 - **Play/pause:** atualiza imediatamente o estado e a âncora do progresso; falha restaura o cache anterior.
-- **Próxima faixa:** usa o primeiro item da fila em cache para trocar metadados imediatamente quando possível.
-- **Anterior/próxima:** reconcilia o servidor em até quatro consultas nos offsets 0, 250, 750 e 1.500 ms.
+- **Anterior/próxima:** mantém capa, título e artista atuais até o Spotify confirmar a troca e reconcilia o servidor em até quatro consultas nos offsets 0, 200, 500 e 1.000 ms, medidos desde o envio do comando.
 - **Seek:** move o cache imediatamente e envia a posição final ao encerrar a interação.
 - **Volume:** reflete o valor local durante o arraste, limita envios a um a cada 200 ms e confirma o último valor ao soltar.
 - **Mudo:** envia volume zero e mantém em memória o último volume audível para restauração.
@@ -49,6 +48,12 @@ O relógio compartilhado:
 - **Favorito:** consulta a biblioteca uma vez por URI, mantém o resultado em cache e faz rollback se salvar ou remover falhar.
 
 Respostas antigas que contradizem uma expectativa otimista são descartadas até o Spotify publicar o novo estado, evitando piscadas e rollbacks temporários.
+
+A fila retornada pelo Spotify não é usada para antecipar os metadados de próxima faixa. Ativar ou desativar o modo aleatório pode reorganizar a fila sem alterar a faixa atual, deixando qualquer cache indexado apenas pelo conteúdo atual temporariamente obsoleto. Nesse cenário, preservar a faixa exibida por alguns milissegundos é preferível a mostrar uma capa incorreta e corrigi-la depois.
+
+### Dívida técnica conhecida
+
+[`PlaybackDisplayPage`](../../apps/desktop/src/renderer/src/features/playback/components/playback-display-page.tsx) ainda aquece uma query de fila a cada identidade de conteúdo por meio de `useGetSpotifyPlaybackQueueQuery`. Esse cache deixou de participar dos comandos e não é consumido pelos temas atuais; portanto, não é uma dependência arquitetural. Remover essa chamada em uma mudança de código posterior reduzirá uma requisição ao Spotify por troca de faixa.
 
 ## Limites e quota do Spotify
 
@@ -94,5 +99,5 @@ LRCLIB é uma integração externa independente do Spotify; disponibilidade e co
 ## Documentos relacionados
 
 - [Visão geral da arquitetura](overview.md)
-- [Controle remoto com polling adaptativo](../decisions/0003-remote-control-with-adaptive-polling.md)
+- [Sincronização responsiva sem antecipar metadados](../decisions/0005-responsive-sync-without-metadata-prediction.md)
 - [Referência de configuração](../reference/configuration.md)

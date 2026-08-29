@@ -97,7 +97,7 @@ O router usa hash history porque o build empacotado carrega o renderer por `file
 
 1. TanStack Query consulta o estado reduzido do player por IPC.
 2. Um relógio monotônico local projeta o progresso entre respostas.
-3. Comandos atualizam o cache de forma otimista quando a intenção é conhecida e reconciliam com o Spotify.
+3. Comandos com resultado determinístico atualizam o cache de forma otimista; trocas de faixa preservam os metadados atuais até o Spotify confirmar o novo conteúdo.
 4. O tema ativo recebe o mesmo contrato de dados e ações, sem conhecer IPC ou tokens.
 5. O processo main controla fullscreen; eventos IPC mantêm a interface sincronizada e `Escape` encerra a apresentação.
 
@@ -121,4 +121,5 @@ O router usa hash history porque o build empacotado carrega o renderer por `file
 - [Sincronização e integrações](playback-and-integrations.md)
 - [Sistema de temas](theme-system.md)
 - [PKCE e fronteira entre processos](../decisions/0002-pkce-and-electron-process-boundary.md)
+- [Sincronização responsiva sem antecipar metadados](../decisions/0005-responsive-sync-without-metadata-prediction.md)
 - [Referência de configuração](../reference/configuration.md)
