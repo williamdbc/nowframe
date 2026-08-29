@@ -58,6 +58,8 @@ const withTrack = (progressMs: number, durationMs: number): PlaybackState => ({
 
 describe('getSpotifyPlaybackRefetchInterval', () => {
   it('uses adaptive intervals for active and idle synchronization', () => {
+    expect(activePlaybackRefetchIntervalMs).toBe(1_500)
+    expect(idlePlaybackRefetchIntervalMs).toBe(2_500)
     expect(getSpotifyPlaybackRefetchInterval(playback, 0, 1_000)).toBe(
       activePlaybackRefetchIntervalMs
     )
