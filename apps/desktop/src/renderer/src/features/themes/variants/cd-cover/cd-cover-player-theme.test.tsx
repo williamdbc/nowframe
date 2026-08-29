@@ -195,6 +195,18 @@ describe('CdCoverPlayerTheme', () => {
     expect(screen.getByText('Koi No Yokan')).toBeInTheDocument()
   })
 
+  /**
+   * Sem amostra da capa nao ha camada de cor. Uma cor neutra de reserva seria pior que
+   * nenhuma: `color` com cinza *tira* a iridescencia e o disco fica prateado, o que parece
+   * defeito em vez de ausencia de cor.
+   */
+  it('leaves the disc untinted while the cover has not been sampled', () => {
+    const { container } = renderTheme()
+
+    expect(container.querySelector('.cd-cover-disc-tint')).toBeNull()
+    expect(container.querySelector('.cd-cover-disc-image')).toBeInTheDocument()
+  })
+
   it('marks a pending option command as busy instead of dimming it', () => {
     renderTheme(false, { isPlaybackOptionPending: true })
 

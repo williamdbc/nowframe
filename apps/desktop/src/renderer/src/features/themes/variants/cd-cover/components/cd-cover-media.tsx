@@ -2,6 +2,7 @@ import { Disc3 } from 'lucide-react'
 import { useRef } from 'react'
 
 import discImage from '../assets/disc.png'
+import { useCdCoverAccent } from '../hooks/useCdCoverAccent'
 import { useCdDiscRotation } from '../hooks/useCdDiscRotation'
 
 interface CdCoverMediaProps {
@@ -26,11 +27,25 @@ export function CdCoverMedia({
 }: CdCoverMediaProps): React.JSX.Element {
   const discRef = useRef<HTMLDivElement>(null)
   useCdDiscRotation(discRef)
+  const accentColor = useCdCoverAccent(imageUrl)
 
   return (
     <div className="cd-cover-media">
       <div aria-hidden="true" className="cd-cover-disc" ref={discRef}>
         <img alt="" className="cd-cover-disc-image" src={discImage} />
+        {/* A cor da capa entra por cima, recortada pela forma do proprio disco. Sem cor
+            amostrada nao ha camada: o disco fica com a iridescencia natural. */}
+        {accentColor && (
+          <div
+            className="cd-cover-disc-tint"
+            style={{
+              backgroundColor: accentColor,
+              // O Vite inlina o PNG como URL de modulo, entao a mascara so pode vir do JS.
+              maskImage: `url("${discImage}")`,
+              WebkitMaskImage: `url("${discImage}")`
+            }}
+          />
+        )}
       </div>
 
       <div className="cd-cover-sleeve">
