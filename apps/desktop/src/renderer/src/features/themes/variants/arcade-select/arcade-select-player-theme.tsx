@@ -37,10 +37,6 @@ export function ArcadeSelectPlayerTheme({
           <b>1 PLAYER</b>
         </header>
         <section className="arcade-current" aria-label="Seleção atual">
-          <div className="arcade-rank">
-            <span>NOW</span>
-            <strong>01</strong>
-          </div>
           <div className="arcade-cover">
             {content.imageUrl ? (
               <img
