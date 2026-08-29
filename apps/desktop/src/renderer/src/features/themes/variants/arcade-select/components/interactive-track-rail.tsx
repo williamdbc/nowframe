@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
 
-import type { SpotifyTracklistTrack } from '../../../../../../contracts/nowframe-api'
+import type { SpotifyTracklistTrack } from '../../../../../../../contracts/nowframe-api'
 
 interface InteractiveTrackRailProps {
   className?: string

@@ -59,22 +59,14 @@ export type PlayerThemeId =
   | 'cd-cover'
   | 'default'
   | 'drive'
-  | 'film-strip'
-  | 'hi-fi-rack'
   | 'karaoke'
-  | 'jukebox'
   | 'lyrics'
-  | 'metro-line'
-  | 'minidisc-deck'
   | 'minimalist'
-  | 'orbit'
   | 'poster'
-  | 'record-crate'
   | 'rocket-league'
   | 'setlist'
   | 'spotlight'
   | 'tracklist'
-  | 'timeline'
 
 export interface PlayerTheme {
   id: PlayerThemeId

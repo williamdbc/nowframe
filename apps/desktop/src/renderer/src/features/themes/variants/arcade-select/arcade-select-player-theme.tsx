@@ -2,11 +2,11 @@ import { Disc3, Gamepad2 } from 'lucide-react'
 
 import { ConceptPlaybackHud } from '@/features/themes/core/components/concept-playback-hud'
 import { ConceptThemeChrome } from '@/features/themes/core/components/concept-theme-chrome'
-import { InteractiveTrackRail } from '@/features/themes/core/components/interactive-track-rail'
 import type { PlayerThemeProps } from '@/features/themes/core/types/player-theme'
 import { getPlayerThemeContent } from '@/features/themes/core/utils/get-player-theme-content'
 import '@/features/themes/core/components/concept-theme-controls.css'
 
+import { InteractiveTrackRail } from './components/interactive-track-rail'
 import './arcade-select-player-theme.css'
 
 export function ArcadeSelectPlayerTheme({

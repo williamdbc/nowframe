@@ -9,7 +9,7 @@ O aplicativo é um controle remoto visual: o áudio continua no dispositivo ativ
 - Aplicação desktop para macOS, Windows e Linux com Electron, React, Vite e TypeScript.
 - Login Spotify com Authorization Code + PKCE, sem Client Secret no aplicativo.
 - Controles de reprodução, volume, aleatório, repetição e biblioteca.
-- Vinte e dois temas: Ambient, Arcade Select, Cassette, CD Cover, Default, Drive, Film Strip, Hi-Fi Rack, Jukebox, Karaoke, Lyrics, Metro Line, MiniDisc Deck, Minimalist, Orbit, Poster, Record Crate, Rocket League, Setlist, Spotlight, Timeline e Tracklist.
+- Quatorze temas: Ambient, Arcade Select, Cassette, CD Cover, Default, Drive, Karaoke, Lyrics, Minimalist, Poster, Rocket League, Setlist, Spotlight e Tracklist.
 - Letras sincronizadas via LRCLIB quando disponíveis.
 
 ## Estrutura do repositório

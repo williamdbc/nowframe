@@ -23,27 +23,19 @@ features/themes/
     ├── cd-cover/
     ├── default/
     ├── drive/
-    ├── film-strip/
-    ├── hi-fi-rack/
-    ├── jukebox/
     ├── karaoke/
     ├── lyrics/
-    ├── metro-line/
-    ├── minidisc-deck/
     ├── minimalist/
-    ├── orbit/
     ├── poster/
-    ├── record-crate/
     ├── rocket-league/
     ├── setlist/
     ├── spotlight/
-    ├── timeline/
     └── tracklist/
 ```
 
 `core` define o contrato e o seletor. `variants` contém tudo que pertence ao desenho de um tema. Componentes de playback realmente compartilhados, como o range de progresso, continuam na feature `playback` e aceitam classes e cores específicas.
 
-Conceitos que repetem exatamente a mesma interação podem possuir uma infraestrutura visual em `core`. Os temas com tracklist conceitual reutilizam `InteractiveTrackRail` para clique, centralização, arraste e inércia, e desenham os cartões inteiramente em sua variante. `ConceptPlaybackHud` e `ConceptThemeChrome` preservam o contrato de controles e chrome sem impor a identidade visual.
+Conceitos que repetem exatamente a mesma interação podem possuir uma infraestrutura visual em `core`. `ConceptPlaybackHud` e `ConceptThemeChrome` preservam o contrato de controles e chrome sem impor a identidade visual. O trilho arrastável pertence ao Arcade Select enquanto não houver uma segunda variante que reutilize seu comportamento.
 
 ## Contrato do tema
 
@@ -61,30 +53,22 @@ Temas não chamam `window.nowframe`, services nem TanStack Query. A página `Pla
 
 ## Temas atuais
 
-| Tema          | Característica principal                                                | Dados condicionais |
-| ------------- | ----------------------------------------------------------------------- | ------------------ |
-| Ambient       | Cor extraída da capa, modo imersivo e letra opcional                    | Letras             |
-| Arcade Select | Seletor de jogo de ritmo com cartões em perspectiva                     | Álbum ou playlist  |
-| Cassette      | Fita física com carretéis e distribuição animada pelo progresso         | Nenhum             |
-| CD Cover      | Capa física com disco animado pela posição real da reprodução           | Nenhum             |
-| Default       | Capa e informações em duas colunas                                      | Nenhum             |
-| Drive         | Controles amplos para leitura à distância                               | Nenhum             |
-| Film Strip    | Faixas como fotogramas atravessando a janela de um projetor             | Álbum ou playlist  |
-| Hi-Fi Rack    | Receiver, medidores analógicos, equalizador e display fluorescente      | Álbum ou playlist  |
-| Jukebox       | Arco de neon e cartões físicos numerados                                | Álbum ou playlist  |
-| Karaoke       | Trilho de frases e preenchimento por palavra quando disponível          | Letras             |
-| Lyrics        | Letra sincronizada em destaque                                          | Letras             |
-| Metro Line    | Faixas como estações de uma linha arrastável                            | Álbum ou playlist  |
-| MiniDisc Deck | Aparelho metálico, disco giratório, LCD âmbar e VU meters               | Álbum ou playlist  |
-| Minimalist    | Informação e transporte com baixa densidade visual                      | Nenhum             |
-| Orbit         | Faixa atual no núcleo e tracklist em órbita arrastável                  | Álbum ou playlist  |
-| Poster        | Capa em tela inteira, degradê derivado e contraste automático           | Nenhum             |
-| Record Crate  | Capas sobrepostas numa caixa, com a faixa atual projetada para a frente | Álbum ou playlist  |
-| Rocket League | Arena azul e laranja, placar central, bola de progresso e boost         | Nenhum             |
-| Setlist       | Papel de palco com faixas anteriores riscadas e atual iluminada         | Álbum ou playlist  |
-| Spotlight     | Capa central sobre arte desfocada                                       | Nenhum             |
-| Timeline      | Linha cuja largura representa proporcionalmente a duração das faixas    | Álbum ou playlist  |
-| Tracklist     | Carrossel arrastável de faixas do álbum ou playlist                     | Álbum ou playlist  |
+| Tema          | Característica principal                                        | Dados condicionais |
+| ------------- | --------------------------------------------------------------- | ------------------ |
+| Ambient       | Cor extraída da capa, modo imersivo e letra opcional            | Letras             |
+| Arcade Select | Seletor de jogo de ritmo com cartões em perspectiva             | Álbum ou playlist  |
+| Cassette      | Fita física com carretéis e distribuição animada pelo progresso | Nenhum             |
+| CD Cover      | Capa física com disco animado pela posição real da reprodução   | Nenhum             |
+| Default       | Capa e informações em duas colunas                              | Nenhum             |
+| Drive         | Controles amplos para leitura à distância                       | Nenhum             |
+| Karaoke       | Trilho de frases e preenchimento por palavra quando disponível  | Letras             |
+| Lyrics        | Letra sincronizada em destaque                                  | Letras             |
+| Minimalist    | Informação e transporte com baixa densidade visual              | Nenhum             |
+| Poster        | Capa em tela inteira, degradê derivado e contraste automático   | Nenhum             |
+| Rocket League | Arena azul e laranja, placar central, bola de progresso e boost | Nenhum             |
+| Setlist       | Papel de palco com faixas anteriores riscadas e atual iluminada | Álbum ou playlist  |
+| Spotlight     | Capa central sobre arte desfocada                               | Nenhum             |
+| Tracklist     | Carrossel arrastável de faixas do álbum ou playlist             | Álbum ou playlist  |
 
 Dados condicionais são carregados apenas para os temas que os usam. A capacidade `usesTracklist` é declarada no registro e habilita a consulta de álbum ou playlist sem acoplar a página a IDs específicos. Trocar de tema não duplica playback, perfil, biblioteca ou estado da janela.
 
@@ -105,7 +89,7 @@ As classes `player-theme-root` e `player-theme-chrome` formam o comportamento co
 
 O registro central é a fonte da lista exibida no seletor. O identificador ativo fica em `localStorage` sob `nowframe:selected-theme`; valores desconhecidos voltam para `default`.
 
-Adicionar uma variante exige atualizar o union `PlayerThemeId` e o `themeRegistry`. O teste de contrato percorre `availableThemes`, renderiza cada componente e verifica conteúdo, transporte, favorito, erros, estados vazios, chrome e saída do fullscreen. As interações de tracklist compartilhadas têm testes próprios para clique, limiar de arraste, supressão de clique acidental e inércia; interações particulares, como a rotação de Orbit, permanecem testadas na variante.
+Adicionar uma variante exige atualizar o union `PlayerThemeId` e o `themeRegistry`. O teste de contrato percorre `availableThemes`, renderiza cada componente e verifica conteúdo, transporte, favorito, erros, estados vazios, chrome e saída do fullscreen. O seletor arrastável do Arcade Select possui testes próprios para clique, limiar de arraste, supressão de clique acidental e inércia.
 
 ## Documentos relacionados
 

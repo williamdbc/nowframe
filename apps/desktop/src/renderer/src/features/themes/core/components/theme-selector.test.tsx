@@ -47,19 +47,11 @@ describe('ThemeSelector', () => {
     expect(screen.getByRole('menuitemradio', { name: 'Karaoke' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Lyrics' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'CD Cover' })).toBeVisible()
-    expect(screen.getByRole('menuitemradio', { name: 'Film Strip' })).toBeVisible()
-    expect(screen.getByRole('menuitemradio', { name: 'Hi-Fi Rack' })).toBeVisible()
-    expect(screen.getByRole('menuitemradio', { name: 'Jukebox' })).toBeVisible()
-    expect(screen.getByRole('menuitemradio', { name: 'Metro Line' })).toBeVisible()
-    expect(screen.getByRole('menuitemradio', { name: 'MiniDisc Deck' })).toBeVisible()
-    expect(screen.getByRole('menuitemradio', { name: 'Orbit' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Poster' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Rocket League' })).toBeVisible()
-    expect(screen.getByRole('menuitemradio', { name: 'Record Crate' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Setlist' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Spotlight' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Tracklist' })).toBeVisible()
-    expect(screen.getByRole('menuitemradio', { name: 'Timeline' })).toBeVisible()
 
     await user.click(screen.getByRole('menuitemradio', { name: 'Drive' }))
     expect(onSelectTheme).toHaveBeenCalledWith('drive')
@@ -70,14 +62,14 @@ describe('ThemeSelector', () => {
     const user = userEvent.setup()
 
     render(
-      <ThemeSelector activeThemeId="timeline" onSelectTheme={vi.fn()} themes={availableThemes} />
+      <ThemeSelector activeThemeId="tracklist" onSelectTheme={vi.fn()} themes={availableThemes} />
     )
 
-    await user.click(screen.getByRole('button', { name: 'Timeline' }))
+    await user.click(screen.getByRole('button', { name: 'Tracklist' }))
 
     const menu = screen.getByRole('menu', { name: 'Temas' })
     const scrollContainer = menu.firstElementChild
-    const activeTheme = screen.getByRole('menuitemradio', { name: 'Timeline' })
+    const activeTheme = screen.getByRole('menuitemradio', { name: 'Tracklist' })
 
     expect(scrollContainer).toHaveClass('overflow-y-auto')
     expect(scrollContainer).toHaveClass('max-h-[min(70vh,28rem)]')
