@@ -23,16 +23,28 @@
      escolhe sobre ela. Os valores abaixo valem so antes da primeira amostragem. */
   --poster-accent-rgb: 27 26 26;
   --poster-on-accent-rgb: 255 255 255;
+  --poster-cover-blur: 40px;
   background-color: rgb(var(--poster-accent-rgb));
 }
 
-/* A capa preenche a tela e é recortada, não desfocada — é a arte que domina. */
+/* A capa preenche a tela, desfocada e ampliada: a arte vira atmosfera, e o degradê
+   encontra uma superfície sem detalhe competindo com o texto.
+ *
+ * A ampliação sai de um inset negativo, não de `scale`. `blur(40px)` é um gaussiano de
+ * desvio 40px, então a imagem esmaece de fora para dentro de cada borda; a margem
+ * precisa cobrir essa franja. Com `scale` a margem seria uma fração da janela — 10% de
+ * uma janela de 720px daria só 36px por borda, e a franja apareceria no topo. Com o
+ * inset ela é constante, ancorada no próprio raio do desfoque.
+ *
+ * Elemento substituído posicionado precisa de largura e altura explícitas: com
+ * `width: auto` o navegador usaria o tamanho intrínseco da imagem e ignoraria o inset. */
 .poster-cover-image {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: calc(var(--poster-cover-blur) * -2);
+  width: calc(100% + var(--poster-cover-blur) * 4);
+  height: calc(100% + var(--poster-cover-blur) * 4);
   object-fit: cover;
+  filter: blur(var(--poster-cover-blur));
   animation: poster-cover-in 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 .poster-cover-placeholder {
@@ -44,14 +56,16 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
+/* A entrada anima `filter`, então precisa assentar no desfoque de repouso: terminar em
+   `blur(0)` sobrescreveria o desfoque do elemento e a capa ficaria nítida. */
 @keyframes poster-cover-in {
   from {
     opacity: 0;
-    filter: blur(4px);
+    filter: blur(calc(var(--poster-cover-blur) + 16px));
   }
   to {
     opacity: 1;
-    filter: blur(0);
+    filter: blur(var(--poster-cover-blur));
   }
 }
 
