@@ -68,9 +68,12 @@ export type PlayerThemeId =
   | 'spotlight'
   | 'tracklist'
 
+export type PlayerThemeCategory = 'main' | 'conceptual'
+
 export interface PlayerTheme {
   id: PlayerThemeId
   name: string
+  category: PlayerThemeCategory
   component: ComponentType<PlayerThemeProps>
   usesTracklist?: boolean
 }

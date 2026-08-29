@@ -40,6 +40,8 @@ describe('ThemeSelector', () => {
 
     await user.click(screen.getByRole('button', { name: 'Default' }))
     expect(screen.getByRole('menu', { name: 'Temas' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Principais' })).toBeVisible()
+    expect(screen.getByRole('group', { name: 'Conceituais' })).toBeVisible()
     expect(screen.getAllByRole('menuitemradio')).toHaveLength(availableThemes.length)
     expect(screen.getByRole('menuitemradio', { name: 'Ambient' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Arcade Select' })).toBeVisible()

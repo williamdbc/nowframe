@@ -21,73 +21,87 @@ export const themeRegistry = {
   ambient: {
     id: 'ambient',
     name: 'Ambient',
+    category: 'main',
     component: AmbientPlayerTheme
   },
   'arcade-select': {
     id: 'arcade-select',
     name: 'Arcade Select',
+    category: 'conceptual',
     component: ArcadeSelectPlayerTheme,
     usesTracklist: true
   },
   cassette: {
     id: 'cassette',
     name: 'Cassette',
+    category: 'conceptual',
     component: CassettePlayerTheme
   },
   'cd-cover': {
     id: 'cd-cover',
     name: 'CD Cover',
+    category: 'main',
     component: CdCoverPlayerTheme
   },
   default: {
     id: defaultThemeId,
     name: 'Default',
+    category: 'main',
     component: DefaultPlayerTheme
   },
   drive: {
     id: 'drive',
     name: 'Drive',
+    category: 'main',
     component: DrivePlayerTheme
   },
   karaoke: {
     id: 'karaoke',
     name: 'Karaoke',
+    category: 'main',
     component: KaraokePlayerTheme
   },
   lyrics: {
     id: 'lyrics',
     name: 'Lyrics',
+    category: 'main',
     component: LyricsPlayerTheme
   },
   minimalist: {
     id: 'minimalist',
     name: 'Minimalist',
+    category: 'main',
     component: MinimalistPlayerTheme
   },
   poster: {
     id: 'poster',
     name: 'Poster',
+    category: 'main',
     component: PosterPlayerTheme
   },
   'rocket-league': {
     id: 'rocket-league',
     name: 'Rocket League',
+    category: 'conceptual',
     component: RocketLeaguePlayerTheme
   },
   setlist: {
     id: 'setlist',
     name: 'Setlist',
+    category: 'main',
     component: SetlistPlayerTheme,
     usesTracklist: true
   },
   spotlight: {
     id: 'spotlight',
     name: 'Spotlight',
+    category: 'main',
     component: SpotlightPlayerTheme
   },
   tracklist: {
     id: 'tracklist',
     name: 'Tracklist',
+    category: 'main',
     component: TracklistPlayerTheme,
     usesTracklist: true
   }
