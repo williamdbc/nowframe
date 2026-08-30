@@ -50,8 +50,8 @@ export function PlaybackDisplayPage(): React.JSX.Element {
   // A posição viva sai do relógio compartilhado, não de um tick que re-renderiza a página.
   useSyncPlaybackClock(playback)
 
-  // Mantém a fila em cache por faixa. É o que permite ao `next` trocar os metadados na
-  // hora, em vez de esperar o Spotify publicar o novo estado.
+  // Esta query de fila ainda é aquecida por identidade de conteúdo, mas não participa
+  // mais da troca de metadados. A arquitetura registra sua remoção como dívida técnica.
   useGetSpotifyPlaybackQueueQuery(getPlaybackContentKey(playback))
 
   const shouldLoadTracklist = selectedTheme.activeTheme.usesTracklist === true

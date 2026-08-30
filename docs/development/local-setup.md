@@ -7,7 +7,7 @@
 - Um aplicativo Spotify em Development Mode ou outro modo compatível.
 - Um dispositivo Spotify capaz de iniciar uma reprodução para testar o controle remoto.
 
-No Development Mode, o proprietário do aplicativo precisa atender aos requisitos atuais do Spotify e cada usuário de teste deve estar na allowlist. Consulte [Quota modes](https://developer.spotify.com/documentation/web-api/concepts/quota-modes) porque limites e critérios podem mudar.
+No Development Mode, o proprietário do aplicativo precisa ter Spotify Premium ativo. Atualmente, até cinco usuários autenticados podem usar o aplicativo e cada usuário de teste precisa estar na allowlist. Consulte [Quota modes](https://developer.spotify.com/documentation/web-api/concepts/quota-modes), porque limites e critérios podem mudar.
 
 ## Configurar o Spotify Dashboard
 
@@ -23,7 +23,7 @@ No Development Mode, o proprietário do aplicativo precisa atender aos requisito
 
 O redirect usa loopback HTTP porque o callback acontece na máquina local. `localhost`, outra porta, barra final diferente ou caminho diferente não correspondem à configuração padrão.
 
-Quotas de Development Mode são contabilizadas por conta de desenvolvedor. Para trabalho simultâneo sem compartilhar a mesma quota, cada colaborador pode criar seu aplicativo Spotify em sua própria conta e configurar o Client ID localmente.
+Quotas de Development Mode são contabilizadas por conta de desenvolvedor, não por Client ID. Criar vários aplicativos na mesma conta continua consumindo o mesmo orçamento. Para trabalho simultâneo sem compartilhar a quota, cada colaborador pode criar seu aplicativo Spotify em sua própria conta de desenvolvedor e configurar o Client ID localmente.
 
 ## Instalar e executar
 
