@@ -85,7 +85,7 @@ Na janela normal:
 - os controles superiores iniciam transparentes e aparecem por hover ou foco;
 - foco por teclado mantém as ações visíveis.
 
-Em fullscreen, a página entrega slots vazios. Cada tema mostra o controle compartilhado para sair; Ambient também pode mostrar sua ação de letra. `Escape` encerra o modo em qualquer tema e uma dica temporária aparece ao entrar.
+Em fullscreen, a conexão do lado esquerdo desaparece. Seletor de tema e perfil continuam disponíveis no hover ou foco, e cada tema troca a ação de entrada pelo controle compartilhado para sair; Ambient também mantém sua ação opcional de letra. `Escape` encerra o modo em qualquer tema e uma dica temporária aparece ao entrar.
 
 As classes `player-theme-root` e `player-theme-chrome` formam o comportamento compartilhado. Variantes podem adicionar suas próprias classes visuais sem recriar a regra de visibilidade.
 

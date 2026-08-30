@@ -53,10 +53,10 @@ const chrome: PlayerThemeChrome = {
 }
 
 const fullscreenChrome: PlayerThemeChrome = {
-  accountMenu: null,
+  accountMenu: <span>Conta</span>,
   connectionStatus: null,
   fullscreenControl: null,
-  themeSelector: null
+  themeSelector: <span>Temas</span>
 }
 
 const tracklist = {
@@ -225,9 +225,9 @@ describe.each(availableThemes)('$name player theme contract', ({ component: Them
 
     expect(container.querySelector('.player-theme-root')).toBeInTheDocument()
     expect(container.querySelectorAll('.player-theme-chrome')).toHaveLength(2)
-    expect(screen.queryByText('Conta')).not.toBeInTheDocument()
+    expect(screen.getByText('Conta')).toBeInTheDocument()
     expect(screen.queryByText('Conectado')).not.toBeInTheDocument()
-    expect(screen.queryByText('Temas')).not.toBeInTheDocument()
+    expect(screen.getByText('Temas')).toBeInTheDocument()
     expect(screen.queryByText('Tela cheia')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Mostrar letra' }) !== null).toBe(id === 'ambient')
 

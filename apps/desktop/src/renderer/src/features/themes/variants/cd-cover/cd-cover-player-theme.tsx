@@ -46,8 +46,6 @@ export function CdCoverPlayerTheme({
       >
         {chrome.themeSelector}
         {chrome.accountMenu}
-        {/* Em tela cheia a moldura do app não entrega chrome nenhum, então a
-            saída fica por conta do tema — é o único caminho de volta. */}
         {isFullScreen ? (
           <FullscreenExitControl
             className="cd-cover-nav-button"

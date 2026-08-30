@@ -113,39 +113,32 @@ export function PlaybackDisplayPage(): React.JSX.Element {
 
   const playbackStatus: PlaybackLoadStatus =
     playbackQuery.data !== undefined ? 'ready' : playbackQuery.isError ? 'error' : 'loading'
-  const chrome = presentationMode.isFullScreen
-    ? {
-        accountMenu: null,
-        connectionStatus: null,
-        fullscreenControl: null,
-        themeSelector: null
-      }
-    : {
-        accountMenu: (
-          <SpotifyProfileMenu
-            profile={profileQuery.data ?? null}
-            isLoading={profileQuery.isPending}
-            isError={profileQuery.isError}
-            isLoggingOut={logoutMutation.isPending}
-            onRetry={() => void profileQuery.refetch()}
-            onLogout={logoutFromSpotify}
-          />
-        ),
-        connectionStatus: <SpotifyConnectionStatus />,
-        fullscreenControl: (
-          <FullscreenControl
-            isEnteringFullScreen={presentationMode.isTransitioning}
-            onEnterFullScreen={presentationMode.enterFullScreen}
-          />
-        ),
-        themeSelector: (
-          <ThemeSelector
-            activeThemeId={selectedTheme.activeThemeId}
-            onSelectTheme={selectedTheme.selectTheme}
-            themes={availableThemes}
-          />
-        )
-      }
+  const chrome = {
+    accountMenu: (
+      <SpotifyProfileMenu
+        profile={profileQuery.data ?? null}
+        isLoading={profileQuery.isPending}
+        isError={profileQuery.isError}
+        isLoggingOut={logoutMutation.isPending}
+        onRetry={() => void profileQuery.refetch()}
+        onLogout={logoutFromSpotify}
+      />
+    ),
+    connectionStatus: presentationMode.isFullScreen ? null : <SpotifyConnectionStatus />,
+    fullscreenControl: presentationMode.isFullScreen ? null : (
+      <FullscreenControl
+        isEnteringFullScreen={presentationMode.isTransitioning}
+        onEnterFullScreen={presentationMode.enterFullScreen}
+      />
+    ),
+    themeSelector: (
+      <ThemeSelector
+        activeThemeId={selectedTheme.activeThemeId}
+        onSelectTheme={selectedTheme.selectTheme}
+        themes={availableThemes}
+      />
+    )
+  }
 
   return (
     <>
