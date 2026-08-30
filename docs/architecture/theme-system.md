@@ -38,7 +38,7 @@ features/themes/
 
 `core` define o contrato e o seletor. `variants` contém tudo que pertence ao desenho de um tema. Componentes de playback realmente compartilhados, como o range de progresso, continuam na feature `playback` e aceitam classes e cores específicas.
 
-A derivação de cor a partir da capa é a exceção útil: a amostragem dos pixels vive em `core`, porque quatro temas leem os mesmos pixels, e cada cálculo continua ao lado do tema que o inventou. O CD Cover reusa a média do Poster e o Vinyl reusa o agrupamento por matiz do Ambient, em vez de reescrever. O que varia é o cálculo, não a amostragem.
+A derivação de cor a partir da capa é uma exceção útil. Ambient e Poster ainda fazem a própria amostragem porque foram as variantes que introduziram seus cálculos. CD Cover e Vinyl usam `useSampledCoverPixels` em `core` e reaproveitam, respectivamente, a média do Poster e o agrupamento por matiz do Ambient. Assim, novos consumidores compartilham a leitura dos pixels sem mover prematuramente os cálculos visuais que pertencem às variantes de origem.
 
 Conceitos que repetem exatamente a mesma interação podem possuir uma infraestrutura visual em `core`. `ConceptPlaybackHud` e `ConceptThemeChrome` preservam o contrato de controles e chrome sem impor a identidade visual. O trilho arrastável pertence ao Arcade Select enquanto não houver uma segunda variante que reutilize seu comportamento.
 
@@ -55,6 +55,8 @@ Conceitos que repetem exatamente a mesma interação podem possuir uma infraestr
 - tracklist normalizada e ação para reproduzir uma posição do contexto.
 
 Temas não chamam `window.nowframe`, services nem TanStack Query. A página `PlaybackDisplayPage` orquestra dados e mutations e entrega props puras ao componente ativo.
+
+Todas as ações do contrato devem ser apresentadas por novas variantes. O CD Cover é a única exceção atual: ele omite o favorito para preservar a simetria visual, e essa decisão fica nomeada no teste de contrato.
 
 ## Temas atuais
 
@@ -77,6 +79,8 @@ Temas não chamam `window.nowframe`, services nem TanStack Query. A página `Pla
 | Tracklist     | Carrossel arrastável de faixas do álbum ou playlist             | Álbum ou playlist  |
 | Vinyl         | Vinil do tamanho da tela girando com a música, na matiz da capa | Nenhum             |
 
+O seletor organiza as variantes por `category`. `main`, exibida como `Principais`, reúne os layouts de uso geral; `conceptual`, exibida como `Conceituais`, reúne Arcade Select, Cassette e Rocket League, que assumem uma referência visual mais explícita. A categoria serve apenas para navegação e não altera dados, capacidades ou comportamento do tema.
+
 Dados condicionais são carregados apenas para os temas que os usam. A capacidade `usesTracklist` é declarada no registro e habilita a consulta de álbum ou playlist sem acoplar a página a IDs específicos. Trocar de tema não duplica playback, perfil, biblioteca ou estado da janela.
 
 O código do Echoes permanece preservado em `variants/echoes`, mas a variante está fora do `themeRegistry`. Por isso ela não aparece no seletor, não participa do contrato dos temas ativos e pode ser reativada futuramente sem reconstruir o layout.
@@ -96,9 +100,9 @@ As classes `player-theme-root` e `player-theme-chrome` formam o comportamento co
 
 ## Preferência e registro
 
-O registro central é a fonte da lista exibida no seletor. O identificador ativo fica em `localStorage` sob `nowframe:selected-theme`; valores desconhecidos voltam para `default`.
+O registro central é a fonte da lista e das categorias exibidas no seletor. O identificador ativo fica em `localStorage` sob `nowframe:selected-theme`; valores desconhecidos voltam para `default`.
 
-Adicionar uma variante exige atualizar o union `PlayerThemeId` e o `themeRegistry`. O teste de contrato percorre `availableThemes`, renderiza cada componente e verifica conteúdo, transporte, favorito, erros, estados vazios, chrome e saída do fullscreen. O seletor arrastável do Arcade Select possui testes próprios para clique, limiar de arraste, supressão de clique acidental e inércia.
+Adicionar uma variante exige atualizar o union `PlayerThemeId` e registrar `id`, `name`, `category` e `component` no `themeRegistry`. Temas com lista de álbum ou playlist também declaram `usesTracklist`. O teste de contrato percorre `availableThemes`, renderiza cada componente e verifica conteúdo, transporte, favorito — respeitando a exceção nomeada do CD Cover —, erros, estados vazios, chrome e saída do fullscreen. O seletor arrastável do Arcade Select possui testes próprios para clique, limiar de arraste, supressão de clique acidental e inércia.
 
 ## Documentos relacionados
 

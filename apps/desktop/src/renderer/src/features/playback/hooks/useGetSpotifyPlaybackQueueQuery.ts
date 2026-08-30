@@ -7,8 +7,8 @@ import { SpotifyPlaybackService } from '../services/spotify-playback-service'
 
 /**
  * A fila só é consultada quando o conteúdo atual muda — a chave da query carrega a
- * identidade da faixa em reprodução. Fora do polling de um segundo, portanto: é uma
- * chamada por troca de faixa, usada para trocar os metadados na hora ao avançar.
+ * identidade da faixa em reprodução. O cache não possui consumidor no fluxo atual e
+ * permanece temporariamente como dívida técnica; ele não antecipa metadados ao avançar.
  */
 export function useGetSpotifyPlaybackQueueQuery(
   currentItemKey: string | null
