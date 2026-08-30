@@ -1,0 +1,332 @@
+.echoes-root {
+  --concept-accent: #f4f4ed;
+  --concept-muted: rgb(255 255 255 / 44%);
+  --concept-control-color: rgb(255 255 255 / 72%);
+  --concept-play-color: #050505;
+  --concept-control-bg: rgb(255 255 255 / 2%);
+  --concept-border: rgb(255 255 255 / 15%);
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  color: #f7f7f2;
+  background: #010102;
+}
+
+.echoes-root::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background:
+    radial-gradient(circle at 49% 44%, rgb(122 137 152 / 8%), transparent 28%),
+    linear-gradient(180deg, #010102, #030304 72%, #010102);
+  content: '';
+  pointer-events: none;
+}
+
+.echoes-optics {
+  position: absolute;
+  z-index: 1;
+  top: 3vh;
+  right: -2vw;
+  bottom: 18vh;
+  left: -2vw;
+  pointer-events: none;
+}
+
+.echoes-optics svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.echoes-prism {
+  stroke-width: 3.5;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 16px rgb(255 255 255 / 10%));
+}
+
+.echoes-prism-reflection {
+  fill: rgb(223 231 238 / 3%);
+  stroke: rgb(255 255 255 / 16%);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.echoes-white-beam,
+.echoes-white-glow {
+  fill: none;
+  stroke: #f6f6f1;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.echoes-white-glow {
+  opacity: 0.34;
+  filter: url('#echoes-white-glow');
+  stroke-width: 12;
+}
+
+.echoes-white-beam {
+  opacity: 0.92;
+  stroke-width: 2.25;
+}
+
+.echoes-spectrum path {
+  fill: none;
+  stroke-width: 8;
+  vector-effect: non-scaling-stroke;
+}
+
+.echoes-spectrum path:nth-child(1) {
+  stroke: #f04c52;
+}
+
+.echoes-spectrum path:nth-child(2) {
+  stroke: #f3943d;
+}
+
+.echoes-spectrum path:nth-child(3) {
+  stroke: #f2dc52;
+}
+
+.echoes-spectrum path:nth-child(4) {
+  stroke: #54b975;
+}
+
+.echoes-spectrum path:nth-child(5) {
+  stroke: #4d9fd2;
+}
+
+.echoes-spectrum path:nth-child(6) {
+  stroke: #9568b7;
+}
+
+.echoes-spectrum--glow {
+  opacity: 0.42;
+  filter: url('#echoes-spectrum-glow');
+}
+
+.echoes-spectrum--glow path {
+  stroke-width: 19;
+}
+
+.echoes-root--playing .echoes-white-glow {
+  animation: echoes-light-pulse 4.8s ease-in-out infinite;
+}
+
+.echoes-root--playing .echoes-spectrum:not(.echoes-spectrum--glow) {
+  animation: echoes-spectrum-breathe 5.6s ease-in-out infinite;
+}
+
+.echoes-track-card {
+  position: absolute;
+  z-index: 3;
+  bottom: clamp(8.5rem, 15vh, 11rem);
+  left: clamp(2.5rem, 5vw, 6rem);
+  display: flex;
+  max-width: min(42rem, 56vw);
+  align-items: flex-end;
+  gap: 1.1rem;
+}
+
+.echoes-cover {
+  display: grid;
+  width: clamp(4.5rem, 6.8vw, 6.5rem);
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 28%);
+  background: #0c0c0d;
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 55%);
+}
+
+.echoes-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.72) contrast(1.08);
+}
+
+.echoes-cover > svg {
+  width: 30%;
+  height: 30%;
+  color: #47484a;
+}
+
+.echoes-copy {
+  min-width: 0;
+  padding-bottom: 0.05rem;
+}
+
+.echoes-copy > span {
+  color: rgb(255 255 255 / 47%);
+  font-family: ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+}
+
+.echoes-copy h1 {
+  display: -webkit-box;
+  margin-top: 0.45rem;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(2.2rem, 4vw, 4.6rem);
+  line-height: 0.9;
+  font-weight: 500;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.echoes-copy p {
+  margin-top: 0.65rem;
+  color: rgb(255 255 255 / 86%);
+  font-size: 0.9rem;
+}
+
+.echoes-copy small {
+  display: block;
+  margin-top: 0.15rem;
+  color: rgb(255 255 255 / 36%);
+  font-size: 0.72rem;
+}
+
+.echoes-hud-shell {
+  position: absolute;
+  z-index: 4;
+  right: clamp(2.5rem, 5vw, 6rem);
+  bottom: clamp(0.75rem, 2vh, 1.5rem);
+  left: clamp(2.5rem, 5vw, 6rem);
+}
+
+.echoes-root .concept-hud {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(255 255 255 / 13%);
+}
+
+.echoes-root .concept-progress-range {
+  height: 0.24rem;
+  background: linear-gradient(
+    90deg,
+    #f04c52 0%,
+    #f3943d 18%,
+    #f2dc52 36%,
+    #54b975 56%,
+    #4d9fd2 76%,
+    #9568b7 100%
+  ) !important;
+  filter: saturate(0.78) brightness(0.92);
+}
+
+.echoes-root .concept-progress-range::-webkit-slider-thumb {
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid #050505;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 70%),
+    0 0 18px rgb(255 255 255 / 55%);
+}
+
+.echoes-root .concept-hud-row {
+  opacity: 0.58;
+  transition: opacity 220ms ease;
+}
+
+.echoes-root .concept-hud:hover .concept-hud-row,
+.echoes-root .concept-hud:focus-within .concept-hud-row {
+  opacity: 1;
+}
+
+.echoes-fullscreen-button {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 50%;
+  color: #fff;
+  background: rgb(4 4 4 / 72%);
+}
+
+@keyframes echoes-light-pulse {
+  0%,
+  100% {
+    opacity: 0.24;
+  }
+
+  50% {
+    opacity: 0.48;
+  }
+}
+
+@keyframes echoes-spectrum-breathe {
+  0%,
+  100% {
+    opacity: 0.88;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (max-height: 620px) {
+  .echoes-optics {
+    top: -2vh;
+    bottom: 17vh;
+  }
+
+  .echoes-track-card {
+    bottom: 7.2rem;
+  }
+
+  .echoes-cover {
+    width: 3.8rem;
+  }
+
+  .echoes-copy h1 {
+    font-size: clamp(1.8rem, 3.7vw, 3rem);
+  }
+
+  .echoes-copy p {
+    margin-top: 0.4rem;
+  }
+
+  .echoes-root .concept-hud {
+    padding-top: 0.4rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .echoes-optics {
+    right: -16vw;
+    left: -24vw;
+  }
+
+  .echoes-track-card {
+    right: 1.5rem;
+    left: 1.5rem;
+    max-width: none;
+  }
+
+  .echoes-hud-shell {
+    right: 1.5rem;
+    left: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .echoes-root--playing .echoes-white-glow,
+  .echoes-root--playing .echoes-spectrum:not(.echoes-spectrum--glow) {
+    animation: none;
+  }
+
+  .echoes-root .concept-hud-row {
+    transition: none;
+  }
+}

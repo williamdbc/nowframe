@@ -63,6 +63,7 @@ export type PlayerThemeId =
   | 'lyrics'
   | 'minimalist'
   | 'poster'
+  | 'prism'
   | 'rocket-league'
   | 'setlist'
   | 'spotlight'

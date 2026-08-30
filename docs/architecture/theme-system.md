@@ -23,10 +23,12 @@ features/themes/
     ├── cd-cover/
     ├── default/
     ├── drive/
+    ├── echoes/
     ├── karaoke/
     ├── lyrics/
     ├── minimalist/
     ├── poster/
+    ├── prism/
     ├── rocket-league/
     ├── setlist/
     ├── spotlight/
@@ -68,6 +70,7 @@ Temas não chamam `window.nowframe`, services nem TanStack Query. A página `Pla
 | Lyrics        | Letra sincronizada em destaque                                  | Letras             |
 | Minimalist    | Informação e transporte com baixa densidade visual              | Nenhum             |
 | Poster        | Capa em tela inteira, degradê derivado e contraste automático   | Nenhum             |
+| Prism         | Capa refratada por lâminas de vidro e luz derivada da arte      | Nenhum             |
 | Rocket League | Arena azul e laranja, placar central, bola de progresso e boost | Nenhum             |
 | Setlist       | Papel de palco com faixas anteriores riscadas e atual iluminada | Álbum ou playlist  |
 | Spotlight     | Capa central sobre arte desfocada                               | Nenhum             |
@@ -75,6 +78,8 @@ Temas não chamam `window.nowframe`, services nem TanStack Query. A página `Pla
 | Vinyl         | Vinil do tamanho da tela girando com a música, na matiz da capa | Nenhum             |
 
 Dados condicionais são carregados apenas para os temas que os usam. A capacidade `usesTracklist` é declarada no registro e habilita a consulta de álbum ou playlist sem acoplar a página a IDs específicos. Trocar de tema não duplica playback, perfil, biblioteca ou estado da janela.
+
+O código do Echoes permanece preservado em `variants/echoes`, mas a variante está fora do `themeRegistry`. Por isso ela não aparece no seletor, não participa do contrato dos temas ativos e pode ser reativada futuramente sem reconstruir o layout.
 
 ## Chrome e fullscreen
 

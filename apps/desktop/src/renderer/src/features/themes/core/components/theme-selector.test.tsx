@@ -50,10 +50,12 @@ describe('ThemeSelector', () => {
     expect(screen.getByRole('menuitemradio', { name: 'Lyrics' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'CD Cover' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Poster' })).toBeVisible()
+    expect(screen.getByRole('menuitemradio', { name: 'Prism' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Rocket League' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Setlist' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Spotlight' })).toBeVisible()
     expect(screen.getByRole('menuitemradio', { name: 'Tracklist' })).toBeVisible()
+    expect(screen.queryByRole('menuitemradio', { name: 'Echoes' })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('menuitemradio', { name: 'Drive' }))
     expect(onSelectTheme).toHaveBeenCalledWith('drive')

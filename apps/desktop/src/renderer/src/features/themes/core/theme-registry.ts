@@ -8,6 +8,7 @@ import { KaraokePlayerTheme } from '@/features/themes/variants/karaoke/karaoke-p
 import { LyricsPlayerTheme } from '@/features/themes/variants/lyrics/lyrics-player-theme'
 import { MinimalistPlayerTheme } from '@/features/themes/variants/minimalist/minimalist-player-theme'
 import { PosterPlayerTheme } from '@/features/themes/variants/poster/poster-player-theme'
+import { PrismPlayerTheme } from '@/features/themes/variants/prism/prism-player-theme'
 import { RocketLeaguePlayerTheme } from '@/features/themes/variants/rocket-league/rocket-league-player-theme'
 import { SetlistPlayerTheme } from '@/features/themes/variants/setlist/setlist-player-theme'
 import { SpotlightPlayerTheme } from '@/features/themes/variants/spotlight/spotlight-player-theme'
@@ -79,6 +80,12 @@ export const themeRegistry = {
     name: 'Poster',
     category: 'main',
     component: PosterPlayerTheme
+  },
+  prism: {
+    id: 'prism',
+    name: 'Prism',
+    category: 'main',
+    component: PrismPlayerTheme
   },
   'rocket-league': {
     id: 'rocket-league',
