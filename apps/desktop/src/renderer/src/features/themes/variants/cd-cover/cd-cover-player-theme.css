@@ -270,14 +270,15 @@
 }
 /* Título longo para em duas linhas: passando disso o painel cresce e empurra o volume
    para fora da janela. O recorte do clamp ganha uma folga vertical devolvida por margem
-   negativa, senão o leading cortaria os descendentes da última linha visível. */
+   negativa, senão o leading e as unidades inline da animação cortariam os
+   descendentes da última linha visível. */
 .cd-cover-title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  padding-block: 0.1em;
-  margin-block: -0.1em;
+  padding-block: 0.25em;
+  margin-block: -0.25em;
   font-size: var(--cd-title-size);
   font-weight: 600;
   line-height: 1.167;

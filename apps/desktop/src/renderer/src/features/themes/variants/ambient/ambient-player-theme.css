@@ -135,14 +135,15 @@
 /* Título longo para em duas linhas: passando disso o bloco de texto engole a
    coluna e empurra o resto do player. O recorte do clamp ganha uma folga
    vertical devolvida por margem negativa, senão o leading de 1.084 cortaria os
-   descendentes da última linha visível. */
+   descendentes da última linha visível. A folga de 0.15em também acomoda as
+   unidades inline da animação sem recortar letras como g e y. */
 .ambient-title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  padding-block: 0.1em;
-  margin-block: -0.1em;
+  padding-block: 0.15em;
+  margin-block: -0.15em;
 }
 
 /* animate-text / per-word-crossfade */

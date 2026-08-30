@@ -344,6 +344,8 @@
 .vinyl-title {
   max-width: 100%;
   overflow: hidden;
+  padding-block: 0.25em;
+  margin-block: -0.25em;
   font-size: var(--vinyl-title-size);
   font-weight: 600;
   line-height: 1.222;
