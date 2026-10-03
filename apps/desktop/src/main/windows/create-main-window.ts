@@ -4,6 +4,7 @@ import { is } from '@electron-toolkit/utils'
 
 import icon from '../../../resources/icon.png?asset'
 import { ipcChannels, type WindowState } from '../../contracts/nowframe-api'
+import { getWindowChromeOptions } from './window-chrome-options'
 
 export function createMainWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -15,6 +16,7 @@ export function createMainWindow(): BrowserWindow {
     title: 'Nowframe',
     backgroundColor: '#08090a',
     autoHideMenuBar: true,
+    ...getWindowChromeOptions(process.platform),
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),

@@ -37,6 +37,16 @@ body {
   user-select: none;
 }
 
+.window-drag-region {
+  position: fixed;
+  z-index: 15;
+  top: 0;
+  right: 9.5rem;
+  left: 5.5rem;
+  height: 44px;
+  app-region: drag;
+}
+
 button,
 input,
 textarea,
@@ -161,6 +171,7 @@ select {
 }
 
 .player-theme-chrome {
+  margin-top: 2rem;
   opacity: 0;
   transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
 }
