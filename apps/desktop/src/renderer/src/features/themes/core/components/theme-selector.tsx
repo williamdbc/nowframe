@@ -60,6 +60,7 @@ export function ThemeSelector({
         type="button"
         aria-expanded={isOpen}
         aria-haspopup="menu"
+        data-demo-theme-selector={activeThemeId}
         onClick={toggleMenu}
       >
         <Palette aria-hidden="true" className="h-4 w-4" />
@@ -104,6 +105,7 @@ export function ThemeSelector({
                         type="button"
                         role="menuitemradio"
                         aria-checked={isActive}
+                        data-demo-theme={theme.id}
                         onClick={() => selectTheme(theme.id)}
                       >
                         {theme.name}

@@ -15,6 +15,7 @@
     "typecheck": "npm run routes:generate && npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
+    "demo:themes": "node scripts/demo/start-demo.mjs",
     "build": "npm run typecheck && electron-vite build",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
