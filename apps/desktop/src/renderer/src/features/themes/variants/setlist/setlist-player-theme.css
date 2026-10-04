@@ -229,16 +229,6 @@
   background: #e84b35;
   opacity: 1;
 }
-.setlist-fullscreen-button {
-  display: grid;
-  width: 2.75rem;
-  height: 2.75rem;
-  place-items: center;
-  border: 1px solid #665a4c;
-  border-radius: 0.25rem;
-  color: #e84b35;
-  background: #181411;
-}
 @media (max-height: 620px) {
   .setlist-layout {
     gap: 0.5rem 2rem;

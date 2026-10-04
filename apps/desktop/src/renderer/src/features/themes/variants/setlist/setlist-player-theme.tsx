@@ -24,7 +24,6 @@ export function SetlistPlayerTheme({
     <main className="player-theme-root setlist-root">
       <ConceptThemeChrome
         chrome={chrome}
-        exitClassName="setlist-fullscreen-button"
         isFullScreen={isFullScreen}
         onExitFullScreen={onExitFullScreen}
       />
