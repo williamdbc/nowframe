@@ -2,7 +2,7 @@
 
 ## Pré-requisitos
 
-Instale dependências e configure `apps/desktop/.env.local` conforme [desenvolvimento local](../development/local-setup.md). O Client ID é incorporado ao processo main no build; o Client Secret nunca deve ser incluído.
+Instale dependências e configure `apps/desktop/.env.local` conforme [desenvolvimento local](../development/local-setup.md). O Client ID e a Redirect URI são incorporados ao processo main no build; o Client Secret nunca deve ser incluído. Alterar o `.env.local` depois de empacotar não modifica o binário existente: gere um novo build para aplicar a configuração.
 
 Antes de empacotar:
 
@@ -39,7 +39,7 @@ O `.app` é o bundle nativo do macOS. Em `npm run dev`, a aplicação usa o proc
 
 Prefira gerar e testar cada artefato no sistema operacional de destino. O Electron Builder oferece alguma compilação cruzada, mas instaladores, assinatura e validação nativa continuam dependentes da plataforma e das ferramentas disponíveis.
 
-O número usado no nome e nos metadados do artefato vem de `apps/desktop/package.json`, atualmente `0.1.0`. As tags e releases do GitHub não atualizam esse campo automaticamente. Antes de distribuir um binário como versão pública, alinhe conscientemente as duas versões e gere o pacote novamente.
+O número usado no nome e nos metadados do artefato vem do campo `version` de `apps/desktop/package.json`. As tags e releases do GitHub não atualizam esse campo automaticamente. Antes de distribuir um binário como versão pública, alinhe conscientemente as duas versões e gere o pacote novamente.
 
 ## Ícones
 

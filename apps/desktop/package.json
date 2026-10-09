@@ -5,6 +5,7 @@
   "description": "A customizable second screen for your music.",
   "main": "./out/main/index.js",
   "author": "William",
+  "license": "MIT",
   "scripts": {
     "format": "prettier --write .",
     "format:check": "prettier --check .",
