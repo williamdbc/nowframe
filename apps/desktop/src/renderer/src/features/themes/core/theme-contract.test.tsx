@@ -110,18 +110,8 @@ function createControls(): PlaybackControls {
   }
 }
 
-/**
- * O tema CD Cover não desenha o favorito: o Figma põe só aleatório, anterior, play,
- * próxima e repetir na fileira, e o desenho depende dessa simetria. É a única capacidade
- * que um tema deixa de expor, e fica registrada aqui em vez de silenciosamente ausente.
- */
 const themesWithoutSavedControl = new Set<string>(['cd-cover'])
 
-/**
- * O contrato é ter controle de volume alcançável, não um slider sempre na tela. Poster e
- * Vinyl mantêm a coluna de volume atrás de um painel, por desenho; que o painel abre e
- * traz o slider fica coberto no teste de cada um.
- */
 const themesWithVolumePanel = new Set<string>(['poster', 'vinyl'])
 
 describe.each(availableThemes)('$name player theme contract', ({ component: Theme, id }) => {

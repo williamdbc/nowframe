@@ -1,4 +1,3 @@
-/* transitions-dev — variáveis do icon swap usadas pelo botão de play/pause. */
 :root {
   --icon-swap-dur: 200ms;
   --icon-swap-blur: 2px;
@@ -37,10 +36,6 @@
   }
 }
 
-/* O fundo acompanha a cor predominante da capa e leva o tempo de uma faixa
-   trocar para chegar lá, evitando o corte seco entre duas artes. */
-/* Escala responsiva: os valores do Figma são o teto, e a altura da janela é a
-   referência porque o tema é um display de tela inteira. */
 .ambient-root {
   --ambient-cover-size: clamp(200px, 42vh, 340px);
   --ambient-column-gap: clamp(20px, 4.4vw, 64px);
@@ -65,7 +60,6 @@
   -webkit-mask-size: contain;
 }
 
-/* Capa: borda, sombra em quatro camadas e brilho diagonal, todos do Figma. */
 .ambient-cover {
   width: var(--ambient-cover-size);
   height: var(--ambient-cover-size);
@@ -105,9 +99,6 @@
   }
 }
 
-/* Entrada escalonada: cada bloco semântico entra 55ms depois do anterior. O
-   intervalo é curto de propósito — escalonar demais faz a troca de faixa ler como
-   uma sequência de blocos em vez de um movimento único. */
 .ambient-stagger {
   animation: ambient-rise-in 360ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
@@ -132,11 +123,6 @@
   }
 }
 
-/* Título longo para em duas linhas: passando disso o bloco de texto engole a
-   coluna e empurra o resto do player. O recorte do clamp ganha uma folga
-   vertical devolvida por margem negativa, senão o leading de 1.084 cortaria os
-   descendentes da última linha visível. A folga de 0.15em também acomoda as
-   unidades inline da animação sem recortar letras como g e y. */
 .ambient-title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -146,7 +132,6 @@
   margin-block: -0.15em;
 }
 
-/* animate-text / per-word-crossfade */
 .ambient-reveal-unit {
   display: inline-block;
   white-space: pre;
@@ -164,8 +149,6 @@
   }
 }
 
-/* Modo letra: o Figma troca a tela inteira por uma coluna de 692px com a letra
-   grande em cima e uma barra compacta de capa, transporte e volume embaixo. */
 .ambient-root--lyrics {
   --ambient-lyrics-column: clamp(320px, 48vw, 692px);
   --ambient-lyrics-size: clamp(22px, 2.78vw, 40px);
@@ -175,8 +158,6 @@
   --ambient-lyrics-bar-gap: clamp(24px, 3.7vh, 40px);
 }
 
-/* O palco tem altura fixa e recorta: a linha atual é levada ao topo e o que já
-   passou sai por cima da borda. */
 .ambient-lyrics-stage {
   position: relative;
   width: 100%;
@@ -221,9 +202,6 @@
   opacity: 0.1;
 }
 
-/* animate-text / mask-reveal-up: a linha sobe de trás de um recorte. O recorte
-   ganha uma folga vertical devolvida por margem negativa, senão o leading de
-   43px do Figma cortaria os descendentes. */
 .ambient-lyrics-mask {
   display: block;
   overflow: hidden;
@@ -231,8 +209,6 @@
   margin-block: -0.14em;
 }
 
-/* A opacidade do estado mora no <p> e a da entrada no <span>: multiplicadas,
-   uma linha distante não pisca em branco enquanto anima. */
 .ambient-lyrics-reveal {
   display: block;
   animation: ambient-mask-reveal-up 760ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
@@ -308,9 +284,6 @@
   outline-offset: 2px;
 }
 
-/* Botões de transporte: 24px visíveis, 40px de área de toque via pseudo-elemento.
-   Os SVGs vêm do Figma com fill-opacity 0.4; a opacidade foi retirada do arquivo
-   para o CSS poder levá-la a 100% no hover, que é o estado de destaque. */
 .ambient-control {
   position: relative;
   display: flex;
@@ -354,11 +327,7 @@
   outline: 2px solid #1ed760;
   outline-offset: 8px;
 }
-/* Enquanto um comando está em voo o botão continua bloqueado para não disparar
-   duas vezes, mas não apaga: o estado otimista já mostrou o resultado, e cair
-   para 0.15 e voltar no meio disso é o piscada que se via ao clicar em aleatório
-   ou repetir. O apagado fica reservado para indisponibilidade real do
-   dispositivo. */
+
 .ambient-control:disabled:not([data-busy='true']) {
   opacity: 0.15;
 }
@@ -369,8 +338,6 @@
   scale: 1;
 }
 
-/* O ícone de salvo é bicolor e só existe no Figma no estado ativo; o estado
-   não salvo reusa o mesmo glifo dessaturado. */
 .ambient-control--saved img {
   transition:
     filter 160ms cubic-bezier(0.2, 0, 0, 1),
@@ -384,7 +351,6 @@
   opacity: 0.85;
 }
 
-/* O SVG de repetir tem 24x32: o ponto abaixo do glifo marca o modo ligado. */
 .ambient-repeat-clip {
   position: relative;
   display: block;
@@ -443,8 +409,6 @@
   height: var(--ambient-cover-size);
 }
 
-/* O range nativo é girado sobre a trilha pintada: o comprimento é a altura da
-   coluna menos o espaço e o ícone. */
 .ambient-volume-range {
   position: absolute;
   top: 50%;
@@ -497,8 +461,7 @@
     width 120ms linear,
     left 120ms linear;
 }
-/* O anel é para navegação por teclado. Com :focus-within ele ficava preso
-   depois de arrastar o volume com o mouse, até um clique fora. */
+
 .ambient-volume-track:has(:focus-visible) {
   outline: 2px solid #1ed760;
   outline-offset: 4px;

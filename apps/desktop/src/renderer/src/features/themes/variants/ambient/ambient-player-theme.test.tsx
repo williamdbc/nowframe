@@ -131,10 +131,9 @@ describe('AmbientPlayerTheme', () => {
     expect(screen.getByRole('img', { name: 'Capa de Koi No Yokan' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Pausar' })).toBeEnabled()
     expect(screen.getByRole('slider', { name: 'Volume' })).toBeEnabled()
-    // Sem texto no desenho, a faixa segue descrita para leitores de tela.
+
     expect(screen.getByText(/Entombed — Deftones — MacBook Pro/)).toBeInTheDocument()
 
-    // O Figma não traz título nem barra de progresso no modo imersivo.
     expect(screen.queryByRole('heading', { name: 'Entombed' })).not.toBeInTheDocument()
     expect(screen.queryByRole('slider', { name: 'Posição da reprodução' })).not.toBeInTheDocument()
   })
@@ -143,8 +142,6 @@ describe('AmbientPlayerTheme', () => {
     const user = userEvent.setup()
     renderTheme(false)
 
-    // O da moldura expande a janela e vive no canto; o do Figma, na barra de
-    // transporte, só troca a apresentação do tema.
     expect(screen.getByText('Tela cheia')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Entrar no modo imersivo' }))
@@ -156,8 +153,6 @@ describe('AmbientPlayerTheme', () => {
   it('caps the title at two lines and the album at one', () => {
     renderTheme(false)
 
-    // Sem layout no jsdom, o recorte só dá para conferir pela classe que o
-    // aplica — títulos e álbuns longos passariam a engolir a coluna sem ela.
     expect(screen.getByRole('heading', { name: 'Entombed' })).toHaveClass('ambient-title')
     expect(screen.getByText('Koi No Yokan')).toHaveClass('truncate')
   })
@@ -172,7 +167,6 @@ describe('AmbientPlayerTheme', () => {
     expect(screen.getByRole('button', { name: 'Pausar' })).toBeEnabled()
     expect(screen.getByRole('slider', { name: 'Volume' })).toBeEnabled()
 
-    // O Figma reduz o modo letra à letra mais capa, transporte e volume.
     expect(screen.queryByRole('heading', { name: 'Entombed' })).not.toBeInTheDocument()
     expect(screen.queryByRole('slider', { name: 'Posição da reprodução' })).not.toBeInTheDocument()
   })
@@ -183,7 +177,6 @@ describe('AmbientPlayerTheme', () => {
 
     await user.click(screen.getByRole('button', { name: 'Mostrar letra' }))
 
-    // A reprodução está em 12s, ou seja, na segunda linha.
     expect(screen.getByText('The way it breaks mine').closest('p')).toHaveAttribute(
       'data-state',
       'active'

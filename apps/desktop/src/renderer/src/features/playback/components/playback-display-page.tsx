@@ -47,11 +47,8 @@ export function PlaybackDisplayPage(): React.JSX.Element {
   const presentationMode = useWindowPresentationMode()
   const playback = playbackQuery.data ?? null
 
-  // A posição viva sai do relógio compartilhado, não de um tick que re-renderiza a página.
   useSyncPlaybackClock(playback)
 
-  // Esta query de fila ainda é aquecida por identidade de conteúdo, mas não participa
-  // mais da troca de metadados. A arquitetura registra sua remoção como dívida técnica.
   useGetSpotifyPlaybackQueueQuery(getPlaybackContentKey(playback))
 
   const shouldLoadTracklist = selectedTheme.activeTheme.usesTracklist === true

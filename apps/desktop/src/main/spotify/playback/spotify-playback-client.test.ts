@@ -324,10 +324,6 @@ describe('SpotifyPlaybackClient', () => {
     )
   })
 
-  /**
-   * A regressão que motivou separar o gate: um 429 no polling deixava play, pause e skip
-   * mortos por no mínimo 30 s, o que lê como app travado.
-   */
   it('still lets a person-initiated command through during the rate limit window', async () => {
     vi.spyOn(Date, 'now').mockReturnValue(3_000_000)
     const fetchMock = vi
@@ -345,12 +341,10 @@ describe('SpotifyPlaybackClient', () => {
       'Too many requests'
     )
 
-    // O polling espera...
     await expect(SpotifyPlaybackClient.getCurrentPlayback('access-token')).rejects.toThrow(
       'O Spotify solicitou uma pausa antes da próxima solicitação. Tente novamente em 30 s.'
     )
 
-    // ...mas o comando vai.
     await expect(SpotifyPlaybackClient.pause('access-token')).resolves.toBeUndefined()
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
@@ -387,10 +381,6 @@ describe('SpotifyPlaybackClient', () => {
   })
 
   it('anchors the synchronization clock at the middle of the round trip', async () => {
-    // O progresso relatado era verdade no servidor por volta da metade da viagem, não na
-    // chegada da resposta: 2_000_000 de saída, 2_000_240 de volta => 2_000_120.
-    // Os timestamps ficam além da janela de rate limit que o teste anterior deixou no
-    // `rateLimitedUntil`, que é estado de módulo e atravessa testes.
     let hasResponded = false
     vi.spyOn(Date, 'now').mockImplementation(() => (hasResponded ? 2_000_240 : 2_000_000))
     vi.stubGlobal(

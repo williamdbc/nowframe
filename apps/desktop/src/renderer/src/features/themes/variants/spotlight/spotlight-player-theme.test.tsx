@@ -116,8 +116,6 @@ describe('SpotlightPlayerTheme', () => {
     const user = userEvent.setup()
     renderTheme()
 
-    // Diferente do Ambient, onde o play é uma pílula branca à parte, aqui ele
-    // divide o estado de hover e o disabled com os vizinhos.
     const pauseButton = screen.getByRole('button', { name: 'Pausar' })
     expect(pauseButton).toHaveClass('spotlight-control')
     expect(screen.getByRole('button', { name: 'Faixa anterior' })).toHaveClass('spotlight-control')
@@ -161,9 +159,6 @@ describe('SpotlightPlayerTheme', () => {
   it('caps the title at two lines and the album at one', () => {
     renderTheme()
 
-    // Sem layout no jsdom, o recorte só dá para conferir pela classe que o
-    // aplica — títulos e álbuns longos passariam a empurrar o transporte para
-    // fora da janela sem ela.
     expect(screen.getByRole('heading', { name: 'Entombed' })).toHaveClass('spotlight-title')
     expect(screen.getByText('This is Deftones')).toHaveClass('truncate')
   })
@@ -177,11 +172,6 @@ describe('SpotlightPlayerTheme', () => {
     expect(onExitFullScreen).toHaveBeenCalledOnce()
   })
 
-  /**
-   * O CSS reserva o apagado (opacidade 0.15) para indisponibilidade real do dispositivo.
-   * Comando em voo é sinalizado por `data-busy`, senão clicar em aleatório ou repetir
-   * derrubava a opacidade e a devolvia, o que se via como uma piscada.
-   */
   it('marks a pending option command as busy instead of dimming it', () => {
     renderTheme(false, { isPlaybackOptionPending: true })
 

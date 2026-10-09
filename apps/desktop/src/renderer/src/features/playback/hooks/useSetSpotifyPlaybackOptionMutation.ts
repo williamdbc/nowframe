@@ -50,8 +50,6 @@ export function useSetSpotifyPlaybackOptionMutation(): UseMutationResult<
         optimisticallySetPlaybackOption(playback, command)
       )
 
-      // Até o Spotify publicar o novo estado, o polling ainda relata o anterior. Sem esta
-      // expectativa o ícone voltava atrás e piscava no ciclo seguinte.
       expectPlayback((playback) =>
         command.type === 'shuffle'
           ? playback.shuffleEnabled === command.enabled

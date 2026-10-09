@@ -87,11 +87,6 @@ describe('reconcileAnchor', () => {
     expect(next.positionMs).toBe(90_000)
   })
 
-  /**
-   * O caso que motiva a convergência: o `progress_ms` do Spotify chega com atraso variável
-   * de 0 a ~1 s, então uma resposta pode implicar posição menor que a estimativa local.
-   * Re-ancorar duro fazia a barra andar para trás e a letra voltar uma linha.
-   */
   it('absorbs a small regression instead of jumping backwards', () => {
     const state = projectAnchor(anchor, now)
     const currentPositionMs = readPosition(state, 6_000)
@@ -103,8 +98,6 @@ describe('reconcileAnchor', () => {
       { epochMs: 1_001_000, monotonicMs: 6_000 }
     )
 
-    // A verdade do servidor implicava 30_400; a estimativa local estava em 31_000.
-    // A posição cede parte da diferença em vez de saltar, e nunca retrocede até o valor cru.
     expect(next.positionMs).toBeGreaterThan(30_400)
     expect(next.positionMs).toBeLessThan(currentPositionMs)
   })
@@ -113,7 +106,6 @@ describe('reconcileAnchor', () => {
     let state = projectAnchor(anchor, now)
     let monotonicMs = 5_000
 
-    // A verdade do servidor corre 600 ms atrás da estimativa local, repetidamente.
     for (let correction = 0; correction < 12; correction += 1) {
       monotonicMs += 1_000
       state = reconcileAnchor(

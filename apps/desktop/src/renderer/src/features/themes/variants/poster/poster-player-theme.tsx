@@ -23,11 +23,9 @@ export function PosterPlayerTheme({
 }: PlayerThemeProps): React.JSX.Element {
   const content = getPlayerThemeContent(playback, playbackStatus)
   const item = playback?.item ?? null
-  // Remontar o bloco a cada faixa é o que dispara a entrada animada de novo.
+
   const trackKey = item?.id ?? content.title
 
-  // O degradê usa a cor da capa, então texto e ícones não podem ser brancos fixos: a
-  // WCAG decide entre preto e branco a cada faixa.
   const accentColor = usePosterAccentColor(content.imageUrl)
   const readableTextColor = getReadableTextColor(accentColor)
 
@@ -42,9 +40,6 @@ export function PosterPlayerTheme({
         } as React.CSSProperties
       }
     >
-      {/* A capa é o fundo inteiro, sem desfoque: é o desenho do tema. O degradê
-          embaixo assenta na cor média da própria arte, e é contra essa cor que o
-          contraste do texto é decidido. */}
       {content.imageUrl ? (
         <img
           key={content.imageUrl}
@@ -92,9 +87,6 @@ export function PosterPlayerTheme({
           </div>
         </div>
 
-        {/* Os tempos ficam nas pontas da barra, não abaixo dela. O controle
-            compartilhado desenha `input` e depois os dois tempos, então o CSS os
-            recoloca na mesma fileira em vez de duplicar a lógica do controle. */}
         <PlaybackProgressControl
           accentColor="rgb(var(--poster-on-accent-rgb))"
           canSeek={Boolean(item && playback?.capabilities.canSeek)}
@@ -123,8 +115,6 @@ export function PosterPlayerTheme({
           }
         />
 
-        {/* O desenho não mostra o dispositivo; o leitor de tela continua sabendo
-            onde a faixa está tocando. */}
         {playback && <span className="sr-only">{playback.device.name}</span>}
 
         {controls.errorMessage && (

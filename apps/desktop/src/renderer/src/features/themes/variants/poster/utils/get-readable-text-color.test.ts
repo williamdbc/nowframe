@@ -51,7 +51,6 @@ describe('getContrastRatio', () => {
 })
 
 describe('getReadableTextColor', () => {
-  /** O destaque da referência do Figma é claro, e o desenho usa texto preto. */
   it('picks black over the light accent from the reference cover', () => {
     const readable = getReadableTextColor(rgb(155, 170, 167))
 
@@ -68,11 +67,6 @@ describe('getReadableTextColor', () => {
     expect(readable.contrastRatio).toBeGreaterThan(4.5)
   })
 
-  /**
-   * A propriedade que dispensa clarear ou escurecer o destaque: as duas curvas de
-   * contraste se cruzam em luminância 0.179, valendo 4.58:1. Como sempre se toma a
-   * maior, nenhuma capa derruba o texto abaixo do mínimo de 4.5:1 da AA.
-   */
   it('never falls below the AA minimum for body text, for any colour', () => {
     let worstRatio = Number.POSITIVE_INFINITY
 
@@ -88,7 +82,7 @@ describe('getReadableTextColor', () => {
     }
 
     expect(worstRatio).toBeGreaterThanOrEqual(4.5)
-    // E o pior caso fica bem perto do cruzamento teórico das duas curvas.
+
     expect(worstRatio).toBeLessThan(5)
   })
 })

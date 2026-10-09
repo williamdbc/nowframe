@@ -34,11 +34,6 @@ function toHsl(hex: string): { hue: number; lightness: number; saturation: numbe
 }
 
 describe('getVinylRecordColor', () => {
-  /**
-   * A regra do desenho: o sulco é o corpo do disco numa claridade maior, e nada além
-   * disso muda. Se matiz ou saturação divergissem, o disco deixaria de parecer uma peça
-   * só e viraria dois materiais.
-   */
   it('keeps the groove on the hue and saturation of the record body', () => {
     const pixels = createPixels([
       [180, 60, 40],
@@ -50,18 +45,11 @@ describe('getVinylRecordColor', () => {
     const grooveHsl = toHsl(groove)
     const recordHsl = toHsl(record)
 
-    // A tolerância de um grau é o arredondamento para 8 bits: na claridade do corpo do
-    // disco o croma cabe em ~26 níveis por canal, e a matiz lida de volta do hexadecimal
-    // não volta exata.
     expect(Math.abs(grooveHsl.hue - recordHsl.hue)).toBeLessThan(1)
     expect(grooveHsl.saturation).toBeCloseTo(recordHsl.saturation, 1)
     expect(grooveHsl.lightness).toBeGreaterThan(recordHsl.lightness)
   })
 
-  /**
-   * As duas claridades são fixas: é o que mantém o texto branco da barra estável e o
-   * contraste entre sulco e disco igual em qualquer capa.
-   */
   it('holds both lightnesses regardless of how light or dark the cover is', () => {
     const darkCover = getVinylRecordColor(createPixels([[40, 20, 90]]))
     const lightCover = getVinylRecordColor(createPixels([[230, 200, 120]]))
@@ -72,7 +60,6 @@ describe('getVinylRecordColor', () => {
     }
   })
 
-  /** Uma arte sem croma não tem matiz para emprestar: sai o vinil preto de sempre. */
   it('returns the plain black record for a cover without chroma', () => {
     const pixels = createPixels([
       [120, 120, 120],
@@ -82,11 +69,6 @@ describe('getVinylRecordColor', () => {
     expect(getVinylRecordColor(pixels)).toEqual(vinylFallbackRecord)
   })
 
-  /**
-   * A capa da referência é amostrada aqui pela própria cor do sulco do Figma, #82703d, que
-   * em HSL é hsl(44, 36%, 37.5%). Nas duas claridades do tema ela reproduz exatamente o par
-   * desenhado — é o teste de que a regra implementada é a regra do desenho.
-   */
   it('reproduces the reference colours of the design', () => {
     const { groove, record } = getVinylRecordColor(createPixels([[130, 112, 61]]))
 

@@ -4,10 +4,6 @@ import type { PlaybackState } from '../types/playback-state'
 import { getPlaybackContentKey } from '../utils/get-playback-content-key'
 import { playbackClock } from '../utils/playback-clock'
 
-/**
- * Empurra a verdade do servidor para o relógio compartilhado. Deve receber os dados crus da
- * query — não uma versão já interpolada — porque é a âncora, não a leitura.
- */
 export function useSyncPlaybackClock(playback: PlaybackState | null): void {
   const itemKey = getPlaybackContentKey(playback)
   const durationMs = playback?.item?.durationMs ?? 0

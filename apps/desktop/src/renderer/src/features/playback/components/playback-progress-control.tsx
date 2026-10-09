@@ -26,11 +26,6 @@ const rangeCommitKeys = new Set([
   'PageUp'
 ])
 
-/**
- * O `step` do range é 1 ms para a pintura por frame não ser arredondada pelo navegador, o
- * que deixaria o polegar e o preenchimento discordando em até um segundo. Como isso tornaria
- * cada seta do teclado um salto de 1 ms, a navegação é tratada aqui com passos úteis.
- */
 const keyboardSeekStepsMs: Record<string, number> = {
   ArrowDown: -5_000,
   ArrowLeft: -5_000,
@@ -61,15 +56,6 @@ function formatDuration(milliseconds: number): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }
 
-/**
- * A posição é pintada direto no DOM a cada frame do relógio compartilhado, sem passar pelo
- * React: antes o valor vinha por prop de um tick de 250 ms que re-renderizava a página
- * inteira, e o `step` de 1 s fazia o ponteiro andar em degraus.
- *
- * Por isso o range é não-controlado. Se o React controlasse `value`, cada re-render
- * (~1×/s, quando o Spotify responde) devolveria o ponteiro para a posição da prop e
- * desfaria a pintura suave.
- */
 export function PlaybackProgressControl({
   accentColor = 'white',
   canSeek,

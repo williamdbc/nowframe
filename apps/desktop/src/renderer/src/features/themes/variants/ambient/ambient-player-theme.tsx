@@ -54,15 +54,12 @@ export function AmbientPlayerTheme({
   playback,
   playbackStatus
 }: PlayerThemeProps): React.JSX.Element {
-  // O tema tem duas apresentações alternativas à padrão, e cada uma tem o seu
-  // botão. Ligar uma desliga a outra: senão o toggle da que ficou por baixo não
-  // teria efeito visível nenhum.
   const [showLyrics, setShowLyrics] = useState(false)
   const [isImmersive, setIsImmersive] = useState(false)
   const content = getPlayerThemeContent(playback, playbackStatus)
   const item = playback?.item ?? null
   const backdrop = useDominantCoverColor(content.imageUrl)
-  // Remontar o bloco de texto a cada faixa é o que dispara a entrada animada.
+
   const trackKey = item?.id ?? content.title
 
   const toggleLyrics = (): void => {
@@ -137,8 +134,6 @@ export function AmbientPlayerTheme({
     </>
   )
 
-  // Modo imersivo: o desenho reduz a tela à capa, ao transporte e ao volume.
-  // Vale com a janela normal ou expandida — são controles independentes.
   if (isImmersive) {
     return (
       <main
@@ -158,8 +153,7 @@ export function AmbientPlayerTheme({
           />
           {transportControls}
           {renderVolumeControl('horizontal')}
-          {/* O modo imersivo do Figma não traz texto; estes nós mantêm a faixa
-              descrita para leitores de tela sem alterar o desenho. */}
+
           <span className="sr-only">
             {content.title} — {content.creatorNames}
             {playback ? ` — ${playback.device.name}` : ''}
@@ -170,8 +164,6 @@ export function AmbientPlayerTheme({
     )
   }
 
-  // O modo letra não é um painel ao lado do player: o Figma troca a tela inteira
-  // por uma coluna com a letra grande em cima e a barra compacta embaixo.
   if (showLyrics) {
     return (
       <main
@@ -203,8 +195,6 @@ export function AmbientPlayerTheme({
             {renderVolumeControl('horizontal')}
           </div>
 
-          {/* A barra do modo letra não traz o texto da faixa; o leitor de tela
-              continua sabendo o que está tocando. */}
           <span className="sr-only">
             {content.title} — {content.creatorNames}
             {playback ? ` — ${playback.device.name}` : ''}

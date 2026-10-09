@@ -18,12 +18,6 @@ interface PosterTransportControlsProps {
   volumeControl: React.ReactNode
 }
 
-/**
- * A fileira ocupa a largura toda com `justify-between`: favorito na ponta esquerda,
- * o grupo de transporte centrado e o volume na ponta direita, como no Figma. Os
- * botões são os mesmos do tema Ambient, o play incluído — a pílula branca de 56px
- * sobre o glifo de 24px.
- */
 export function PosterTransportControls({
   controls,
   playback,
@@ -46,10 +40,6 @@ export function PosterTransportControls({
         disabled={!playback?.item || !controls.canToggleSaved || controls.isLibraryPending}
         onClick={controls.onToggleSaved}
       >
-        {/* Máscara, não <img>: o arquivo vem do Figma com o verde do Spotify assado no
-            fill, e como <img> ele ignorava a cor legível escolhida para o resto da
-            fileira. O check é um furo no próprio path, então o recorte sobrevive à
-            máscara e deixa o degradê aparecer por dentro do círculo. */}
         <PosterIcon className="size-full" source={savedIcon} />
       </button>
 
@@ -89,7 +79,7 @@ export function PosterTransportControls({
           >
             <span className="t-icon-swap poster-play-glyph" data-state={isPlaying ? 'a' : 'b'}>
               <PosterIcon className="t-icon size-full" source={pauseIcon} data-icon="a" />
-              {/* O Figma entrega apenas o estado tocando, sem glifo de play. */}
+
               <Play
                 aria-hidden="true"
                 className="t-icon size-full translate-x-[1px]"
@@ -121,8 +111,6 @@ export function PosterTransportControls({
           disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleRepeat}
           onClick={controls.onCycleRepeat}
         >
-          {/* O SVG tem 24x32: o ponto de "repetição ligada" fica abaixo do glifo e
-              só escapa do recorte quando o modo está ativo. */}
           <span className="poster-repeat-clip size-full">
             <PosterIcon className="poster-repeat-glyph" source={repeatIcon} />
           </span>

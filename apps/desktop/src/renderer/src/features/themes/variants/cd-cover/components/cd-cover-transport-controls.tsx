@@ -16,11 +16,6 @@ interface CdCoverTransportControlsProps {
   playback: PlaybackState | null
 }
 
-/**
- * Fileira centrada: aleatório e repetir em 18px nas pontas, e o trio anterior/play/próxima
- * no meio. O play é só o glifo maior, sem a pílula branca do tema Ambient — a caixa de
- * 56px do Figma vira área de toque em volta do glifo de 40px.
- */
 export function CdCoverTransportControls({
   controls,
   playback
@@ -69,7 +64,7 @@ export function CdCoverTransportControls({
         >
           <span className="t-icon-swap cd-cover-play-glyph" data-state={isPlaying ? 'a' : 'b'}>
             <CdCoverIcon className="t-icon size-full" source={pauseIcon} data-icon="a" />
-            {/* O Figma entrega apenas o estado tocando, sem glifo de play. */}
+
             <Play
               aria-hidden="true"
               className="t-icon size-full translate-x-[1px]"
@@ -101,8 +96,6 @@ export function CdCoverTransportControls({
         disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleRepeat}
         onClick={controls.onCycleRepeat}
       >
-        {/* O SVG tem 24x32: o ponto de "repetição ligada" fica abaixo do glifo e só
-            escapa do recorte quando o modo está ativo. */}
         <span className="cd-cover-repeat-clip size-full">
           <CdCoverIcon className="cd-cover-repeat-glyph" source={repeatIcon} />
         </span>

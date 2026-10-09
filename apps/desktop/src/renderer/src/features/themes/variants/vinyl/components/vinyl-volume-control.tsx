@@ -25,15 +25,6 @@ const rangeCommitKeys = new Set([
   'PageUp'
 ])
 
-/**
- * O Figma desenha só o ícone no canto: a barra ficaria numa faixa larga e vazia da tela,
- * competindo com a barra de progresso logo ao lado. Então o ícone abre um painel, como no
- * tema Poster, e o painel reusa o mesmo comportamento de dispensa do seletor de temas —
- * clique fora, foco fora e Escape.
- *
- * O input continua sendo um range nativo, transparente sobre a trilha pintada, para
- * preservar teclado e leitor de tela.
- */
 export function VinylVolumeControl({
   canSetVolume,
   isPending,

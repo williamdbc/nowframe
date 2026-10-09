@@ -20,13 +20,11 @@ export function CdCoverPlayerTheme({
 }: PlayerThemeProps): React.JSX.Element {
   const content = getPlayerThemeContent(playback, playbackStatus)
   const item = playback?.item ?? null
-  // Remontar o bloco a cada faixa é o que dispara a entrada animada de novo.
+
   const trackKey = item?.id ?? content.title
 
   return (
     <main className="player-theme-root cd-cover-root relative flex h-screen overflow-x-hidden overflow-y-auto">
-      {/* O fundo é a própria capa, muito ampliada e desfocada, sob um véu branco de 92%:
-          sobra só um rastro de cor da arte sobre o cinza claro do tema. */}
       {content.imageUrl && (
         <div aria-hidden="true" className="cd-cover-backdrop">
           <img
@@ -65,7 +63,6 @@ export function CdCoverPlayerTheme({
 
         <div className="cd-cover-panel">
           <div className="cd-cover-details">
-            {/* O Figma põe o artista acima do título, e menor. */}
             <p className="cd-cover-artist">
               <CdCoverRevealedText text={content.creatorNames} />
             </p>
@@ -99,8 +96,6 @@ export function CdCoverPlayerTheme({
           />
         </div>
 
-        {/* O desenho não mostra o álbum nem o dispositivo; o leitor de tela continua
-            recebendo os dois. */}
         {content.collectionName && <span className="sr-only">{content.collectionName}</span>}
         {playback && <span className="sr-only">{playback.device.name}</span>}
 

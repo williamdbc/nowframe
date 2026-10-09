@@ -24,12 +24,6 @@ const rangeCommitKeys = new Set([
   'PageUp'
 ])
 
-/**
- * O controle compartilhado é sempre horizontal e mostra a porcentagem; o Figma
- * pede uma coluna ao lado da capa na janela e uma faixa com thumb no modo tela
- * cheia. O input continua sendo um range nativo — transparente sobre a trilha
- * pintada — para preservar teclado e leitor de tela.
- */
 export function AmbientVolumeControl({
   canSetVolume,
   isPending,

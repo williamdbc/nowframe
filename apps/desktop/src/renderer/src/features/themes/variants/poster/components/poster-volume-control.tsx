@@ -25,15 +25,6 @@ const rangeCommitKeys = new Set([
   'PageUp'
 ])
 
-/**
- * Diferente dos outros temas, aqui o volume não fica na tela: o ícone abre um painel
- * com a coluna vertical desenhada no Figma. O painel reusa o mesmo comportamento de
- * dispensa do seletor de temas — clique fora, foco fora e Escape.
- *
- * O input continua sendo um range nativo, transparente sobre a trilha pintada, para
- * preservar teclado e leitor de tela. Ele é girado -90° porque `writing-mode` vertical
- * ainda não é confiável em todos os motores.
- */
 export function PosterVolumeControl({
   canSetVolume,
   isPending,

@@ -23,12 +23,6 @@ const rangeCommitKeys = new Set([
   'PageUp'
 ])
 
-/**
- * O controle compartilhado mostra a porcentagem em texto; o Figma pede uma
- * faixa fina com thumb visível ao lado do ícone. O input continua sendo um
- * range nativo — transparente sobre a trilha pintada — para preservar teclado e
- * leitor de tela.
- */
 export function SpotlightVolumeControl({
   canSetVolume,
   isPending,

@@ -1,14 +1,7 @@
-/**
- * O tema Ambient pinta o fundo com a cor predominante da capa do álbum.
- * O Figma define esse fundo como #312a17 para a capa de referência, que em HSL
- * é hsl(44, 36%, 14%): a matiz vem da arte, a luminosidade é fixa para manter o
- * contraste do texto branco estável em qualquer capa.
- */
 const backdropLightness = 0.14
 const minimumBackdropSaturation = 0.18
 const maximumBackdropSaturation = 0.42
 
-/** Pixels quase brancos ou quase pretos não definem a identidade da capa. */
 const maximumSampledLightness = 0.92
 const minimumSampledLightness = 0.06
 const minimumSampledSaturation = 0.12
@@ -32,11 +25,6 @@ interface HslColor {
   lightness: number
 }
 
-/**
- * Matiz e saturação predominantes da capa, sem luminosidade: quem consome decide em que
- * claridade pintar. O Ambient usa uma só, escura e fixa; o Vinyl usa duas, o corpo do
- * disco e o sulco.
- */
 export interface DominantCoverHue {
   hue: number
   saturation: number
@@ -89,17 +77,6 @@ export function toHslHex(hue: number, saturation: number, lightness: number): st
   return `#${toChannel(red)}${toChannel(green)}${toChannel(blue)}`
 }
 
-/**
- * Agrupa os pixels por matiz e escolhe o grupo de maior peso, onde o peso é a
- * saturação acumulada. Somar saturação em vez de contar pixels evita que uma
- * capa majoritariamente cinza devolva um fundo sem identidade.
- *
- * As matizes são somadas como vetores no círculo cromático para que o vermelho,
- * que fica nas duas pontas da escala, não seja partido em dois grupos opostos.
- *
- * Devolve `null` quando nenhum pixel carrega croma suficiente: uma arte preto e branco
- * não tem matiz para emprestar, e cada tema decide o que fazer com essa ausência.
- */
 export function getDominantCoverHue(pixels: Uint8ClampedArray): DominantCoverHue | null {
   const buckets = new Map<number, HueBucket>()
 
@@ -139,10 +116,6 @@ export function getDominantCoverHue(pixels: Uint8ClampedArray): DominantCoverHue
   }
 }
 
-/**
- * A saturação da capa entra numa janela estreita: abaixo do mínimo a arte perde
- * identidade no fundo, acima do máximo ela vira uma cor de aviso atrás do texto.
- */
 export function clampBackdropSaturation(saturation: number): number {
   return Math.min(maximumBackdropSaturation, Math.max(minimumBackdropSaturation, saturation))
 }

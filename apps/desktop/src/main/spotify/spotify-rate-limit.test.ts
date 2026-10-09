@@ -62,7 +62,6 @@ describe('rate limit window', () => {
     noteRequestSucceeded()
     expect(isRateLimited()).toBe(false)
 
-    // O contador voltou ao início, então a próxima espera é a menor de novo.
     noteRateLimited(null)
     vi.spyOn(Date, 'now').mockReturnValue(1_007_002)
     expect(isRateLimited()).toBe(false)

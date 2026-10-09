@@ -1,8 +1,3 @@
-/**
- * Spec per-word-crossfade do catálogo animate-text: as palavras entram uma após a outra
- * com um deslocamento vertical curto, em cadência calma e legível. É a mesma entrada dos
- * temas Ambient, Spotlight e CD Cover.
- */
 const staggerMs = 30
 
 interface VinylRevealedTextProps {
@@ -16,10 +11,6 @@ interface RevealUnit {
   value: string
 }
 
-/**
- * O split preserva os espaços para não colapsar a frase, mas só as palavras contam para o
- * stagger: senão a cadência sairia com o dobro do intervalo.
- */
 function toRevealUnits(text: string): RevealUnit[] {
   let wordIndex = 0
 
@@ -36,9 +27,7 @@ export function VinylRevealedText({
   text
 }: VinylRevealedTextProps): React.JSX.Element {
   const units = toRevealUnits(text)
-  // Uma frase quebrada em palavras não é legível como texto único, então o texto inteiro
-  // vai num nó exclusivo para leitores de tela. Com uma palavra só esse nó seria uma
-  // duplicata exata do span animado, e aí o próprio span já serve.
+
   const needsAccessibleCopy = units.length > 1
 
   return (

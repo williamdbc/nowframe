@@ -82,11 +82,6 @@ describe('useSetSpotifyPlaybackVolumeMutation', () => {
     expect(invalidateQueriesSpy).not.toHaveBeenCalled()
   })
 
-  /**
-   * Enquanto o Spotify nao publica o novo volume, o polling ainda relata o anterior. Sem a
-   * guarda ele sobrescrevia o valor otimista e o controle pulava de volta entre um arraste
-   * e outro — o que se sentia como um seletor travado.
-   */
   it('discards a polling response that still reports the previous volume', async () => {
     clearPlaybackExpectation()
     vi.spyOn(SpotifyPlaybackService, 'setVolume').mockResolvedValue(undefined)

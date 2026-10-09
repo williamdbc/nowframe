@@ -137,10 +137,6 @@ describe('CdCoverPlayerTheme', () => {
     expect(screen.getByRole('slider', { name: 'Volume' })).toBeVisible()
   })
 
-  /**
-   * A particularidade do tema: o disco gira enquanto toca, em velocidade constante, e o
-   * ângulo vem da posição de reprodução — não de uma animação de duração fixa.
-   */
   it('starts the disc unturned', () => {
     anchorClockAt(0, false)
     const { container } = renderTheme()
@@ -162,13 +158,11 @@ describe('CdCoverPlayerTheme', () => {
     expect(readRotationDegrees(container)).toBeCloseTo(270, 0)
   })
 
-  /** O ângulo é o resto da volta: numa faixa longa ele não cresce sem limite. */
   it('wraps the angle instead of letting it grow without bound', () => {
     anchorClockAt(16_000, false)
     const { container } = renderTheme()
     expect(readRotationDegrees(container)).toBeCloseTo(0, 0)
 
-    // 200 s são 12 voltas e meia: as doze inteiras somem, sobra a meia volta.
     playbackClock.setAnchor(null)
     anchorClockAt(200_000, false)
     const later = renderTheme()
@@ -182,24 +176,14 @@ describe('CdCoverPlayerTheme', () => {
     expect(readRotationDegrees(container)).toBe(0)
   })
 
-  /**
-   * O Figma desenha a fileira com aleatório, anterior, play, próxima e repetir — sem o
-   * favorito. É a única capacidade que este tema não expõe, e está registrada como
-   * exceção em `theme-contract.test.tsx`.
-   */
   it('does not draw a saved control, matching the design', () => {
     renderTheme()
 
     expect(screen.queryByRole('button', { name: 'Adicionar à biblioteca' })).not.toBeInTheDocument()
-    // O álbum não aparece na tela, mas o leitor de tela continua recebendo.
+
     expect(screen.getByText('Koi No Yokan')).toBeInTheDocument()
   })
 
-  /**
-   * Sem amostra da capa nao ha camada de cor. Uma cor neutra de reserva seria pior que
-   * nenhuma: `color` com cinza *tira* a iridescencia e o disco fica prateado, o que parece
-   * defeito em vez de ausencia de cor.
-   */
   it('leaves the disc untinted while the cover has not been sampled', () => {
     const { container } = renderTheme()
 

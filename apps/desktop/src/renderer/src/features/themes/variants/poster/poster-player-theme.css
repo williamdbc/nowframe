@@ -1,7 +1,3 @@
-/* Escala responsiva: os valores do Figma (frame de 1440x1080) são o teto. A
-   tipografia acompanha a largura porque o bloco de texto ocupa a fileira inteira;
-   os espaçamentos e os controles acompanham a altura, que é o que decide se o
-   conjunto ainda cabe acima da borda inferior. */
 .poster-root {
   --poster-inset: clamp(16px, 2.8vw, 40px);
   --poster-bottom: clamp(20px, 4.45vh, 48px);
@@ -19,32 +15,19 @@
   --poster-title-size: clamp(28px, 3.34vw, 48px);
   --poster-body-size: clamp(17px, 1.7vw, 24px);
   --poster-label-size: clamp(12px, 1vw, 14px);
-  /* Preenchidos em runtime pelo tema: a media da capa e o preto ou branco que a WCAG
-     escolhe sobre ela. Os valores abaixo valem so antes da primeira amostragem. */
+
   --poster-accent-rgb: 27 26 26;
   --poster-on-accent-rgb: 255 255 255;
   --poster-cover-blur: 40px;
   background-color: rgb(var(--poster-accent-rgb));
 }
 
-/* A capa preenche a tela, desfocada e ampliada: a arte vira atmosfera, e o degradê
-   encontra uma superfície sem detalhe competindo com o texto.
- *
- * A ampliação sai de um inset negativo, não de `scale`. `blur(40px)` é um gaussiano de
- * desvio 40px, então a imagem esmaece de fora para dentro de cada borda; a margem
- * precisa cobrir essa franja. Com `scale` a margem seria uma fração da janela — 10% de
- * uma janela de 720px daria só 36px por borda, e a franja apareceria no topo. Com o
- * inset ela é constante, ancorada no próprio raio do desfoque.
- *
- * Elemento substituído posicionado precisa de largura e altura explícitas: com
- * `width: auto` o navegador usaria o tamanho intrínseco da imagem e ignoraria o inset. */
 .poster-cover-image {
   position: absolute;
   inset: calc(var(--poster-cover-blur) * -2);
   width: calc(100% + var(--poster-cover-blur) * 4);
   height: calc(100% + var(--poster-cover-blur) * 4);
-  /* O preflight do Tailwind aplica `max-width: 100%` a toda <img>, o que prenderia a
-     largura no tamanho da janela e deixaria a margem do desfoque só de um lado. */
+
   max-width: none;
   object-fit: cover;
   filter: blur(var(--poster-cover-blur));
@@ -59,8 +42,6 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
-/* A entrada anima `filter`, então precisa assentar no desfoque de repouso: terminar em
-   `blur(0)` sobrescreveria o desfoque do elemento e a capa ficaria nítida. */
 @keyframes poster-cover-in {
   from {
     opacity: 0;
@@ -72,9 +53,6 @@
   }
 }
 
-/* O degradê parte da cor da capa em alfa zero e chega a ela cheia em 70%, ficando
-   opaco daí para baixo. É o que faz o bloco de informação assentar na arte em vez de
-   sobre uma tarja preta. */
 .poster-fade {
   position: absolute;
   bottom: 0;
@@ -100,8 +78,6 @@
   -webkit-mask-size: contain;
 }
 
-/* O conteúdo é ancorado pela borda inferior, não pelo topo: assim a coluna sobe
-   junto com a janela em vez de escapar por baixo. */
 .poster-stack {
   position: absolute;
   right: var(--poster-inset);
@@ -164,11 +140,6 @@
   color: rgb(var(--poster-on-accent-rgb));
 }
 
-/* Título longo para em duas linhas: passando disso o bloco de texto cresce e
-   empurra o transporte para fora da tela. O recorte do clamp ganha uma folga
-   vertical devolvida por margem negativa, senão o leading cortaria os
-   descendentes da última linha visível. A folga de 0.15em também acomoda as
-   unidades inline da animação sem recortar letras como g e y. */
 .poster-title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -192,7 +163,6 @@
   white-space: nowrap;
 }
 
-/* animate-text / per-word-crossfade */
 .poster-reveal-unit {
   display: inline-block;
   white-space: pre;
@@ -210,9 +180,6 @@
   }
 }
 
-/* O controle compartilhado renderiza o range e, depois, os dois tempos num nó
-   próprio. Aqui o Figma quer os três na mesma fileira, então o nó dos tempos
-   deixa de gerar caixa (`display: contents`) e a ordem recoloca cada um. */
 .poster-progress {
   display: flex;
   align-items: center;
@@ -243,10 +210,6 @@
   height: 8px;
 }
 
-/* Os botões são os do tema Ambient. O apagado fica reservado para
-   indisponibilidade real do dispositivo: comando em voo é sinalizado por
-   `data-busy`, senão clicar em aleatório ou repetir derrubava a opacidade e a
-   devolvia, o que se via como uma piscada. */
 .poster-control {
   --poster-control-size: var(--poster-icon-size);
   position: relative;
@@ -267,7 +230,7 @@
     opacity 160ms cubic-bezier(0.2, 0, 0, 1),
     scale 160ms cubic-bezier(0.2, 0, 0, 1);
 }
-/* Área de toque maior que o glifo, sem inflar o desenho. */
+
 .poster-control::before {
   content: '';
   position: absolute;
@@ -277,7 +240,7 @@
   height: calc(var(--poster-control-size) + 16px);
   transform: translate(-50%, -50%);
 }
-/* Aleatório e repetir são 18px no Figma; o resto da fileira é 24px. */
+
 .poster-control--sm {
   --poster-control-size: var(--poster-icon-small);
 }
@@ -288,9 +251,7 @@
 .poster-control:active {
   scale: 0.96;
 }
-/* O ativo era verde Spotify. Sobre um degradê que muda de cor a cada capa ele deixa de
-   ter contraste garantido, então o estado passa a usar a própria cor legível — o que
-   distingue ativo de inativo aqui é a opacidade cheia. */
+
 .poster-control[data-active='true'] {
   color: rgb(var(--poster-on-accent-rgb));
   opacity: 1;
@@ -309,13 +270,6 @@
   scale: 1;
 }
 
-/* O salvo não tem tratamento próprio aqui: como os demais controles, ele é uma máscara
-   em `currentColor`, e o que separa salvo de não salvo é a opacidade herdada de
-   `.poster-control` — 0.4 inativo, 1 ativo. Nos temas Ambient e Spotlight o mesmo ícone
-   é um <img> dessaturado por filtro, porque lá o verde do Spotify é a cor do estado. */
-
-/* O SVG de repetir tem 24x32: o ponto abaixo do glifo marca o modo ligado e só
-   escapa do recorte quando a repetição está ativa. */
 .poster-repeat-clip {
   position: relative;
   display: block;
@@ -329,9 +283,6 @@
   height: calc(var(--poster-control-size) * 4 / 3);
 }
 
-/* Sem a pílula branca do tema Ambient: aqui o play é só o glifo, maior que os demais
-   controles e na mesma cor legível. A caixa de 56px do Figma continua sendo a área de
-   toque em volta do glifo de 40px. */
 .poster-play {
   display: flex;
   align-items: center;
@@ -368,7 +319,6 @@
   scale: 1;
 }
 
-/* O painel de volume: o ícone é a âncora, e a coluna abre acima dele. */
 .poster-volume {
   position: relative;
   display: flex;
@@ -426,9 +376,6 @@
   background: #ffffff;
 }
 
-/* O range nativo fica transparente sobre a trilha pintada: preserva teclado e
-   leitor de tela e deixa o desenho do Figma por conta do CSS. Girar -90° é mais
-   confiável que `writing-mode` vertical entre motores. */
 .poster-volume-range {
   position: absolute;
   top: 50%;
@@ -499,8 +446,6 @@
   outline-offset: 2px;
 }
 
-/* Vermelho fixo só funciona num dos lados, então a variante segue o mesmo contraste
-   que a WCAG escolheu para o resto da informação. */
 .poster-error {
   font-size: var(--poster-label-size);
   font-weight: 500;

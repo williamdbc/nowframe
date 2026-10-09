@@ -1,9 +1,5 @@
 import type { SpotifyPlaybackItem } from '../../../../../contracts/nowframe-api'
 
-/**
- * Identidade estável de um conteúdo em reprodução. O Spotify omite o `id` em faixas
- * locais, então caímos para uma composição dos metadados quando ele não vem.
- */
 export function getPlaybackItemKey(item: SpotifyPlaybackItem | null | undefined): string | null {
   if (!item) return null
 
