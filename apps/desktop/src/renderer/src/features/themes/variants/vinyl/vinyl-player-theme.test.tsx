@@ -129,8 +129,6 @@ describe('VinylPlayerTheme', () => {
   it('puts the cover on the record label and repeats it in the bar', () => {
     const { container } = renderTheme()
 
-    // A capa aparece duas vezes: o rótulo do disco é a que se descreve, a miniatura da
-    // barra é decorativa e fica fora da árvore de acessibilidade.
     expect(screen.getByAltText('Capa de Koi No Yokan')).toBeVisible()
     expect(container.querySelector('.vinyl-sleeve-image')).toHaveAttribute('alt', '')
     expect(screen.getByRole('heading', { level: 1, name: 'Entombed' })).toBeVisible()
@@ -138,10 +136,6 @@ describe('VinylPlayerTheme', () => {
     expect(screen.getByRole('slider', { name: 'Posição da reprodução' })).toBeVisible()
   })
 
-  /**
-   * O disco gira inteiro, não só o miolo: a camada que roda é a única filha do recorte, e
-   * tudo que desenha o vinil — varreduras, sulcos e rótulo — está dentro dela.
-   */
   it('turns the whole record, not only the label', () => {
     const { container } = renderTheme()
     const record = container.querySelector('.vinyl-record') as HTMLElement
@@ -155,11 +149,6 @@ describe('VinylPlayerTheme', () => {
     expect(turn.querySelectorAll('.vinyl-groove[data-filled="true"]')).toHaveLength(1)
   })
 
-  /**
-   * A particularidade do tema: o disco gira enquanto toca, em velocidade constante, e o
-   * ângulo vem da posição de reprodução — não de uma animação de duração fixa. Uma volta
-   * leva 20 segundos de música.
-   */
   it('starts the record unturned', () => {
     anchorClockAt(0, false)
     const { container } = renderTheme()
@@ -181,13 +170,11 @@ describe('VinylPlayerTheme', () => {
     expect(readRotationDegrees(container)).toBeCloseTo(270, 0)
   })
 
-  /** O ângulo é o resto da volta: numa faixa longa ele não cresce sem limite. */
   it('wraps the angle instead of letting it grow without bound', () => {
     anchorClockAt(20_000, false)
     const { container } = renderTheme()
     expect(readRotationDegrees(container)).toBeCloseTo(0, 0)
 
-    // 230 s são 11 voltas e meia: as onze inteiras somem, sobra a meia volta.
     playbackClock.setAnchor(null)
     anchorClockAt(230_000, false)
     const later = renderTheme()
@@ -201,10 +188,6 @@ describe('VinylPlayerTheme', () => {
     expect(readRotationDegrees(container)).toBe(0)
   })
 
-  /**
-   * Sem amostra da capa o disco fica preto de sulco cinza — o vinil comum, não um estado à
-   * espera de cor.
-   */
   it('falls back to a black record while the cover has not been sampled', () => {
     const { container } = renderTheme()
     const root = container.querySelector('.vinyl-root') as HTMLElement
@@ -213,7 +196,6 @@ describe('VinylPlayerTheme', () => {
     expect(root.style.getPropertyValue('--vinyl-groove')).toBe('#5f5f5f')
   })
 
-  /** O Figma mostra só o ícone de volume; a barra vive num painel que ele abre. */
   it('keeps the volume slider behind a panel', async () => {
     const user = userEvent.setup()
     renderTheme()
@@ -262,8 +244,7 @@ describe('VinylPlayerTheme', () => {
     renderTheme(false, {}, { ...playback, item: { ...playback.item!, imageUrl: null } })
 
     expect(screen.getByText('Nenhuma capa de álbum disponível')).toBeInTheDocument()
-    // O álbum e o dispositivo não aparecem na tela, mas o leitor de tela continua
-    // recebendo os dois.
+
     expect(screen.getByText('Koi No Yokan')).toBeInTheDocument()
     expect(screen.getByText('MacBook Pro')).toBeInTheDocument()
   })

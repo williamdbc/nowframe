@@ -76,12 +76,11 @@ export function SpotlightPlayerTheme({
 }: PlayerThemeProps): React.JSX.Element {
   const content = getPlayerThemeContent(playback, playbackStatus)
   const item = playback?.item ?? null
-  // Remontar o bloco a cada faixa é o que dispara a entrada animada de novo.
+
   const trackKey = item?.id ?? content.title
 
   return (
     <main className="player-theme-root spotlight-root group relative flex h-screen overflow-x-hidden overflow-y-auto px-[24px] py-[32px]">
-      {/* O fundo do Figma é a própria capa, ampliada e desfocada. */}
       {content.imageUrl && (
         <div aria-hidden="true" className="spotlight-backdrop">
           <img
@@ -165,8 +164,6 @@ export function SpotlightPlayerTheme({
           />
         </div>
 
-        {/* O desenho não mostra o dispositivo; o leitor de tela continua sabendo
-            onde a faixa está tocando. */}
         {playback && <span className="sr-only">{playback.device.name}</span>}
 
         {controls.errorMessage && (

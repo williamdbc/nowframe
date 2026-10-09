@@ -11,15 +11,6 @@ interface CdCoverMediaProps {
   title: string
 }
 
-/**
- * A capa e o disco saindo por trás dela, como o Figma desenha: a capa em 340px na frente,
- * o disco em 300px deslocado para a direita e um pouco para baixo.
- *
- * O disco é um único PNG exportado do grupo do Figma. No arquivo ele é uma pilha de treze
- * elipses com `hard-light`, `overlay` e `color-burn` compondo a iridescência; achatar isso
- * num asset só evita treze imagens e treze camadas de composição a cada frame — e, como o
- * disco gira inteiro, é justamente a unidade que precisa girar.
- */
 export function CdCoverMedia({
   collectionName,
   imageUrl,
@@ -33,14 +24,13 @@ export function CdCoverMedia({
     <div className="cd-cover-media">
       <div aria-hidden="true" className="cd-cover-disc" ref={discRef}>
         <img alt="" className="cd-cover-disc-image" src={discImage} />
-        {/* A cor da capa entra por cima, recortada pela forma do proprio disco. Sem cor
-            amostrada nao ha camada: o disco fica com a iridescencia natural. */}
+
         {accentColor && (
           <div
             className="cd-cover-disc-tint"
             style={{
               backgroundColor: accentColor,
-              // O Vite inlina o PNG como URL de modulo, entao a mascara so pode vir do JS.
+
               maskImage: `url("${discImage}")`,
               WebkitMaskImage: `url("${discImage}")`
             }}

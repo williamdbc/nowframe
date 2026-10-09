@@ -121,7 +121,24 @@ export const themeRegistry = {
   }
 } as const satisfies Record<PlayerThemeId, PlayerTheme>
 
-export const availableThemes = Object.values(themeRegistry)
+export const availableThemes = [
+  themeRegistry.ambient,
+  themeRegistry['arcade-select'],
+  // themeRegistry.cassette,
+  themeRegistry['cd-cover'],
+  themeRegistry.default,
+  themeRegistry.drive,
+  themeRegistry.karaoke,
+  themeRegistry.lyrics,
+  themeRegistry.minimalist,
+  themeRegistry.poster,
+  // themeRegistry.prism,
+  // themeRegistry['rocket-league'],
+  themeRegistry.setlist,
+  themeRegistry.spotlight,
+  themeRegistry.tracklist,
+  themeRegistry.vinyl
+]
 
 export function isPlayerThemeId(value: string): value is PlayerThemeId {
   return value in themeRegistry

@@ -45,13 +45,9 @@ export function VinylPlayerTheme({
 }: PlayerThemeProps): React.JSX.Element {
   const content = getPlayerThemeContent(playback, playbackStatus)
   const item = playback?.item ?? null
-  // Remontar o bloco a cada faixa é o que dispara a entrada animada de novo. Aqui a chave
-  // fica só no bloco de identificação: o disco e os controles atravessam a troca de faixa
-  // inteiros, o disco para não reiniciar o giro e os controles para não perderem o foco.
+
   const trackKey = item?.id ?? content.title
 
-  // As duas cores saem da capa; a transição entre elas fica no CSS, então trocar de faixa
-  // vira uma virada de cor do disco e do fundo em vez de um corte seco.
   const recordColor = useVinylRecordColor(content.imageUrl)
 
   return (
@@ -101,7 +97,6 @@ export function VinylPlayerTheme({
           </div>
 
           <div className="vinyl-details">
-            {/* O Figma põe o artista acima do título, e menor. */}
             <p className="vinyl-artist">
               <VinylRevealedText text={content.creatorNames} />
             </p>
@@ -114,9 +109,6 @@ export function VinylPlayerTheme({
         <div className="vinyl-controls">
           <VinylTransportControls controls={controls} playback={playback} />
 
-          {/* Os tempos ficam nas pontas da barra, não abaixo dela. O controle compartilhado
-              desenha o input e depois os dois tempos, então o CSS os recoloca na mesma
-              fileira em vez de duplicar a lógica do controle. */}
           <PlaybackProgressControl
             accentColor="#ffffff"
             canSeek={Boolean(item && playback?.capabilities.canSeek)}
@@ -145,8 +137,6 @@ export function VinylPlayerTheme({
         </div>
       </footer>
 
-      {/* O desenho não mostra o álbum nem o dispositivo; o leitor de tela continua
-          recebendo os dois. */}
       {content.collectionName && <span className="sr-only">{content.collectionName}</span>}
       {playback && <span className="sr-only">{playback.device.name}</span>}
 

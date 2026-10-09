@@ -4,7 +4,6 @@ import { getPosterAccentColor, posterFallbackAccent } from './get-poster-accent-
 
 const sampleSize = 4
 
-/** Monta uma amostra `sampleSize x sampleSize` a partir de uma cor por linha. */
 function buildSample(rowColors: Array<[number, number, number, number]>): Uint8ClampedArray {
   const pixels = new Uint8ClampedArray(sampleSize * sampleSize * 4)
 
@@ -35,10 +34,6 @@ describe('getPosterAccentColor', () => {
     expect(getPosterAccentColor(pixels, sampleSize)).toEqual({ blue: 167, green: 170, red: 155 })
   })
 
-  /**
-   * O degradê encosta na metade de baixo da arte, então ela pesa mais: sem isso uma capa
-   * com topo muito diferente do rodapé produzia emenda visível.
-   */
   it('weights the bottom half of the cover more than the top', () => {
     const pixels = buildSample([
       [0, 0, 0, 255],
@@ -49,7 +44,6 @@ describe('getPosterAccentColor', () => {
 
     const accent = getPosterAccentColor(pixels, sampleSize)
 
-    // Média simples daria 100; com peso 3 na metade de baixo, 150.
     expect(accent.red).toBe(150)
   })
 

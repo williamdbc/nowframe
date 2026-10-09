@@ -23,11 +23,6 @@ const rangeCommitKeys = new Set([
   'PageUp'
 ])
 
-/**
- * Fileira horizontal ao pé da coluna: ícone de som e a trilha ocupando o resto. O input é
- * um range nativo transparente sobre a trilha pintada, para preservar teclado e leitor de
- * tela enquanto o desenho fica por conta do CSS.
- */
 export function CdCoverVolumeControl({
   canSetVolume,
   isPending,

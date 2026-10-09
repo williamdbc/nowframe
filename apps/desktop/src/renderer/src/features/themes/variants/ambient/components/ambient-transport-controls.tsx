@@ -82,7 +82,7 @@ export function AmbientTransportControls({
         >
           <span className="t-icon-swap size-[24px]" data-state={isPlaying ? 'a' : 'b'}>
             <AmbientIcon className="t-icon size-[24px]" source={pauseIcon} data-icon="a" />
-            {/* O Figma entrega apenas o estado tocando, sem glifo de play. */}
+
             <Play
               aria-hidden="true"
               className="t-icon size-[24px] translate-x-[1px]"
@@ -115,14 +115,11 @@ export function AmbientTransportControls({
           disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleRepeat}
           onClick={controls.onCycleRepeat}
         >
-          {/* O SVG tem 24x32: o ponto de "repetição ligada" fica abaixo dos
-              24px do ícone e só aparece quando o modo está ativo. */}
           <span className="ambient-repeat-clip size-[24px]">
             <AmbientIcon className="ambient-repeat-glyph" source={repeatIcon} />
           </span>
         </button>
-        {/* O ícone de tela cheia do Figma alterna o layout reduzido do tema. A
-            janela do app em si continua sendo assunto do botão do canto. */}
+
         <button
           className="ambient-control"
           type="button"

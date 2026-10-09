@@ -1,10 +1,11 @@
 {
   "name": "nowframe-desktop",
   "productName": "Nowframe",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "A customizable second screen for your music.",
   "main": "./out/main/index.js",
   "author": "William",
+  "license": "MIT",
   "scripts": {
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -15,6 +16,7 @@
     "typecheck": "npm run routes:generate && npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
+    "demo:themes": "node scripts/demo/start-demo.mjs",
     "build": "npm run typecheck && electron-vite build",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",

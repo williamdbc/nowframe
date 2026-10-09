@@ -1,6 +1,3 @@
-/* Escala responsiva: os valores do Figma (frame de 1440x1080) são o teto. A barra segue a
-   altura da janela, como nos outros temas, porque é ela que decide se texto e controles
-   ainda cabem numa fileira só; os espaços horizontais seguem a largura. */
 .vinyl-root {
   --vinyl-inset: clamp(16px, 2.78vw, 40px);
   --vinyl-bar-gap: clamp(16px, 2.78vw, 40px);
@@ -20,16 +17,11 @@
   --vinyl-body-size: clamp(12px, 1.3vh, 14px);
   --vinyl-time-size: clamp(11px, 1.3vh, 14px);
 
-  /* O disco é 1280 num frame de 1440x1080. Os dois limites entram porque cada um governa
-     uma janela diferente: numa tela larga e baixa a altura é que segura o disco, numa
-     estreita e alta é a largura. */
   --vinyl-size: min(118.5vh, 88.9vw);
-  /* Todas as medidas internas do disco foram lidas no Figma em cima de 1280px. */
+
   --vinyl-unit: calc(var(--vinyl-size) / 1280);
   --vinyl-hairline: calc(var(--vinyl-unit) * 1.72);
 
-  /* Preenchidas em runtime pelo tema: a matiz da capa em duas claridades. Os valores
-     abaixo valem só antes da primeira amostragem — um vinil preto de sulco cinza. */
   --vinyl-record-color: #1b1a19;
   --vinyl-groove: #5f5f5f;
 
@@ -38,8 +30,7 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  /* O fundo do Figma é a cor do disco sob um véu preto de 48%: a mesma matiz da capa, mais
-     escura que o disco, para o vinil se destacar sem uma segunda cor entrar em cena. */
+
   background-color: var(--vinyl-record-color);
   background-image: linear-gradient(rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.48));
   transition: background-color 900ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -56,11 +47,6 @@
   -webkit-mask-size: contain;
 }
 
-/* ---------------------------------------------------------------- o disco -- */
-
-/* O centro do disco fica na borda de cima da janela, então só a metade de baixo aparece.
-   O recorte circular do próprio disco é o que contém a luz e a sombra, que transbordam a
-   caixa de propósito. */
 .vinyl-record {
   position: absolute;
   top: 0;
@@ -72,11 +58,9 @@
   border: calc(var(--vinyl-unit) * 2) solid rgba(255, 255, 255, 0.06);
   border-radius: 50%;
   overflow: hidden;
-  /* Base sob a camada que gira: sem ela uma borda antisserrilhada deixaria um fio do fundo
-     do tema aparecer na volta do recorte. */
+
   background-color: var(--vinyl-record-color);
-  /* Contém o `mix-blend-mode` da varredura de luz: sem isto ela alcançaria o fundo do
-     tema em vez de parar no disco. */
+
   isolation: isolate;
   box-shadow:
     0 calc(var(--vinyl-unit) * 2.133) calc(var(--vinyl-unit) * 2.133) rgba(14, 14, 16, 0.04),
@@ -86,19 +70,13 @@
   transition: background-color 900ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* O disco inteiro numa camada só: corpo, brilho, varreduras, sulcos e rótulo giram juntos.
-   O quadrado gira dentro do recorte redondo sem abrir buraco porque o círculo do recorte é
-   o inscrito neste quadrado, e um círculo inscrito é invariante à rotação.
-
-   `will-change` promove a camada para o compositor: o gradiente, as duas varreduras com
-   filtro e os quatro anéis são rasterizados uma vez e a rotação vira só composição. */
 .vinyl-record-turn {
   position: absolute;
   inset: 0;
   rotate: var(--vinyl-rotation, 0deg);
   will-change: rotate;
   background-color: var(--vinyl-record-color);
-  /* A luz difusa de cima e o brilho em losango, os dois do Figma. */
+
   background-image:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 100%),
     url("data:image/svg+xml;utf8,<svg viewBox='0 0 1280 1280' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'><g transform='matrix(128 128 -64 64 0 0)' opacity='0.25'><rect height='100' width='100' fill='url(%23grad)' id='quad' shape-rendering='crispEdges'/><use href='%23quad' transform='scale(1 -1)'/><use href='%23quad' transform='scale(-1 1)'/><use href='%23quad' transform='scale(-1 -1)'/></g><defs><linearGradient id='grad' gradientUnits='userSpaceOnUse' x2='5' y2='5'><stop stop-color='rgba(255,255,255,0.4)' offset='0'/><stop stop-color='rgba(255,255,255,0)' offset='1'/></linearGradient></defs></svg>");
@@ -112,8 +90,6 @@
   pointer-events: none;
 }
 
-/* Cada varredura é uma caixa do tamanho do disco, girada, com a imagem transbordando nas
-   proporções que o Figma exportou — é a folga do desfoque, que morreria cortada rente. */
 .vinyl-record-sweep {
   position: absolute;
   inset: 0;
@@ -124,13 +100,10 @@
   left: -3.71%;
   width: 110.57%;
   height: 116.83%;
-  /* O preflight do Tailwind aplica `max-width: 100%` a toda <img>; sem desarmar aqui a
-     largura fica presa e a varredura sai distorcida. */
+
   max-width: none;
 }
-/* A varredura clara entra em `overlay`: sobre o disco escuro o modo multiplica em vez de
-   apenas somar, então o realce puxa a própria cor da capa para cima em vez de lavá-la de
-   branco. É por isso que ela aguenta 20% de preenchimento sem virar um véu cinza. */
+
 .vinyl-record-sweep--light {
   rotate: 13.32deg;
   mix-blend-mode: overlay;
@@ -148,13 +121,11 @@
   border-radius: 50%;
   transition: border-color 900ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-/* O anel interno é preenchido com a própria cor do disco a 25%: abafa de leve o reflexo do
-   ambiente na faixa em volta do rótulo. */
+
 .vinyl-groove[data-filled='true'] {
   background-color: color-mix(in srgb, var(--vinyl-record-color) 25%, transparent);
 }
 
-/* O rótulo é a capa recortada em círculo, com a borda na cor do disco. */
 .vinyl-label {
   position: absolute;
   top: 50%;
@@ -193,7 +164,6 @@
   }
 }
 
-/* O furo: três anéis metálicos concêntricos, medidos em fração do rótulo. */
 .vinyl-spindle {
   position: absolute;
   top: 50%;
@@ -227,11 +197,6 @@
   background-image: linear-gradient(to left, #bfbfbf, #e1e1e1);
 }
 
-/* --------------------------------------------------------------- a barra -- */
-
-/* Três colunas: identificação à esquerda, transporte e progresso no centro, favorito e
-   volume à direita. A do meio tem largura própria para o transporte ficar centrado na
-   janela, e não no espaço que sobrar das outras duas. */
 .vinyl-bar {
   position: relative;
   z-index: 2;
@@ -244,8 +209,6 @@
   grid-template-columns: minmax(0, 1fr) var(--vinyl-center-column) minmax(0, 1fr);
 }
 
-/* Abaixo da janela mínima suportada (900x540) as três colunas deixam de caber sem
-   espremer o título. Aí a barra vira duas fileiras e o transporte ocupa a de baixo. */
 @media (max-width: 860px) {
   .vinyl-bar {
     grid-template-areas:
@@ -284,7 +247,6 @@
   }
 }
 
-/* A capa pequena: borda, sombra em quatro camadas e brilho diagonal, todos do Figma. */
 .vinyl-sleeve {
   position: relative;
   width: var(--vinyl-cover-size);
@@ -339,8 +301,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* Título longo para numa linha só: a barra tem altura fixa e uma segunda linha empurraria
-   o transporte para fora do alinhamento com as outras colunas. */
+
 .vinyl-title {
   max-width: 100%;
   overflow: hidden;
@@ -354,7 +315,6 @@
   white-space: nowrap;
 }
 
-/* animate-text / per-word-crossfade */
 .vinyl-reveal-unit {
   display: inline-block;
   white-space: pre;
@@ -393,9 +353,6 @@
   gap: var(--vinyl-transport-inner-gap);
 }
 
-/* Os tempos ficam nas pontas da barra, não abaixo dela. `display: contents` desmonta o
-   invólucro que o controle compartilhado desenha e devolve os dois <span> à mesma fileira
-   do input, sem duplicar a lógica do controle. */
 .vinyl-progress {
   display: flex;
   width: 100%;
@@ -435,13 +392,6 @@
   grid-area: actions;
 }
 
-/* ------------------------------------------------------------- controles -- */
-
-/* O Figma deixa os controles secundários a 80% de branco, não aos 40% dos temas escuros:
-   o disco por trás é uma superfície de cor, e 40% ali some. O apagado fica reservado para
-   indisponibilidade real do dispositivo — comando em voo é sinalizado por `data-busy`,
-   senão clicar em aleatório ou repetir derrubava a opacidade e a devolvia, o que se via
-   como uma piscada. */
 .vinyl-control {
   --vinyl-control-size: var(--vinyl-icon-size);
   position: relative;
@@ -461,7 +411,7 @@
     opacity 160ms cubic-bezier(0.2, 0, 0, 1),
     scale 160ms cubic-bezier(0.2, 0, 0, 1);
 }
-/* Área de toque maior que o glifo, sem inflar o desenho. */
+
 .vinyl-control::before {
   content: '';
   position: absolute;
@@ -474,7 +424,7 @@
 .vinyl-control--sm {
   --vinyl-control-size: var(--vinyl-icon-small);
 }
-/* O play é só o glifo maior, sem pílula. A caixa de 56px do Figma vira área de toque. */
+
 .vinyl-control--play {
   --vinyl-control-size: var(--vinyl-play-glyph-size);
   opacity: 1;
@@ -508,8 +458,6 @@
   scale: 1;
 }
 
-/* O SVG de repetir tem 18x24: o ponto abaixo do glifo marca o modo ligado e só escapa do
-   recorte quando a repetição está ativa. */
 .vinyl-repeat-clip {
   position: relative;
   display: block;
@@ -523,7 +471,6 @@
   height: calc(var(--vinyl-control-size) * 4 / 3);
 }
 
-/* transitions-dev — troca do glifo de play/pause dentro do mesmo botão. */
 .vinyl-icon-swap {
   position: relative;
   display: inline-grid;
@@ -547,8 +494,6 @@
   filter: blur(2px);
   transform: scale(0.25);
 }
-
-/* ---------------------------------------------------------------- volume -- */
 
 .vinyl-volume {
   position: relative;
@@ -649,8 +594,7 @@
     width 120ms linear,
     left 120ms linear;
 }
-/* O range nativo fica transparente sobre a trilha pintada: preserva teclado e leitor de
-   tela e deixa o desenho do Figma por conta do CSS. */
+
 .vinyl-volume-range {
   position: absolute;
   inset: -10px 0;
@@ -667,14 +611,11 @@
 .vinyl-volume-range:disabled {
   cursor: not-allowed;
 }
-/* O anel é para navegação por teclado. Com `:focus-within` ele ficaria preso depois de
-   arrastar o volume com o mouse, até um clique fora. */
+
 .vinyl-volume-track:has(:focus-visible) {
   outline: 2px solid #1ed760;
   outline-offset: 4px;
 }
-
-/* ----------------------------------------------------------------- resto -- */
 
 .vinyl-nav-button {
   display: flex;

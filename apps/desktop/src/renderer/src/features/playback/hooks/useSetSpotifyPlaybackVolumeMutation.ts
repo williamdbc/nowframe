@@ -41,9 +41,6 @@ export function useSetSpotifyPlaybackVolumeMutation(): UseMutationResult<
         }
       })
 
-      // Até o Spotify publicar o novo volume, o polling ainda relata o anterior. Sem esta
-      // expectativa o valor pulava de volta entre um arraste e outro, o que se sentia como
-      // um controle travado brigando com o cursor.
       const committedVolumePercent = Math.min(100, Math.max(0, volumePercent))
       expectPlayback((playback) => playback.device.volumePercent === committedVolumePercent)
 

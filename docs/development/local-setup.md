@@ -2,7 +2,7 @@
 
 ## Pré-requisitos
 
-- Git, Node.js e npm.
+- Git, Node.js 22.12 ou superior e npm.
 - Uma conta Spotify e acesso ao [Spotify Developer Dashboard](https://developer.spotify.com/dashboard).
 - Um aplicativo Spotify em Development Mode ou outro modo compatível.
 - Um dispositivo Spotify capaz de iniciar uma reprodução para testar o controle remoto.
@@ -11,17 +11,21 @@ No Development Mode, o proprietário do aplicativo precisa ter Spotify Premium a
 
 ## Configurar o Spotify Dashboard
 
-1. Crie ou abra um aplicativo no Developer Dashboard.
+1. Crie seu próprio aplicativo no [Developer Dashboard](https://developer.spotify.com/dashboard), usando **Create app**, ou abra um aplicativo existente. Preencha nome e descrição à sua escolha.
 2. Em Redirect URIs, adicione exatamente:
 
    ```text
    http://127.0.0.1:8888/callback
    ```
 
-3. Se outra pessoa usar o mesmo aplicativo em Development Mode, adicione a conta em Users Management.
-4. Copie o Client ID. Não copie nem compartilhe o Client Secret com o Nowframe.
+3. Em **Which API/SDKs are you planning to use?**, marque **Web API**. O **Web Playback SDK** não é usado pela versão atual; pode continuar marcado em um aplicativo existente, mas não é necessário para o Nowframe.
+4. Deixe **Bundle IDs** e **Android packages** vazios. Esses campos pertencem às integrações com os SDKs de iOS e Android, não à aplicação Electron.
+5. Aceite os termos e salve. Confira em **Settings → Users Management** se a conta que fará login está autorizada; adicione as contas de outras pessoas caso compartilhe o mesmo Client ID em Development Mode.
+6. Copie o **Client ID** nas configurações do app. Não copie nem compartilhe o **Client Secret** com o Nowframe: o login usa PKCE.
 
-O redirect usa loopback HTTP porque o callback acontece na máquina local. `localhost`, outra porta, barra final diferente ou caminho diferente não correspondem à configuração padrão.
+O redirect usa loopback HTTP porque o callback acontece na máquina local. `localhost`, outra porta, barra final diferente ou caminho diferente não correspondem à configuração padrão. A configuração segue as [regras de Redirect URIs do Spotify](https://developer.spotify.com/documentation/web-api/concepts/redirect_uri).
+
+Se o seu Dashboard já usa `http://127.0.0.1:3000/callback`, você pode manter essa URI, configurando o mesmo valor em `MAIN_VITE_SPOTIFY_REDIRECT_URI`. A porta escolhida deve estar livre durante o login. O próprio Nowframe inicia o servidor do callback; não é preciso criar um servidor separado.
 
 Quotas de Development Mode são contabilizadas por conta de desenvolvedor, não por Client ID. Criar vários aplicativos na mesma conta continua consumindo o mesmo orçamento. Para trabalho simultâneo sem compartilhar a quota, cada colaborador pode criar seu aplicativo Spotify em sua própria conta de desenvolvedor e configurar o Client ID localmente.
 
@@ -33,6 +37,8 @@ Na raiz do repositório:
 npm --prefix apps/desktop install
 cp apps/desktop/.env.example apps/desktop/.env.local
 ```
+
+No Windows com PowerShell, use `Copy-Item apps/desktop/.env.example apps/desktop/.env.local` no lugar de `cp`.
 
 Edite `apps/desktop/.env.local`:
 

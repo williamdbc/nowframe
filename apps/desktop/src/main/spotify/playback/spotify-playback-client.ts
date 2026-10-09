@@ -161,12 +161,6 @@ function mapPlaybackItem(item: unknown): SpotifyPlaybackItem | null {
   return null
 }
 
-/**
- * O `progress_ms` devolvido pelo Spotify era verdade no servidor por volta da metade da
- * viagem de ida e volta, não no momento em que a resposta chegou. Estampar `Date.now()`
- * na chegada faz o relógio local nascer atrasado por ~RTT/2 (medido: 75–130 ms), viés que
- * todo o cálculo de progresso e a sincronia da letra herdam.
- */
 export function estimatePlaybackSynchronizedAt(
   requestStartedAt: number,
   respondedAt: number
@@ -175,10 +169,6 @@ export function estimatePlaybackSynchronizedAt(
   return requestStartedAt + Math.round(roundTripMs / 2)
 }
 
-/**
- * Só as consultas periódicas esperam a janela de rate limit. Comandos da pessoa passam
- * direto — ver `spotify-rate-limit.ts`.
- */
 function ensurePollingIsAllowed(): void {
   const remainingMs = getRateLimitRemainingMs()
   if (remainingMs <= 0) return

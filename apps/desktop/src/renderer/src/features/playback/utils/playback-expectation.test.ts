@@ -33,7 +33,6 @@ describe('shouldDiscardPlayback', () => {
     expect(shouldDiscardPlayback({ ...playback, shuffleEnabled: true }, 1_100)).toBe(false)
   })
 
-  /** Uma vez confirmada, o servidor volta a mandar — inclusive para desligar de novo. */
   it('stops guarding once the expectation is satisfied', () => {
     expectPlayback((state) => state.shuffleEnabled, 1_000)
     shouldDiscardPlayback({ ...playback, shuffleEnabled: true }, 1_100)
@@ -41,7 +40,6 @@ describe('shouldDiscardPlayback', () => {
     expect(shouldDiscardPlayback(playback, 1_200)).toBe(false)
   })
 
-  /** Válvula de escape: se o Spotify nunca confirmar, a verdade dele prevalece. */
   it('gives up after the expectation expires', () => {
     expectPlayback((state) => state.shuffleEnabled, 1_000)
 

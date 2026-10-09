@@ -21,3 +21,9 @@ createRoot(rootElement).render(
     </QueryClientProvider>
   </StrictMode>
 )
+
+if (import.meta.env.DEV && import.meta.env.VITE_THEME_SHOWCASE === 'true') {
+  void import('../../../scripts/demo/showcase-themes').then(({ installThemeShowcase }) => {
+    installThemeShowcase()
+  })
+}

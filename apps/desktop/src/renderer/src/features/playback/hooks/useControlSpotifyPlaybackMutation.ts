@@ -20,11 +20,6 @@ interface PlaybackMutationContext {
   reconciliationSequence: number
 }
 
-/**
- * Offsets medidos a partir do instante em que o comando foi disparado, não do fim da
- * tentativa anterior. Assim, a confirmação fica limitada ao primeiro segundo mesmo que
- * cada consulta ao Spotify leve alguns centenas de milissegundos.
- */
 const playbackReconciliationOffsetsMs = [0, 200, 500, 1_000] as const
 
 function wait(delayMs: number): Promise<void> {
@@ -35,10 +30,6 @@ function hasPlaybackChanged(
   previousPlayback: SpotifyPlayback | undefined,
   currentPlayback: NonNullable<SpotifyPlayback>
 ): boolean {
-  // `stateChangedAt` é o único sinal autoritativo de que o player mudou de estado, e pega
-  // casos que as heurísticas abaixo não veem — avançar para a mesma faixa em repeat, por
-  // exemplo. Só é usado como sinal positivo: o campo tem histórico de vir ausente ou
-  // zerado, então igualdade não vale como prova de que nada mudou.
   const previousStateChangedAt = previousPlayback?.stateChangedAt
   if (
     previousStateChangedAt != null &&
@@ -69,7 +60,6 @@ async function reconcilePlaybackAfterSkip(
     if (delayMs > 0) await wait(delayMs)
     if (reconciliationSequence !== getCurrentReconciliationSequence()) return
 
-    // Se o polling já confirmou a troca, não gastamos outra chamada de reconciliação.
     const cachedPlayback = queryClient.getQueryData<SpotifyPlayback>(queryKey)
     if (cachedPlayback && hasPlaybackChanged(previousPlayback, cachedPlayback)) return
 
@@ -147,10 +137,6 @@ export function useControlSpotifyPlaybackMutation(): UseMutationResult<
         optimisticallyUpdatePlayingState(playback, command)
       )
 
-      // Ao trocar de faixa, o polling ainda relata a anterior por um tempo. Sem esta
-      // expectativa o cache oscilava entre as duas, e como o tema usa a identidade da
-      // faixa como `key`, cada oscilação remontava a seção e reiniciava as animações —
-      // era o conteúdo "piscando" ao pular.
       if (command === 'next' || command === 'previous') {
         const previousContentKey = getPlaybackContentKey(previousPlayback)
         expectPlayback((playback) => getPlaybackContentKey(playback) !== previousContentKey)

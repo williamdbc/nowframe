@@ -16,10 +16,6 @@ interface VinylTransportControlsProps {
   playback: PlaybackState | null
 }
 
-/**
- * A fileira do Figma: aleatório, anterior, play, próxima e repetir, centrados na barra. O
- * play é só o glifo maior, sem pílula — a caixa de 56px do desenho vira área de toque.
- */
 export function VinylTransportControls({
   controls,
   playback
@@ -65,7 +61,7 @@ export function VinylTransportControls({
         >
           <span className="vinyl-icon-swap size-full" data-state={isPlaying ? 'playing' : 'paused'}>
             <VinylIcon className="size-full" source={pauseIcon} data-icon="pause" />
-            {/* O Figma entrega apenas o estado tocando, sem glifo de play. */}
+
             <Play
               aria-hidden="true"
               className="size-full translate-x-[2%]"
@@ -97,8 +93,6 @@ export function VinylTransportControls({
         disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleRepeat}
         onClick={controls.onCycleRepeat}
       >
-        {/* O SVG de repetir tem 18x24: o ponto de "repetição ligada" fica abaixo do glifo e
-            só escapa do recorte quando o modo está ativo. */}
         <span className="vinyl-repeat-clip size-full">
           <VinylIcon className="vinyl-repeat-glyph" source={repeatIcon} />
         </span>

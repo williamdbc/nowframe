@@ -120,7 +120,6 @@ describe('PosterPlayerTheme', () => {
     expect(screen.getByText('3:14')).toBeVisible()
   })
 
-  /** O volume não fica na tela: o ícone abre o painel desenhado no Figma. */
   it('opens the volume panel from the transport icon', async () => {
     const user = userEvent.setup()
     renderTheme()
@@ -162,11 +161,6 @@ describe('PosterPlayerTheme', () => {
     expect(screen.getByRole('button', { name: 'Volume' })).toBeDisabled()
   })
 
-  /**
-   * A amostragem da capa usa canvas, que o jsdom não executa, então aqui vale o destaque
-   * neutro: o que se verifica é que o tema publica os dois tokens e o lado do contraste,
-   * que é o contrato que o CSS consome.
-   */
   it('publishes the accent and readable colour as tokens on the root', () => {
     renderTheme()
 
@@ -177,11 +171,6 @@ describe('PosterPlayerTheme', () => {
     expect(root).toHaveAttribute('data-contrast', 'light-on-dark')
   })
 
-  /**
-   * O arquivo do Figma traz o verde do Spotify assado no `fill`. Como <img> ele ignorava
-   * a cor legível escolhida para a fileira e ficava verde sobre qualquer degradê, então
-   * aqui ele tem de ser máscara em `currentColor` como os outros.
-   */
   it('renders the saved icon as a mask so it follows the readable colour', () => {
     renderTheme()
 
@@ -191,8 +180,7 @@ describe('PosterPlayerTheme', () => {
 
     const glyph = saved.querySelector('.poster-icon') as HTMLElement
     expect(glyph).not.toBeNull()
-    // O verde segue dentro do arquivo — o que importa é que ele agora está numa máscara,
-    // que descarta a cor da fonte e pinta com o `currentColor` do botão.
+
     expect(glyph.style.maskImage).toContain('%231ED760')
     expect(glyph.style.maskImage).toContain('data:image/svg+xml')
   })

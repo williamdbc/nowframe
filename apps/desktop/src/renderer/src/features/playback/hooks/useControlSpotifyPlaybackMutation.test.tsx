@@ -182,7 +182,6 @@ describe('useControlSpotifyPlaybackMutation', () => {
     const attemptsAfterLadder = getCurrentPlaybackSpy.mock.calls.length
     expect(attemptsAfterLadder).toBe(4)
 
-    // O ladder é limitado: passado o último offset, nenhuma tentativa nova acontece.
     await act(() => vi.advanceTimersByTimeAsync(10_000))
     expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(attemptsAfterLadder)
   })
@@ -212,11 +211,6 @@ describe('useControlSpotifyPlaybackMutation', () => {
     expect(getCurrentPlaybackSpy).toHaveBeenCalled()
   })
 
-  /**
-   * Sem o `stateChangedAt`, avançar para a mesma faixa (repeat, ou a mesma música duas vezes
-   * seguidas na fila) não é distinguível de uma resposta obsoleta: a chave de conteúdo é
-   * igual e o progresso não regrediu o bastante.
-   */
   it('detects a change to the same content through the Spotify state timestamp', async () => {
     vi.useFakeTimers()
     const previousPlayback = { ...playback, progressMs: 1_000, stateChangedAt: 111 }
@@ -235,7 +229,7 @@ describe('useControlSpotifyPlaybackMutation', () => {
     await act(() => vi.advanceTimersByTimeAsync(2_000))
 
     expect(queryClient.getQueryData(spotifyPlaybackQueryKeys.current())).toEqual(restartedPlayback)
-    // Saiu na primeira tentativa, sem precisar percorrer o ladder inteiro.
+
     expect(getCurrentPlaybackSpy).toHaveBeenCalledTimes(1)
   })
 })

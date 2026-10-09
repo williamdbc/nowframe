@@ -82,7 +82,6 @@ describe('getSpotifyPlaybackRefetchInterval', () => {
   })
 
   it('counts the time elapsed since synchronization when predicting the boundary', () => {
-    // 110 s de 120 s na âncora: fora da janela. Passados 8 s, está dentro.
     expect(getSpotifyPlaybackRefetchInterval(withTrack(110_000, 120_000), 0, 1_000)).toBe(
       activePlaybackRefetchIntervalMs
     )

@@ -83,7 +83,6 @@ describe('PlaybackProgressControl', () => {
     fireEvent.keyDown(slider, { key: 'ArrowRight' })
     fireEvent.keyUp(slider, { key: 'ArrowRight' })
 
-    // Sem âncora no relógio, a pintura parte da posição recebida por prop: 30 s + 5 s.
     expect(onSeek).toHaveBeenCalledWith(35_000)
   })
 

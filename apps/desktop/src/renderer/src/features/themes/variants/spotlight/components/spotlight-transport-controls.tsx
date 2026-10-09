@@ -55,8 +55,6 @@ export function SpotlightTransportControls({
           <SpotlightIcon className="size-full" source={previousIcon} />
         </button>
 
-        {/* Diferente do Ambient, o play não é uma pílula branca: é o mesmo botão
-            dos outros, só com o glifo maior que o Figma pede. */}
         <button
           className="spotlight-control spotlight-control--lg"
           type="button"
@@ -69,7 +67,7 @@ export function SpotlightTransportControls({
             data-state={isPlaying ? 'playing' : 'paused'}
           >
             <SpotlightIcon className="size-full" source={pauseIcon} data-icon="pause" />
-            {/* O Figma entrega apenas o estado tocando, sem glifo de play. */}
+
             <Play
               aria-hidden="true"
               className="size-full translate-x-[2%]"
@@ -101,8 +99,6 @@ export function SpotlightTransportControls({
         disabled={controls.isPlaybackOptionPending || !playback?.capabilities.canToggleRepeat}
         onClick={controls.onCycleRepeat}
       >
-        {/* O SVG tem 24x32: o ponto de "repetição ligada" fica abaixo do glifo e
-            só escapa do recorte quando o modo está ativo. */}
         <span className="spotlight-repeat-clip size-full">
           <SpotlightIcon className="spotlight-repeat-glyph" source={repeatIcon} />
         </span>

@@ -6,6 +6,7 @@ import { registerAppIpcHandlers } from './ipc/register-app-ipc-handlers'
 import { registerLyricsIpcHandlers } from './ipc/register-lyrics-ipc-handlers'
 import { registerSpotifyIpcHandlers } from './ipc/register-spotify-ipc-handlers'
 import { registerWindowIpcHandlers } from './ipc/register-window-ipc-handlers'
+import { registerDemoCursorIpcHandlers } from './ipc/register-demo-cursor-ipc-handlers'
 import { createMainWindow } from './windows/create-main-window'
 
 void app.whenReady().then(() => {
@@ -20,6 +21,7 @@ void app.whenReady().then(() => {
   registerLyricsIpcHandlers()
   registerSpotifyIpcHandlers()
   registerWindowIpcHandlers()
+  registerDemoCursorIpcHandlers()
   createMainWindow()
 
   app.on('activate', () => {

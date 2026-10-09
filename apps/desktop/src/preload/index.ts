@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import type { IpcRendererEvent } from 'electron'
 
 import { ipcChannels, type NowframeApi, type WindowState } from '../contracts/nowframe-api'
+import { demoCursorChannels, type DemoCursorApi } from '../contracts/demo-cursor-api'
 
 const nowframeApi: NowframeApi = {
   app: {
@@ -52,3 +53,12 @@ const nowframeApi: NowframeApi = {
 }
 
 contextBridge.exposeInMainWorld('nowframe', nowframeApi)
+
+const demoCursorApi: DemoCursorApi = {
+  prepare: () => ipcRenderer.invoke(demoCursorChannels.prepare),
+  move: (x, y, duration) => ipcRenderer.invoke(demoCursorChannels.move, x, y, duration),
+  click: (x, y) => ipcRenderer.invoke(demoCursorChannels.click, x, y),
+  stop: () => ipcRenderer.invoke(demoCursorChannels.stop)
+}
+
+contextBridge.exposeInMainWorld('nowframeDemo', demoCursorApi)
