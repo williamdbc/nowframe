@@ -7,6 +7,7 @@ import { availableThemes } from '@/features/themes/core/theme-registry'
 import type { PlayerThemeId } from '@/features/themes/core/types/player-theme'
 
 import { installThemeShowcase, runThemeShowcase } from './showcase-themes'
+import type { DemoCursorApi } from '../../src/contracts/demo-cursor-api'
 
 afterEach(() => vi.useRealTimers())
 
@@ -76,6 +77,25 @@ it('stops before selecting a theme when interrupted during the countdown', async
   const run = runThemeShowcase(document.createElement('div'), controller.signal)
   controller.abort()
   await expect(run).rejects.toMatchObject({ name: 'AbortError' })
+  expect(screen.getByRole('button', { name: 'Ambient' })).toHaveAttribute('aria-expanded', 'false')
+})
+
+it('does not fall back to DOM clicks if native mouse permission is denied', async () => {
+  render(<DemoPage />)
+  const forbidden = async (): Promise<void> => {
+    throw new Error('unexpected mouse command')
+  }
+  const nativeCursor: DemoCursorApi = {
+    prepare: async () => {
+      throw new Error('Accessibility permission denied')
+    },
+    move: forbidden,
+    click: forbidden,
+    stop: async () => {}
+  }
+  await expect(
+    runThemeShowcase(null, new AbortController().signal, undefined, nativeCursor)
+  ).rejects.toThrow('Accessibility permission denied')
   expect(screen.getByRole('button', { name: 'Ambient' })).toHaveAttribute('aria-expanded', 'false')
 })
 
