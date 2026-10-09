@@ -1,7 +1,7 @@
 {
   "name": "nowframe-desktop",
   "productName": "Nowframe",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "A customizable second screen for your music.",
   "main": "./out/main/index.js",
   "author": "William",
